@@ -5,7 +5,7 @@ void entityLogic() {
 			/*The AI state machine starts here.*/
 
 			case 1: //The player.
-				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
 				for (register j=0; j<7; j++) { //number of pixels to move per frame.
 					if (keyboard[SDL_SCANCODE_RIGHT]) {
@@ -64,29 +64,41 @@ void entityLogic() {
 				fastMoveX(&entSet[i], -1, 8);
 				fastMoveY(&entSet[i], -1, 8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
-				else entSet[i].behaviourId=entSet[i].status[0];
-				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 6:
 				fastMoveX(&entSet[i], 1, 8);
 				fastMoveY(&entSet[i], -1, 8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
-				else entSet[i].behaviourId=entSet[i].status[0];
-				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 7:
 				fastMoveX(&entSet[i], -1, 8);
 				fastMoveY(&entSet[i], 1, 8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
-				else entSet[i].behaviourId=entSet[i].status[0];
-				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 8:
 				fastMoveX(&entSet[i], 1, 8);
 				fastMoveY(&entSet[i], 1, 8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
-				else entSet[i].behaviourId=entSet[i].status[0];
-				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 		}
 	}

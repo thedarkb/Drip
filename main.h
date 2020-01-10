@@ -84,6 +84,7 @@ void entityReset();
 void entitySpawn(entity in);
 void nentityReset();
 void nentitySpawn(entity in);
+void deadEntityCleaner();
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
 unsigned int get_diff (int val1, int val2);

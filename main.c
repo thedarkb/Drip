@@ -49,34 +49,48 @@ void nentitySpawn(entity in) {
 	nspawnSlot++;
 }
 
+void deadEntityCleaner() {
+	for (register i=0; i<spawnSlot; i++) {
+		if(entSet[i].health==0) entSet[i].behaviourId=0;
+	}
+}
+
 void spriteCollisions() {
 	for (register i=0; i<spawnSlot; i++) {
 		for (register j=0; j<spawnSlot; j++) {
-			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && entSet[j].collisionClass != entSet[i].collisionClass) {
-				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) {
+			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && entSet[j].collisionClass != entSet[i].collisionClass) { //Checks for X overlap and class conflicts.
+				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) { //Checks for Y overlap.
 					if(entSet[i].collisionClass == 2) {
 						if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
 							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
+								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
 								entSet[j].status[0]=entSet[j].behaviourId;
 								entSet[j].behaviourId=5; //up left
+								entSet[j].collisionClass=entSet[i].collisionClass;
 							}
 							else {
+								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
 								entSet[j].status[0]=entSet[j].behaviourId;
 								entSet[j].behaviourId=6; //up right
+								entSet[j].collisionClass=entSet[i].collisionClass;
 							}
 						}
 						else {
 							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
+								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
 								entSet[j].status[0]=entSet[j].behaviourId;
 								entSet[j].behaviourId=7; //down left
+								entSet[j].collisionClass=entSet[i].collisionClass;
 							}
 							else {
+								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
 								entSet[j].status[0]=entSet[j].behaviourId;
 								entSet[j].behaviourId=8; //down right
+								entSet[j].collisionClass=entSet[i].collisionClass;
 							}
 						}												
 					}
