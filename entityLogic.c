@@ -27,8 +27,7 @@ void entityLogic() {
 					if (pmotion == 0) entSet[i].animation=0;
 
 					if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
-					if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(s, 0);
-                            
+					if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);                            
 
 					if (entSet[i].y < 1) scroll = 1;
 					if (entSet[i].y+TS > TS*SH-1) scroll=2;

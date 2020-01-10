@@ -49,6 +49,39 @@ void nentitySpawn(entity in) {
 	nspawnSlot++;
 }
 
+void spriteCollisions() {
+	for (register i=0; i<spawnSlot; i++) {
+		for (register j=0; j<spawnSlot; j++) {
+			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && (entSet[i].collisionClass & BIT(7))) {
+				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) {
+					if(entSet[j].collisionClass & BIT(0)) {
+						if(entSet[j].x>entSet[i].x) {
+							for (register s=0; s<entSet[i].attack*50; s++) {
+								moveX(&entSet[0], 1);
+							}
+						}
+						else {
+							for (register s=0; s<entSet[i].attack*50; s++) {
+								moveX(&entSet[0], -1);
+							}
+						}
+						if(entSet[j].y>entSet[0].y) {
+							for (register s=0; s<entSet[i].attack*50; s++) {
+								moveY(&entSet[0], 1);
+							}
+						}
+						else {
+							for (register s=0; s<entSet[i].attack*50; s++) {
+								moveY(&entSet[0], -1);
+							}
+						}							
+					}
+				}
+			}
+		}
+	}
+}
+
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {
 	for (register x=0; x<SW; x++) {
 		for (register y=0; y<SH; y++) {
@@ -83,7 +116,7 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 int main () {
 	printf("Scroll status: %u\n", ENABLESCROLL);
 	SDL_Init(SDL_INIT_VIDEO);
-	w = SDL_CreateWindow("Test", 0, 0, SW*TS, SH*TS, SDL_WINDOW_OPENGL);
+	w = SDL_CreateWindow("Eastward Bound", 0, 0, SW*TS, SH*TS, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	s = SDL_GetWindowSurface(w);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
@@ -228,112 +261,8 @@ void snapToGrid(entity* movEnt) {
 }
 
 void loop() {
-	if (scroll != 0) {
-		int checkX = entSet[0].x;
-		int checkY = entSet[0].y;
-		switch (scroll) {
-			case 1:
-			sY--;
-			SDL_BlitSurface(s, NULL, scrollLayer, NULL);
-			worldgen(sX,sY);
-			checkY=TS*SH-5;
-			if (nlayers[checkX][checkY] == 0 && nlayers[checkX+TS/2][checkY] == 0 && nlayers[checkX+TS][checkY] == 0 ) {
-				entSet[0].x=checkX;
-				memcpy(&cScreen, &nScreen, sizeof nScreen);
-				memcpy(&layers, &nlayers, sizeof nlayers);
-				memcpy(&entSet, &nentSet, sizeof nentSet);
-				spawnSlot=nspawnSlot;
-				bgDraw();
-				#ifndef NOSCROLL
-					for (register i=0; i<SH*TS; i+=5) {
-						if(entSet[0].y<TS*SH-TS) entSet[0].y=entSet[0].y+5;
-						image(bgLayer,0,i-SH*TS,SW*TS,SH*TS);
-						image(scrollLayer,0,i,SW*TS,SH*TS);
-						flip();
-					}
-				#endif
-				entSet[0].y=TS*SH-TS-1;
-			}
-			else sY++;
-			scroll=0;
-			break;
-			case 2:
-			sY++;
-			SDL_BlitSurface(s, NULL, scrollLayer, NULL);
-			worldgen(sX,sY);
-			checkY=5;
-			if (nlayers[checkX][checkY] == 0 && nlayers[checkX+TS/2][checkY] == 0 && nlayers[checkX+TS][checkY] == 0 ) {
-				entSet[0].x=checkX;
-				memcpy(&cScreen, &nScreen, sizeof nScreen);
-				memcpy(&layers, &nlayers, sizeof nlayers);
-				memcpy(&entSet, &nentSet, sizeof nentSet);
-				spawnSlot=nspawnSlot;
-				bgDraw();
-				#ifndef NOSCROLL
-					for (register i=SH*TS; i>0; i=i-5) {
-						if(entSet[0].y>0) entSet[0].y=entSet[0].y-5;
-						image(bgLayer,0,i,SW*TS,SH*TS);
-						image(scrollLayer,0,i-SH*TS,SW*TS,SH*TS);
-						flip();
-					}
-				#endif
-				entSet[0].y=1;
-			}
-			else sY--;
-			scroll=0;
-			break;
-			case 3:
-			sX--;
-			SDL_BlitSurface(s, NULL, scrollLayer, NULL);
-			worldgen(sX,sY);
-			checkX=TS*SW-5;
-			if (nlayers[checkX][checkY] == 0 && nlayers[checkX][checkY+TS/2] == 0 && nlayers[checkX][checkY+TS] == 0 ) {
-				memcpy(&cScreen, &nScreen, sizeof nScreen);
-				memcpy(&layers, &nlayers, sizeof nlayers);
-				memcpy(&entSet, &nentSet, sizeof nentSet);
-				spawnSlot=nspawnSlot;
-				bgDraw();
-				#ifndef NOSCROLL
-					for (register i=0; i<SW*TS; i+=5) {
-						if(entSet[0].x<SW*TS-TS) entSet[0].x+=5;
-						image(bgLayer,i-SW*TS,0,SW*TS,SH*TS);
-						image(scrollLayer,i,0,SW*TS,SH*TS);
-						flip();
-					}
-				#endif
-				entSet[0].x=TS*SW-TS;
-			}
-			else sX++;
-			scroll=0;
-			break;
-			case 4:
-			sX++;
-			SDL_BlitSurface(s, NULL, scrollLayer, NULL);
-			worldgen(sX,sY);
-			checkX=5;
-			if (nlayers[checkX][checkY] == 0 && nlayers[checkX][checkY+TS/2] == 0 && nlayers[checkX][checkY+TS] == 0 ) {
-				//entSet[0].x=checkX;
-				memcpy(&cScreen, &nScreen, sizeof nScreen);
-				memcpy(&layers, &nlayers, sizeof nlayers);
-				memcpy(&entSet, &nentSet, sizeof nentSet);
-				spawnSlot=nspawnSlot;
-				bgDraw();
-				#ifndef NOSCROLL
-					for (register i=SW*TS; i>0; i-=5) {
-						if(entSet[0].x>0) entSet[0].x-=5;
-						image(bgLayer,i,0,SW*TS,SH*TS);
-						image(scrollLayer,i-SW*TS,0,SW*TS,SH*TS);
-						flip();
-					}
-				#endif
-				entSet[0].x=1;
-			}
-			else sX--;
-			scroll=0;
-			break;
-		}
-
-	}
+	if (scroll != 0) scrollMap();
+	
 	if (refresh != 0) {
 		worldgen(sX,sY);
 		memcpy(&cScreen, &nScreen, sizeof nScreen);
@@ -342,6 +271,7 @@ void loop() {
 		refresh=0;
 	}
 	image(bgLayer,0,0,SW*TS,SH*TS);
+	spriteCollisions();
 	entityLogic();
 	flip();
 	if(animationG<30) animationG+=2;

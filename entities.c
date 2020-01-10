@@ -20,6 +20,7 @@ entity ent_player() {
 	me.xSub=14;
 	me.ySub=1;
 	me.direction=1;
+	me.collisionClass=BIT(0);
 	me.frame[0]=148;
 	me.frame[1]=124;
 	me.frame[2]=132;
@@ -41,6 +42,8 @@ entity ent_aitest() {
 	me.xSub=2;
 	me.ySub=10;
 	me.direction=1;
+	me.attack=2;
+	me.collisionClass=BIT(7);
 	me.frame[0]=177;
 	me.frame[1]=153;
 	me.frame[2]=161;

@@ -40,6 +40,8 @@ typedef struct entity {
 	unsigned int behaviourId;
 	unsigned char direction;
 	unsigned char animation;
+	unsigned char collisionClass;
+	unsigned char attack;
 	uint32_t status;
 	uint16_t health;
 	unsigned char inventory[INVLIMIT];
@@ -88,6 +90,7 @@ unsigned int get_diff (int val1, int val2);
 uint32_t lfsr (uint32_t shift);
 void setCollision(int iX, int iY, char stat);
 void worldgen(uint16_t xPos, uint16_t yPos);
+void scrollMap();
 void image(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
