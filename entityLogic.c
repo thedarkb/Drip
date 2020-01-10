@@ -58,7 +58,36 @@ void entityLogic() {
 				entSet[i].animation=0;
 				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 				if(get_diff(entSet[i].x,entSet[0].x) < TS*2 && get_diff(entSet[i].y,entSet[0].y) < TS*2) entSet[i].behaviourId=3;
-			break; //End wait state.		
+			break; //End wait state.
+
+			case 5:
+				fastMoveX(&entSet[i], -1, 8);
+				fastMoveY(&entSet[i], -1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else entSet[i].behaviourId=entSet[i].status[0];
+				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+			break;
+			case 6:
+				fastMoveX(&entSet[i], 1, 8);
+				fastMoveY(&entSet[i], -1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else entSet[i].behaviourId=entSet[i].status[0];
+				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+			break;
+			case 7:
+				fastMoveX(&entSet[i], -1, 8);
+				fastMoveY(&entSet[i], 1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else entSet[i].behaviourId=entSet[i].status[0];
+				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+			break;
+			case 8:
+				fastMoveX(&entSet[i], 1, 8);
+				fastMoveY(&entSet[i], 1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else entSet[i].behaviourId=entSet[i].status[0];
+				image(tileset[ANIMPARSE], PRESENTENT.x, entSet[i].y, TS, TS);
+			break;
 		}
 	}
 }

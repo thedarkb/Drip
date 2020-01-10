@@ -52,29 +52,33 @@ void nentitySpawn(entity in) {
 void spriteCollisions() {
 	for (register i=0; i<spawnSlot; i++) {
 		for (register j=0; j<spawnSlot; j++) {
-			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && (entSet[i].collisionClass & BIT(7))) {
+			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && entSet[j].collisionClass != entSet[i].collisionClass) {
 				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) {
-					if(entSet[j].collisionClass & BIT(0)) {
-						if(entSet[j].x>entSet[i].x) {
-							for (register s=0; s<entSet[i].attack*50; s++) {
-								moveX(&entSet[0], 1);
+					if(entSet[i].collisionClass == 2) {
+						if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
+							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
+								entSet[j].status[1]=10;
+								entSet[j].status[0]=entSet[j].behaviourId;
+								entSet[j].behaviourId=5; //up left
+							}
+							else {
+								entSet[j].status[1]=10;
+								entSet[j].status[0]=entSet[j].behaviourId;
+								entSet[j].behaviourId=6; //up right
 							}
 						}
 						else {
-							for (register s=0; s<entSet[i].attack*50; s++) {
-								moveX(&entSet[0], -1);
+							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
+								entSet[j].status[1]=10;
+								entSet[j].status[0]=entSet[j].behaviourId;
+								entSet[j].behaviourId=7; //down left
 							}
-						}
-						if(entSet[j].y>entSet[0].y) {
-							for (register s=0; s<entSet[i].attack*50; s++) {
-								moveY(&entSet[0], 1);
+							else {
+								entSet[j].status[1]=10;
+								entSet[j].status[0]=entSet[j].behaviourId;
+								entSet[j].behaviourId=8; //down right
 							}
-						}
-						else {
-							for (register s=0; s<entSet[i].attack*50; s++) {
-								moveY(&entSet[0], -1);
-							}
-						}							
+						}												
 					}
 				}
 			}
@@ -251,6 +255,18 @@ void moveY(entity* movEnt, char amount) {
 	if (collisionCheck((*movEnt).x+TS/2, check+TS-(*movEnt).ySub)) return;	
 	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+TS-(*movEnt).ySub)) return;	
 	(*movEnt).y = check;
+}
+
+void fastMoveX(entity* movEnt, char direction, char speed) {
+	for (register i=0; i<speed; i++) {
+		moveX(movEnt, direction);
+	}
+}
+
+void fastMoveY(entity* movEnt, char direction, char speed) {
+	for (register i=0; i<speed; i++) {
+		moveY(movEnt, direction);
+	}
 }
 
 void snapToGrid(entity* movEnt) {

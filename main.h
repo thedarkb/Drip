@@ -42,7 +42,7 @@ typedef struct entity {
 	unsigned char animation;
 	unsigned char collisionClass;
 	unsigned char attack;
-	uint32_t status;
+	unsigned char status[4];
 	uint16_t health;
 	unsigned char inventory[INVLIMIT];
 	unsigned char frame[FLIMIT];
@@ -98,6 +98,8 @@ void flip();
 char collisionCheck(int x, int y);
 void moveX(entity* movEnt, char amount);
 void moveY(entity* movEnt, char amount);
+void fastMoveX(entity* movEnt, char direction, char speed);
+void fastMoveY(entity* movEnt, char direction, char speed);
 void snapToGrid(entity* movEnt);
 void entityLogic();
 void loop();
