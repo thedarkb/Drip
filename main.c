@@ -2,6 +2,7 @@
 #include <emscripten.h>
 #endif
 #include <SDL2/SDL_image.h>
+#include <assert.h>
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "main.h"
@@ -11,14 +12,14 @@
 #include "entityLogic.c"
 
 void entityInitialise() {
-	for (register i=0; i<ELIMIT; i++) {
+	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
 	}
 	entSet[0]=ent_player();
 }
 
 void entityReset() {
-	for (register i=1; i<ELIMIT; i++) {
+	for (int i=1; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
 	}
 	spawnSlot=1;
@@ -34,7 +35,7 @@ void entitySpawn(entity in) {
 }
 
 void nentityReset() {
-	for (register i=1; i<ELIMIT; i++) {
+	for (int i=1; i<ELIMIT; i++) {
 		memset(&nentSet[i], 0, sizeof entSet[i]);
 	}
 	nspawnSlot=1;
@@ -50,7 +51,7 @@ void nentitySpawn(entity in) {
 }
 
 void deadEntityCleaner() {
-	for (register i=0; i<spawnSlot; i++) {
+	for (int i=0; i<spawnSlot; i++) {
 		if(entSet[i].health==0) {
 			entSet[i].behaviourId=255;
 			entSet[i].collisionClass=0;
@@ -59,8 +60,8 @@ void deadEntityCleaner() {
 }
 
 void spriteCollisions() {
-	for (register i=0; i<spawnSlot; i++) {
-		for (register j=0; j<spawnSlot; j++) {
+	for (int i=0; i<spawnSlot; i++) {
+		for (int j=0; j<spawnSlot; j++) {
 			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && entSet[j].collisionClass != entSet[i].collisionClass && entSet[j].collisionClass<128 && entSet[j].collisionClass!=0 ){ //Checks for X overlap and class conflicts.
 				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) { //Checks for Y overlap.
 					switch (entSet[i].collisionClass) {
@@ -143,13 +144,13 @@ void spriteCollisions() {
 }
 
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {
-	for (register x=0; x<SW; x++) {
-		for (register y=0; y<SH; y++) {
+	for (int x=0; x<SW; x++) {
+		for (int y=0; y<SH; y++) {
 			if(collisions[x][y]>0) setCollision(x,y,collisions[x][y]);
 		}
 	}
-	for (register x=0; x<SW; x++) {
-		for (register y=0; y<SH; y++) {
+	for (int x=0; x<SW; x++) {
+		for (int y=0; y<SH; y++) {
 			printf("X: %u\n", x);
 			printf("Y: %u\n", y);
 			printf("Entity: %u\n", entities[x][y]);
@@ -186,15 +187,15 @@ int main () {
 
 	loader = IMG_Load("sheet.png"); //tilesheet
 
-	for (register x=0; x<SW; x++) {
-		for (register y=0; y<SH; y++) {
+	for (int x=0; x<SW; x++) {
+		for (int y=0; y<SH; y++) {
 			setCollision(x,y,0);
 		}
 	}
 
 	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
 	tile size as stored, fifth is for the tile number. It reads from the */
-	for (register i = 0; i<TILECOUNT; i++) {
+	for (int i = 0; i<TILECOUNT; i++) {
 		tileset[i] = surfLoader (loader, SHEETX, SHEETY, 16, 64, i);
 		SDL_SetColorKey(tileset[i], SDL_TRUE, 0x00FF00);
 	}
@@ -210,6 +211,7 @@ int main () {
 		SDL_PollEvent(&keyIn);
 		if (keyIn.type == SDL_QUIT) goto quit;
 		loop();
+		assert(ent_sword(1,1,1,0).behaviourId==9);
 	}
 	quit:
 	#endif
@@ -226,7 +228,7 @@ unsigned int get_diff (int val1, int val2) {
 }
 
 uint32_t lfsr (uint32_t shift) {
-	for (register i=0; i<32; i++) {
+	for (int i=0; i<32; i++) {
 		shift ^= (shift >> 31);
 		shift ^= (shift >> 31) << 4;
 		shift ^= (shift >> 31) << 5;
@@ -241,8 +243,8 @@ uint32_t getrandom() {
 }
 
 void setCollision(int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
-	for (register x=1; x<TS-1; x++) {
-		for (register y=1; y<TS-1; y++) {
+	for (int x=1; x<TS-1; x++) {
+		for (int y=1; y<TS-1; y++) {
 			nlayers[(iX*TS)+x][(iY*TS)+y] = stat; 
 		}
 	}
@@ -259,8 +261,8 @@ void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) {
 }
 
 void bgDraw () {
-	for (register x=0; x<SW; x++) {
-		for (register y=0; y<SH; y++) {
+	for (int x=0; x<SW; x++) {
+		for (int y=0; y<SH; y++) {
 			bgBlit(tileset[cScreen[x][y]],x*TS,y*TS,TS,TS);
 		}
 	}
@@ -314,13 +316,13 @@ void moveY(entity* movEnt, char amount) {
 }
 
 void fastMoveX(entity* movEnt, char direction, char speed) {
-	for (register i=0; i<speed; i++) {
+	for (int i=0; i<speed; i++) {
 		moveX(movEnt, direction);
 	}
 }
 
 void fastMoveY(entity* movEnt, char direction, char speed) {
-	for (register i=0; i<speed; i++) {
+	for (int i=0; i<speed; i++) {
 		moveY(movEnt, direction);
 	}
 }

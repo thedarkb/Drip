@@ -1,15 +1,19 @@
 void entityLogic() {
-	for (register i=0; i<spawnSlot; i++) {
-		switch(entSet[i].behaviourId) {
-
-			/*The AI state machine starts here.*/
+	for (int i=0; i<spawnSlot; i++) { //Bottom entity layer, affectionately known as the corpse pit.
+		switch (entSet[i].behaviourId) {
 			case 255:
 				if (entSet[i].deathframe != 0) image(tileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
-			break;		
+			break;	
+		}
+	}
+	for (int i=0; i<spawnSlot; i++) {
+		switch(entSet[i].behaviourId) {
+
+			/*The AI state machine starts here.*/	
 			case 1: //The player.
 				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
-				for (register j=0; j<7; j++) { //number of pixels to move per frame.
+				for (int j=0; j<7; j++) { //number of pixels to move per frame.
 					if (entSet[i].status[3]==0) {
 						if (keyboard[SDL_SCANCODE_RIGHT]) {
 							moveX(&entSet[i], 1);
@@ -38,6 +42,12 @@ void entityLogic() {
 					}	
 
 					if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
+					if (keyboard[SDL_SCANCODE_J]) {
+						unsigned char* aP = &entSet[0];
+						for (int k=0; k< sizeof entSet[0]; k++) {
+							printf("%u\n", aP[k]);
+						}
+					}
 					if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);                            
 
 					if (entSet[i].y < 1) scroll = 1;
@@ -57,7 +67,7 @@ void entityLogic() {
 
 			case 3://Chase state.
 				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE live in main.h
-				for (register j=0; j<4; j++) {
+				for (int j=0; j<4; j++) {
 					if (entSet[0].x > entSet[i].x) moveX(&entSet[i], 1);
 					if (entSet[0].x < entSet[i].x) moveX(&entSet[i], -1);
 					if (entSet[0].y > entSet[i].y) moveY(&entSet[i], 1);

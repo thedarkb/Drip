@@ -4,7 +4,7 @@
 
 #define ENABLESCROLL 0
 
-#define ELIMIT 100
+#define ELIMIT 32
 #define FLIMIT 32
 #define INVLIMIT 8
 #define ENTFRAMES 32

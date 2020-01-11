@@ -14,6 +14,7 @@ IF YOU DON'T FILL ALL OF THESE, YOU'LL GET UNDEFINED BEHAVIOUR.*/
 
 entity ent_player() {
 	entity me;
+	memset(&me, 0, sizeof me);
 	me.behaviourId=1;
 	me.x=280;
 	me.y=20;
@@ -66,6 +67,7 @@ entity ent_aitest() {
 
 entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char creator) {
 	entity me;
+	memset(&me, 0, sizeof me);
 	switch(direction){
 		case 0:
 			me.y-=TS;
@@ -92,6 +94,7 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	me.frame[1]=67;
 	me.frame[2]=67;
 	me.frame[3]=67;
+	me.health=255;
 	me.status[0]=10;
 	me.status[1]=creator;
 	me.behaviourId=9;
