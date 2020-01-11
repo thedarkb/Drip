@@ -51,16 +51,20 @@ void nentitySpawn(entity in) {
 
 void deadEntityCleaner() {
 	for (register i=0; i<spawnSlot; i++) {
-		if(entSet[i].health==0) entSet[i].behaviourId=0;
+		if(entSet[i].health==0) {
+			entSet[i].behaviourId=255;
+			entSet[i].collisionClass=0;
+		}
 	}
 }
 
 void spriteCollisions() {
 	for (register i=0; i<spawnSlot; i++) {
 		for (register j=0; j<spawnSlot; j++) {
-			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && entSet[j].collisionClass != entSet[i].collisionClass) { //Checks for X overlap and class conflicts.
+			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && entSet[j].collisionClass != entSet[i].collisionClass && entSet[j].collisionClass<128 && entSet[j].collisionClass!=0 ){ //Checks for X overlap and class conflicts.
 				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) { //Checks for Y overlap.
-					if(entSet[i].collisionClass == 2) {
+					switch (entSet[i].collisionClass) {
+						case 2:
 						if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
 							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 								entSet[j].status[2]=entSet[j].collisionClass;
@@ -92,7 +96,45 @@ void spriteCollisions() {
 								entSet[j].behaviourId=8; //down right
 								entSet[j].collisionClass=entSet[i].collisionClass;
 							}
-						}												
+						}
+						break;
+						case 129:
+							printf("Collision");
+							switch(entSet[i].direction) {
+								case 0:
+									entSet[j].status[2]=entSet[j].collisionClass;
+									entSet[j].status[1]=10;
+									entSet[j].status[0]=entSet[j].behaviourId;
+									entSet[j].behaviourId=6; //up right
+									entSet[j].collisionClass=entSet[i].collisionClass;
+								break;
+								case 1:
+									entSet[j].status[2]=entSet[j].collisionClass;
+									entSet[j].status[1]=10;
+									entSet[j].status[0]=entSet[j].behaviourId;
+									entSet[j].behaviourId=8; //down right
+									entSet[j].collisionClass=entSet[i].collisionClass;
+								break;
+								case 2:
+									entSet[j].status[2]=entSet[j].collisionClass;
+									entSet[j].status[1]=10;
+									entSet[j].status[0]=entSet[j].behaviourId;
+									entSet[j].behaviourId=7; //down left
+									entSet[j].collisionClass=entSet[i].collisionClass;
+								break;
+								case 3:
+									entSet[j].status[2]=entSet[j].collisionClass;
+									entSet[j].status[1]=10;
+									entSet[j].status[0]=entSet[j].behaviourId;
+									entSet[j].behaviourId=5; //up left
+									entSet[j].collisionClass=entSet[i].collisionClass;
+								break;
+								if (entSet[entSet[i].status[1]].attack > entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
+								else entSet[j].health=0;									
+							}
+							if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
+							else entSet[j].health=0;
+						break;									
 					}
 				}
 			}
@@ -134,7 +176,7 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 int main () {
 	printf("Scroll status: %u\n", ENABLESCROLL);
 	SDL_Init(SDL_INIT_VIDEO);
-	w = SDL_CreateWindow("Eastward Bound", 0, 0, SW*TS, SH*TS, SDL_WINDOW_OPENGL);
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS, SH*TS, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	s = SDL_GetWindowSurface(w);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
@@ -301,6 +343,7 @@ void loop() {
 		refresh=0;
 	}
 	image(bgLayer,0,0,SW*TS,SH*TS);
+	deadEntityCleaner();
 	spriteCollisions();
 	entityLogic();
 	flip();

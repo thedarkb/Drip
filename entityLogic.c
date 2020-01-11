@@ -3,28 +3,39 @@ void entityLogic() {
 		switch(entSet[i].behaviourId) {
 
 			/*The AI state machine starts here.*/
-
+			case 255:
+				if (entSet[i].deathframe != 0) image(tileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
+			break;		
 			case 1: //The player.
 				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
 				for (register j=0; j<7; j++) { //number of pixels to move per frame.
-					if (keyboard[SDL_SCANCODE_RIGHT]) {
-						moveX(&entSet[i], 1);
-						pmotion=1;
-					}
-					if (keyboard[SDL_SCANCODE_LEFT]) {
-						moveX(&entSet[i], -1);
-						pmotion=1;
-					}						
-					if (keyboard[SDL_SCANCODE_UP]) {
-						moveY(&entSet[i], -1);
-						pmotion=1;
-					}
-					if (keyboard[SDL_SCANCODE_DOWN]) {
-						moveY(&entSet[i], 1);
-						pmotion=1;
-					}
-					if (pmotion == 0) entSet[i].animation=0;
+					if (entSet[i].status[3]==0) {
+						if (keyboard[SDL_SCANCODE_RIGHT]) {
+							moveX(&entSet[i], 1);
+							pmotion=1;
+						}
+						if (keyboard[SDL_SCANCODE_LEFT]) {
+							moveX(&entSet[i], -1);
+							pmotion=1;
+						}						
+						if (keyboard[SDL_SCANCODE_UP]) {
+							moveY(&entSet[i], -1);
+							pmotion=1;
+						}
+						if (keyboard[SDL_SCANCODE_DOWN]) {
+							moveY(&entSet[i], 1);
+							pmotion=1;
+						}
+						if (pmotion == 0) entSet[i].animation=0;
+
+						if (keyboard[SDL_SCANCODE_X] && entSet[i].status[3] == 0 && entSet[i].status[0] == 0) {
+							printf("Detected: %u\n", spawnSlot);
+							entitySpawn(ent_sword(entSet[i].direction, entSet[i].x, entSet[i].y, i));
+							entSet[i].status[3]=10;
+							entSet[i].status[0]=30;
+						}
+					}	
 
 					if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
 					if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);                            
@@ -33,8 +44,9 @@ void entityLogic() {
 					if (entSet[i].y+TS > TS*SH-1) scroll=2;
 					if (entSet[i].x < 1) scroll = 3;
 					if (entSet[i].x > TS*SW-TS-1) scroll = 4;
-
 				}
+				if(entSet[i].status[3]>0) entSet[i].status[3]--;
+				if(entSet[i].status[0]>0) entSet[i].status[0]--;
 			break;//End of player.
 
 
@@ -99,6 +111,31 @@ void entityLogic() {
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
 				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+			break;
+
+
+			case 9:
+				if (entSet[i].status[0]==0) entSet[i].health=0;
+				entSet[i].status[0]--;
+				switch(entSet[entSet[i].status[1]].direction) {
+					case 0:
+						entSet[i].x=entSet[entSet[i].status[1]].x;
+						entSet[i].y=entSet[entSet[i].status[1]].y-TS;
+					break;
+					case 1:
+						entSet[i].x=entSet[entSet[i].status[1]].x;
+						entSet[i].y=entSet[entSet[i].status[1]].y+TS;
+					break;
+					case 2:
+						entSet[i].x=entSet[entSet[i].status[1]].x-TS;
+						entSet[i].y=entSet[entSet[i].status[1]].y;
+					break;
+					case 3:
+						entSet[i].x=entSet[entSet[i].status[1]].x+TS;
+						entSet[i].y=entSet[entSet[i].status[1]].y;
+					break;
+				}
+				if(entSet[entSet[i].status[1]].status[3] != 0) image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 		}
 	}

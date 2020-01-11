@@ -17,14 +17,16 @@ entity ent_player() {
 	me.behaviourId=1;
 	me.x=280;
 	me.y=20;
+	me.health=100;
+	me.attack=5;
 	me.xSub=14;
 	me.ySub=1;
 	me.direction=1;
-	me.collisionClass=0;
-	me.frame[0]=148;
-	me.frame[1]=124;
-	me.frame[2]=132;
-	me.frame[3]=140;
+	me.collisionClass=1;
+	me.frame[0]=148; //up
+	me.frame[1]=124; //down
+	me.frame[2]=132; //left
+	me.frame[3]=140; //right
 	me.frame[4]=147;
 	me.frame[5]=123;
 	me.frame[6]=131;
@@ -43,6 +45,8 @@ entity ent_aitest() {
 	me.ySub=10;
 	me.direction=1;
 	me.attack=2;
+	me.deathframe=206;
+	me.health=30;
 	me.collisionClass=2;
 	me.frame[0]=177;
 	me.frame[1]=153;
@@ -60,9 +64,46 @@ entity ent_aitest() {
 	return me;
 }
 
+entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char creator) {
+	entity me;
+	switch(direction){
+		case 0:
+			me.y-=TS;
+			me.xSub=16;
+			me.ySub=1;
+		break;
+		case 1:
+			me.y+=TS;
+			me.xSub=16;
+			me.ySub=1;			
+		break;
+		case 2:
+			me.x-=TS;
+			me.xSub=1;
+			me.ySub=16;
+		break;
+		case 3:
+			me.x+=TS;
+			me.xSub=1;
+			me.ySub=16;
+		break;
+	}
+	me.frame[0]=67;
+	me.frame[1]=67;
+	me.frame[2]=67;
+	me.frame[3]=67;
+	me.status[0]=10;
+	me.status[1]=creator;
+	me.behaviourId=9;
+	me.setframe=direction;
+	me.collisionClass=129;
+	return me;
+}
+
 entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
 	entity me;
 	me.behaviourId=2;
+	me.health=1;
 	me.x=x*TS;
 	me.y=y*TS;
 	me.frame[0]=tile;
@@ -74,6 +115,8 @@ entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
 entity ent_nonsolid(unsigned char x, unsigned char y, unsigned char tile) {
 	entity me;
 	me.behaviourId=2;
+	me.collisionClass=0;
+	me.health=1;
 	me.x=x*TS;
 	me.y=y*TS;
 	me.animation=0;

@@ -8,7 +8,7 @@
 #define FLIMIT 32
 #define INVLIMIT 8
 #define ENTFRAMES 32
-#define TILECOUNT 182 //Set this to the actual number of sprites for best performance.
+#define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 30
 
 #define SHEETX 128 //Tile sheet size
@@ -18,6 +18,8 @@
 
 #define ANIMPARSE entSet[i].frame[entSet[i].direction+entSet[i].animation]
 #define PRESENTENT entSet[i]
+
+#define TITLE "Eastbound Interloper"
 
 
 SDL_Window* w = NULL;
@@ -47,6 +49,7 @@ typedef struct entity {
 	unsigned char inventory[INVLIMIT];
 	unsigned char frame[FLIMIT];
 	unsigned char setframe;
+	unsigned char deathframe;
 } entity;
 
 typedef struct screen {

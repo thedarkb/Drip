@@ -33,7 +33,6 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 	}
 	if(xPos == 0 && yPos == 0) {
 		memcpy(&nScreen, testhouse().tileLayer, sizeof nScreen);
-		//nentitySpawn(ent_techo());
 	}
 }
 
