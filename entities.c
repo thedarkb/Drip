@@ -61,6 +61,7 @@ entity ent_aitest() {
 	me.frame[9]=154;
 	me.frame[10]=162;
 	me.frame[11]=170;
+	me.drop[0]=1;
 	snapToGrid(&me);
 	return me;
 }
@@ -126,5 +127,19 @@ entity ent_nonsolid(unsigned char x, unsigned char y, unsigned char tile) {
 	me.direction=0;
 	me.frame[0]=tile;
 	me.setframe=0;
+	return me;
+}
+
+entity ent_item(unsigned int x, unsigned int y, unsigned char type) {
+	entity me;
+	memset(&me, 0, sizeof me);
+	me.health=10;
+	me.behaviourId=10;
+	me.x=x;
+	me.y=y;
+	me.frame[0]=getItemSprite(type);
+	me.setframe=0;
+	me.status[0]=type;
+	me.collisionClass=130;
 	return me;
 }

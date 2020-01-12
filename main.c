@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "main.h"
+#include "items.c"
 #include "entities.c"
 #include "maps.c"
 #include "worldgen.c"
@@ -50,11 +51,15 @@ void nentitySpawn(entity in) {
 	nspawnSlot++;
 }
 
-void deadEntityCleaner() {
+void deadEntityKiller() {
 	for (int i=0; i<spawnSlot; i++) {
 		if(entSet[i].health==0) {
 			entSet[i].behaviourId=255;
 			entSet[i].collisionClass=0;
+			if(entSet[i].drop[0] != 0) {
+				entitySpawn(ent_item(entSet[i].x, entSet[i].y, entSet[i].drop[0]));
+				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
+			}
 		}
 	}
 }
@@ -100,7 +105,7 @@ void spriteCollisions() {
 						}
 						break;
 						case 129:
-							printf("Collision");
+							printf("Collision\n");
 							switch(entSet[i].direction) {
 								case 0:
 									entSet[j].status[2]=entSet[j].collisionClass;
@@ -135,7 +140,18 @@ void spriteCollisions() {
 							}
 							if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
 							else entSet[j].health=0;
-						break;									
+						break;
+						case 130:
+							printf("I executed\n");
+							if (j != 0) break;
+							for (int k=0; k<INVLIMIT; k++) {
+								if (pInv.items[k] == 0) {
+									pInv.items[k]=entSet[i].status[0];
+									entSet[i].health=0;
+									break;
+								}
+							}
+						break;							
 					}
 				}
 			}
@@ -239,7 +255,7 @@ uint32_t lfsr (uint32_t shift) {
 }
 
 uint32_t getrandom() {
-	return lfsr(SDL_GetTicks());
+	return lfsr(SDL_GetTicks()) >> 1;
 }
 
 void setCollision(int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
@@ -345,9 +361,10 @@ void loop() {
 		refresh=0;
 	}
 	image(bgLayer,0,0,SW*TS,SH*TS);
-	deadEntityCleaner();
+	deadEntityKiller();
 	spriteCollisions();
 	entityLogic();
+	deadEntityKiller();
 	flip();
 	if(animationG<30) animationG+=2;
 	else animationG=0;

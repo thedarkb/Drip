@@ -10,6 +10,7 @@
 #define ENTFRAMES 32
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 30
+#define HUDHEIGHT 80
 
 #define SHEETX 128 //Tile sheet size
 #define SHEETY 480
@@ -50,7 +51,13 @@ typedef struct entity {
 	unsigned char frame[FLIMIT];
 	unsigned char setframe;
 	unsigned char deathframe;
+	unsigned char drop[4];
 } entity;
+
+typedef struct inventory {
+	unsigned char items[INVLIMIT];
+	unsigned char selection;
+} inventory;
 
 typedef struct screen {
 	unsigned char* tileLayer;
@@ -79,6 +86,8 @@ char mode = 0;
 
 entity entSet[ELIMIT];
 entity nentSet[ELIMIT];
+
+inventory pInv;
 
 SDL_Surface* sf1 = NULL;
 

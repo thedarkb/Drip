@@ -3,7 +3,10 @@ void entityLogic() {
 		switch (entSet[i].behaviourId) {
 			case 255:
 				if (entSet[i].deathframe != 0) image(tileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
-			break;	
+			break;
+			case 10:
+				image(tileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
+			break;
 		}
 	}
 	for (int i=0; i<spawnSlot; i++) {
