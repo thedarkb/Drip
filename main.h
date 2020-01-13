@@ -32,7 +32,8 @@ SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
 uint8_t* keyboard = NULL;
 
-SDL_Surface* tileset[TILECOUNT]; 
+SDL_Surface* swtileset[TILECOUNT]; 
+SDL_Texture* hwtileset[TILECOUNT];
 SDL_Surface* bgLayer = NULL;
 SDL_Surface* scrollLayer = NULL;
 
@@ -105,7 +106,8 @@ void entityReset();
 void entitySpawn(entity in);
 void nentityReset();
 void nentitySpawn(entity in);
-void deadEntityCleaner();
+void deadEntityKiller();
+void corpseDisposal();
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
 unsigned int get_diff (int val1, int val2);
@@ -113,7 +115,7 @@ uint32_t lfsr (uint32_t shift);
 void setCollision(int iX, int iY, char stat);
 void worldgen(uint16_t xPos, uint16_t yPos);
 void scrollMap();
-void image(SDL_Surface* imgIn, int x, int y, int w, int h);
+void image(SDL_Texture* imgIn, int x, int y, int w, int h);
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
 void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);

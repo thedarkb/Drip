@@ -67,7 +67,6 @@ void deadEntityKiller() {
 
 void corpseDisposal() {
 	printf("Despawning dead entities.");
-	int maxi;
 	memcpy(&nentSet, &entSet, sizeof entSet);
 	entityReset();
 	for (int i=1; i<ELIMIT; i++) {
@@ -79,96 +78,104 @@ void corpseDisposal() {
 	spawnSlot=nspawnSlot;
 }
 
+int overlap(unsigned char i, unsigned char j){
+	if (!entSet[j].collisionClass) return 0;
+	if (entSet[j].collisionClass>128) return 0;
+	if (entSet[i].collisionClass == entSet[j].collisionClass) return 0;
+	if ((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub)) {
+		if ((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) return 1;
+	}
+	return 0;
+}
+
 void spriteCollisions() {
 	for (int i=0; i<spawnSlot; i++) {
 		for (int j=0; j<spawnSlot; j++) {
-			if((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub) && entSet[j].collisionClass != entSet[i].collisionClass && entSet[j].collisionClass<128 && entSet[j].collisionClass!=0 ){ //Checks for X overlap and class conflicts.
-				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) { //Checks for Y overlap.
-					switch (entSet[i].collisionClass) {
-						case 2:
-						entSet[j].health-=20;
-						if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
-							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
-								entSet[j].status[2]=entSet[j].collisionClass;
-								entSet[j].status[1]=10;
-								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=5; //up left
-								entSet[j].collisionClass=entSet[i].collisionClass;
-							}
-							else {
-								entSet[j].status[2]=entSet[j].collisionClass;
-								entSet[j].status[1]=10;
-								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=6; //up right
-								entSet[j].collisionClass=entSet[i].collisionClass;
-							}
+			if(overlap(i,j)){
+				switch (entSet[i].collisionClass) {
+					case 2:
+					entSet[j].health-=20;
+					if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
+						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
+							entSet[j].status[2]=entSet[j].collisionClass;
+							entSet[j].status[1]=10;
+							entSet[j].status[0]=entSet[j].behaviourId;
+							entSet[j].behaviourId=5; //up left
+							entSet[j].collisionClass=entSet[i].collisionClass;
 						}
 						else {
-							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
+							entSet[j].status[2]=entSet[j].collisionClass;
+							entSet[j].status[1]=10;
+							entSet[j].status[0]=entSet[j].behaviourId;
+							entSet[j].behaviourId=6; //up right
+							entSet[j].collisionClass=entSet[i].collisionClass;
+						}
+					}
+					else {
+						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
+							entSet[j].status[2]=entSet[j].collisionClass;
+							entSet[j].status[1]=10;
+							entSet[j].status[0]=entSet[j].behaviourId;
+							entSet[j].behaviourId=7; //down left
+							entSet[j].collisionClass=entSet[i].collisionClass;
+						}
+						else {
+							entSet[j].status[2]=entSet[j].collisionClass;
+							entSet[j].status[1]=10;
+							entSet[j].status[0]=entSet[j].behaviourId;
+							entSet[j].behaviourId=8; //down right
+							entSet[j].collisionClass=entSet[i].collisionClass;
+						}
+					}
+					break;
+					case 129:
+						printf("Collision\n");
+						printf("Direction: %u\n", entSet[i].direction);
+						switch(entSet[entSet[i].status[1]].direction) {
+							case 0:
 								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
 								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=7; //down left
+								entSet[j].behaviourId=11; //up
 								entSet[j].collisionClass=entSet[i].collisionClass;
-							}
-							else {
+							break;
+							case 1:
 								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
 								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=8; //down right
+								entSet[j].behaviourId=12; //down
 								entSet[j].collisionClass=entSet[i].collisionClass;
+							break;
+							case 2:
+								entSet[j].status[2]=entSet[j].collisionClass;
+								entSet[j].status[1]=10;
+								entSet[j].status[0]=entSet[j].behaviourId;
+								entSet[j].behaviourId=13; //left
+								entSet[j].collisionClass=entSet[i].collisionClass;
+							break;
+							case 3:
+								entSet[j].status[2]=entSet[j].collisionClass;
+								entSet[j].status[1]=10;
+								entSet[j].status[0]=entSet[j].behaviourId;
+								entSet[j].behaviourId=14; //right
+								entSet[j].collisionClass=entSet[i].collisionClass;
+							break;
+							if (entSet[entSet[i].status[1]].attack > entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
+							else entSet[j].health=0;									
+						}
+						if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
+						else entSet[j].health=0;
+					break;
+					case 130:
+						if (j != 0) break;
+						for (int k=0; k<INVLIMIT; k++) {
+							if (pInv.items[k].type == 0) {
+								pInv.items[k].type=entSet[i].status[0];
+								entSet[i].health=0;
+								break;
 							}
 						}
-						break;
-						case 129:
-							printf("Collision\n");
-							printf("Direction: %u\n", entSet[i].direction);
-							switch(entSet[entSet[i].status[1]].direction) {
-								case 0:
-									entSet[j].status[2]=entSet[j].collisionClass;
-									entSet[j].status[1]=10;
-									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=11; //up
-									entSet[j].collisionClass=entSet[i].collisionClass;
-								break;
-								case 1:
-									entSet[j].status[2]=entSet[j].collisionClass;
-									entSet[j].status[1]=10;
-									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=12; //down
-									entSet[j].collisionClass=entSet[i].collisionClass;
-								break;
-								case 2:
-									entSet[j].status[2]=entSet[j].collisionClass;
-									entSet[j].status[1]=10;
-									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=13; //left
-									entSet[j].collisionClass=entSet[i].collisionClass;
-								break;
-								case 3:
-									entSet[j].status[2]=entSet[j].collisionClass;
-									entSet[j].status[1]=10;
-									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=14; //right
-									entSet[j].collisionClass=entSet[i].collisionClass;
-								break;
-								if (entSet[entSet[i].status[1]].attack > entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
-								else entSet[j].health=0;									
-							}
-							if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
-							else entSet[j].health=0;
-						break;
-						case 130:
-							if (j != 0) break;
-							for (int k=0; k<INVLIMIT; k++) {
-								if (pInv.items[k].type == 0) {
-									pInv.items[k].type=entSet[i].status[0];
-									entSet[i].health=0;
-									break;
-								}
-							}
-						break;							
-					}
+					break;							
 				}
 			}
 		}
@@ -228,8 +235,11 @@ int main () {
 	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
 	tile size as stored, fifth is for the tile number. It reads from the */
 	for (int i = 0; i<TILECOUNT; i++) {
-		tileset[i] = surfLoader (loader, SHEETX, SHEETY, 16, 64, i);
-		SDL_SetColorKey(tileset[i], SDL_TRUE, 0x00FF00);
+		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, 64, i);
+		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
+	}
+	for (int i=0; i<TILECOUNT; i++) {
+		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
 	}
 
 	SDL_FreeSurface(loader);
@@ -282,14 +292,21 @@ void setCollision(int iX, int iY, char stat) { //Leaves a 1 pixel border to allo
 	}
 }
 
-void image(SDL_Surface* imgIn, int x, int y, int w, int h) {
+void image(SDL_Texture* imgIn, int x, int y, int w, int h) {
 	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h};
-	SDL_BlitSurface(imgIn, NULL, s, &scaler);
+	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }
 
-void hudDraw(SDL_Surface* imgIn, int x, int y, int w, int h) {
+void simage(SDL_Surface* imgIn, int x, int y, int w, int h) {
+	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h};
+	SDL_Texture* imgOut = SDL_CreateTextureFromSurface(r, imgIn);
+	SDL_RenderCopy(r, imgOut, NULL, &scaler);
+	SDL_DestroyTexture(imgOut);
+}
+
+void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h) {
 	SDL_Rect scaler = {x,y,w,h};
-	SDL_BlitSurface(imgIn, NULL, s, &scaler);
+	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }
 
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) {
@@ -300,7 +317,7 @@ void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) {
 void bgDraw () {
 	for (int x=0; x<SW; x++) {
 		for (int y=0; y<SH; y++) {
-			bgBlit(tileset[cScreen[x][y]],x*TS,y*TS,TS,TS);
+			bgBlit(swtileset[cScreen[x][y]],x*TS,y*TS,TS,TS);
 		}
 	}
 }
@@ -333,8 +350,8 @@ void hudRefresh() {
 	drawRect(528,32,420,16,0xd04648);
 	drawRect(528,48,420,16,0x597dce);
 	for (int i=0; i<INVLIMIT; i++) {
-		if (pInv.items[i].type) hudDraw(tileset[getItemSprite(pInv.items[i].type)], TS*i, 8, TS, TS);
-		hudDraw(tileset[83], TS*i, 8, TS, TS);
+		if (pInv.items[i].type) hudDraw(hwtileset[getItemSprite(pInv.items[i].type)], TS*i, 8, TS, TS);
+		hudDraw(hwtileset[83], TS*i, 8, TS, TS);
 	}
 	drawRect((pInv.selection*TS)+4,8,TS-8,4,0xFFFF00);
 }
@@ -406,16 +423,16 @@ void snapToGrid(entity* movEnt) {
 }
 
 void loop() {
-	if (scroll != 0) scrollMap();
+	if (scroll) scrollMap();
 	
-	if (refresh != 0) {
+	if (refresh) {
 		worldgen(sX,sY);
 		memcpy(&cScreen, &nScreen, sizeof nScreen);
 		memcpy(&layers, &nlayers, sizeof nlayers);
 		bgDraw();
 		refresh=0;
 	}
-	image(bgLayer,0,0,SW*TS,SH*TS);
+	simage(bgLayer,0,0,SW*TS,SH*TS);
 	spriteCollisions();
 	entityLogic();
 	deadEntityKiller();

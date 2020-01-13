@@ -57,8 +57,8 @@ void scrollMap() {
 			#ifndef NOSCROLL
 				for (int i=0; i<SH*TS; i+=5) {
 					if(entSet[0].y<TS*SH-TS) entSet[0].y=entSet[0].y+5;
-					image(bgLayer,0,i-SH*TS,SW*TS,SH*TS);
-					image(scrollLayer,0,i,SW*TS,SH*TS);
+					simage(bgLayer,0,i-SH*TS,SW*TS,SH*TS);
+					simage(scrollLayer,0,i,SW*TS,SH*TS);
 					hudRefresh();
 					flip();
 				}
@@ -82,8 +82,8 @@ void scrollMap() {
 			#ifndef NOSCROLL
 				for (int i=SH*TS; i>0; i=i-5) {
 					if(entSet[0].y>0) entSet[0].y=entSet[0].y-5;
-					image(bgLayer,0,i,SW*TS,SH*TS);
-					image(scrollLayer,0,i-SH*TS,SW*TS,SH*TS);
+					simage(bgLayer,0,i,SW*TS,SH*TS);
+					simage(scrollLayer,0,i-SH*TS,SW*TS,SH*TS);
 					hudRefresh();
 					flip();
 				}
@@ -106,8 +106,8 @@ void scrollMap() {
 			#ifndef NOSCROLL
 				for (int i=0; i<SW*TS; i+=5) {
 					if(entSet[0].x<SW*TS-TS) entSet[0].x+=5;
-					image(bgLayer,i-SW*TS,0,SW*TS,SH*TS);
-					image(scrollLayer,i,0,SW*TS,SH*TS);
+					simage(bgLayer,i-SW*TS,0,SW*TS,SH*TS);
+					simage(scrollLayer,i,0,SW*TS,SH*TS);
 					hudRefresh();
 					flip();
 				}
@@ -131,8 +131,8 @@ void scrollMap() {
 			#ifndef NOSCROLL
 				for (int i=SW*TS; i>0; i-=5) {
 					if(entSet[0].x>0) entSet[0].x-=5;
-					image(bgLayer,i,0,SW*TS,SH*TS);
-					image(scrollLayer,i-SW*TS,0,SW*TS,SH*TS);
+					simage(bgLayer,i,0,SW*TS,SH*TS);
+					simage(scrollLayer,i-SW*TS,0,SW*TS,SH*TS);
 					hudRefresh();
 					flip();
 				}

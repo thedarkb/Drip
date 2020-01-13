@@ -5,6 +5,7 @@ unsigned char getItemSprite(unsigned char type) {
 		printf("Invalid drop.");
 		return 0;
 	}
+	
 	sprite[0]=83;
 	sprite[1]=69;
 	sprite[2]=69;
@@ -19,7 +20,7 @@ void itemEffects(unsigned char type) {
 		break;
 		case 1:
 			printf("My name is Steve, I'm a bunch of coloured rocks and I like the exit function.\n");
-			sleep(5);
+			SDL_Delay(5000);
 			exit(0);
 		break;
 	}

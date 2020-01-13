@@ -2,10 +2,10 @@ void entityLogic() {
 	for (int i=0; i<spawnSlot; i++) { //Bottom entity layer, affectionately known as the corpse pit.
 		switch (entSet[i].behaviourId) {
 			case 255:
-				if (entSet[i].deathframe != 0) image(tileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
+				if (entSet[i].deathframe != 0) image(hwtileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 10:
-				image(tileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 		}
 	}
@@ -14,7 +14,7 @@ void entityLogic() {
 
 			/*The AI state machine starts here.*/	
 			case 1: //The player.
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
 				for (int j=0; j<7; j++) { //number of pixels to move per frame.
 					if (entSet[i].status[3]==0) {
@@ -86,12 +86,12 @@ void entityLogic() {
 
 
 			case 2://Potato
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 			break;//End of Potato
 
 
 			case 3://Chase state.
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE live in main.h
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE live in main.h
 				for (int j=0; j<4; j++) {
 					if (entSet[0].x > entSet[i].x) moveX(&entSet[i], 1);
 					if (entSet[0].x < entSet[i].x) moveX(&entSet[i], -1);
@@ -103,7 +103,7 @@ void entityLogic() {
 
 			case 4://Entity stays still, changes to chase state when player is in range.
 				entSet[i].animation=0;
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 				if(get_diff(entSet[i].x,entSet[0].x) < TS*2 && get_diff(entSet[i].y,entSet[0].y) < TS*2) entSet[i].behaviourId=3;
 			break; //End wait state.
 
@@ -115,7 +115,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 6:
 				fastMoveX(&entSet[i], 1, 8);
@@ -125,7 +125,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 7:
 				fastMoveX(&entSet[i], -1, 8);
@@ -135,7 +135,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 8:
 				fastMoveX(&entSet[i], 1, 8);
@@ -145,7 +145,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 
 
@@ -170,7 +170,7 @@ void entityLogic() {
 						entSet[i].y=entSet[entSet[i].status[1]].y;
 					break;
 				}
-				if(entSet[entSet[i].status[1]].status[3] != 0) image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				if(entSet[entSet[i].status[1]].status[3] != 0) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 
 			case 11:
@@ -181,7 +181,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 12:
 				printf("Down\n");
@@ -191,7 +191,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 13:
 				printf("Left\n");
@@ -201,7 +201,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 14:
 				printf("Right\n");
@@ -211,7 +211,7 @@ void entityLogic() {
 					entSet[i].behaviourId=entSet[i].status[0];
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
-				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 		}
 	}
