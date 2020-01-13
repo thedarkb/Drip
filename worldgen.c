@@ -33,16 +33,18 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 	}
 	if(xPos == 0 && yPos == 0) {
 		memcpy(&nScreen, testhouse().tileLayer, sizeof nScreen);
+		nentitySpawn(ent_item(120,120,1,255));
+		nentSet[nspawnSlot-1].health=255;
 	}
 }
 
 void scrollMap() {
 	int checkX = entSet[0].x;
 	int checkY = entSet[0].y;
+	SDL_BlitSurface(s, &hudStripper, scrollLayer, NULL);
 	switch (scroll) {
 		case 1:
 		sY--;
-		SDL_BlitSurface(s, NULL, scrollLayer, NULL);
 		worldgen(sX,sY);
 		checkY=TS*SH-5;
 		if (nlayers[checkX][checkY] == 0 && nlayers[checkX+TS/2][checkY] == 0 && nlayers[checkX+TS][checkY] == 0 ) {
@@ -57,6 +59,7 @@ void scrollMap() {
 					if(entSet[0].y<TS*SH-TS) entSet[0].y=entSet[0].y+5;
 					image(bgLayer,0,i-SH*TS,SW*TS,SH*TS);
 					image(scrollLayer,0,i,SW*TS,SH*TS);
+					hudRefresh();
 					flip();
 				}
 			#endif
@@ -67,7 +70,6 @@ void scrollMap() {
 		break;
 		case 2:
 		sY++;
-		SDL_BlitSurface(s, NULL, scrollLayer, NULL);
 		worldgen(sX,sY);
 		checkY=5;
 		if (nlayers[checkX][checkY] == 0 && nlayers[checkX+TS/2][checkY] == 0 && nlayers[checkX+TS][checkY] == 0 ) {
@@ -82,6 +84,7 @@ void scrollMap() {
 					if(entSet[0].y>0) entSet[0].y=entSet[0].y-5;
 					image(bgLayer,0,i,SW*TS,SH*TS);
 					image(scrollLayer,0,i-SH*TS,SW*TS,SH*TS);
+					hudRefresh();
 					flip();
 				}
 			#endif
@@ -92,7 +95,6 @@ void scrollMap() {
 		break;
 		case 3:
 		sX--;
-		SDL_BlitSurface(s, NULL, scrollLayer, NULL);
 		worldgen(sX,sY);
 		checkX=TS*SW-5;
 		if (nlayers[checkX][checkY] == 0 && nlayers[checkX][checkY+TS/2] == 0 && nlayers[checkX][checkY+TS] == 0 ) {
@@ -106,6 +108,7 @@ void scrollMap() {
 					if(entSet[0].x<SW*TS-TS) entSet[0].x+=5;
 					image(bgLayer,i-SW*TS,0,SW*TS,SH*TS);
 					image(scrollLayer,i,0,SW*TS,SH*TS);
+					hudRefresh();
 					flip();
 				}
 			#endif
@@ -116,7 +119,6 @@ void scrollMap() {
 		break;
 		case 4:
 		sX++;
-		SDL_BlitSurface(s, NULL, scrollLayer, NULL);
 		worldgen(sX,sY);
 		checkX=5;
 		if (nlayers[checkX][checkY] == 0 && nlayers[checkX][checkY+TS/2] == 0 && nlayers[checkX][checkY+TS] == 0 ) {
@@ -131,6 +133,7 @@ void scrollMap() {
 					if(entSet[0].x>0) entSet[0].x-=5;
 					image(bgLayer,i,0,SW*TS,SH*TS);
 					image(scrollLayer,i-SW*TS,0,SW*TS,SH*TS);
+					hudRefresh();
 					flip();
 				}
 			#endif

@@ -17,6 +17,7 @@ void entityInitialise() {
 		memset(&entSet[i], 0, sizeof entSet[i]);
 	}
 	entSet[0]=ent_player();
+	memset(&pInv, 0, sizeof pInv);
 }
 
 void entityReset() {
@@ -28,8 +29,8 @@ void entityReset() {
 
 void entitySpawn(entity in) {
 	if (spawnSlot > ELIMIT) {
-		printf("Spawn failed, limit exceeded.\n");
-		return;
+		printf("Spawn limit exceeded.\n");
+		corpseDisposal();
 	}
 	entSet[spawnSlot]=in;
 	spawnSlot++;
@@ -57,11 +58,25 @@ void deadEntityKiller() {
 			entSet[i].behaviourId=255;
 			entSet[i].collisionClass=0;
 			if(entSet[i].drop[0] != 0) {
-				entitySpawn(ent_item(entSet[i].x, entSet[i].y, entSet[i].drop[0]));
+				entitySpawn(ent_item(entSet[i].x, entSet[i].y, entSet[i].drop[0], 255));
 				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
 			}
 		}
 	}
+}
+
+void corpseDisposal() {
+	printf("Despawning dead entities.");
+	int maxi;
+	memcpy(&nentSet, &entSet, sizeof entSet);
+	entityReset();
+	for (int i=1; i<ELIMIT; i++) {
+		if (nentSet[i].health>0) {
+			entitySpawn(nentSet[i]);
+			printf("Live entity found in position: %u\n", i);
+		}
+	}
+	spawnSlot=nspawnSlot;
 }
 
 void spriteCollisions() {
@@ -71,6 +86,7 @@ void spriteCollisions() {
 				if((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) { //Checks for Y overlap.
 					switch (entSet[i].collisionClass) {
 						case 2:
+						entSet[j].health-=20;
 						if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
 							if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 								entSet[j].status[2]=entSet[j].collisionClass;
@@ -106,33 +122,34 @@ void spriteCollisions() {
 						break;
 						case 129:
 							printf("Collision\n");
-							switch(entSet[i].direction) {
+							printf("Direction: %u\n", entSet[i].direction);
+							switch(entSet[entSet[i].status[1]].direction) {
 								case 0:
 									entSet[j].status[2]=entSet[j].collisionClass;
 									entSet[j].status[1]=10;
 									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=6; //up right
+									entSet[j].behaviourId=11; //up
 									entSet[j].collisionClass=entSet[i].collisionClass;
 								break;
 								case 1:
 									entSet[j].status[2]=entSet[j].collisionClass;
 									entSet[j].status[1]=10;
 									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=8; //down right
+									entSet[j].behaviourId=12; //down
 									entSet[j].collisionClass=entSet[i].collisionClass;
 								break;
 								case 2:
 									entSet[j].status[2]=entSet[j].collisionClass;
 									entSet[j].status[1]=10;
 									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=7; //down left
+									entSet[j].behaviourId=13; //left
 									entSet[j].collisionClass=entSet[i].collisionClass;
 								break;
 								case 3:
 									entSet[j].status[2]=entSet[j].collisionClass;
 									entSet[j].status[1]=10;
 									entSet[j].status[0]=entSet[j].behaviourId;
-									entSet[j].behaviourId=5; //up left
+									entSet[j].behaviourId=14; //right
 									entSet[j].collisionClass=entSet[i].collisionClass;
 								break;
 								if (entSet[entSet[i].status[1]].attack > entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
@@ -142,11 +159,10 @@ void spriteCollisions() {
 							else entSet[j].health=0;
 						break;
 						case 130:
-							printf("I executed\n");
 							if (j != 0) break;
 							for (int k=0; k<INVLIMIT; k++) {
-								if (pInv.items[k] == 0) {
-									pInv.items[k]=entSet[i].status[0];
+								if (pInv.items[k].type == 0) {
+									pInv.items[k].type=entSet[i].status[0];
 									entSet[i].health=0;
 									break;
 								}
@@ -193,7 +209,7 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 int main () {
 	printf("Scroll status: %u\n", ENABLESCROLL);
 	SDL_Init(SDL_INIT_VIDEO);
-	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS, SH*TS, SDL_WINDOW_OPENGL);
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS, SH*TS+HUDHEIGHT, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	s = SDL_GetWindowSurface(w);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
@@ -267,6 +283,11 @@ void setCollision(int iX, int iY, char stat) { //Leaves a 1 pixel border to allo
 }
 
 void image(SDL_Surface* imgIn, int x, int y, int w, int h) {
+	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h};
+	SDL_BlitSurface(imgIn, NULL, s, &scaler);
+}
+
+void hudDraw(SDL_Surface* imgIn, int x, int y, int w, int h) {
 	SDL_Rect scaler = {x,y,w,h};
 	SDL_BlitSurface(imgIn, NULL, s, &scaler);
 }
@@ -282,6 +303,40 @@ void bgDraw () {
 			bgBlit(tileset[cScreen[x][y]],x*TS,y*TS,TS,TS);
 		}
 	}
+}
+
+void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) {
+	union htmlDecode {
+		uint32_t htmlCode;
+		unsigned char rgb[3];
+	} htmlDecode;
+	htmlDecode.htmlCode=colour;
+	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
+	SDL_Rect scaler={x,y,w,h};
+	SDL_RenderFillRect(r, &scaler);
+}
+
+void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) {
+	union htmlDecode {
+		uint32_t htmlCode;
+		unsigned char rgb[3];
+	} htmlDecode;
+	htmlDecode.htmlCode=colour;
+	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
+	SDL_Rect scaler={x,y,w,h};
+	SDL_RenderDrawRect(r, &scaler);
+}
+
+void hudRefresh() {
+	drawRect(0,0,TS*SW,HUDHEIGHT,0);
+	drawRect(528,16,entSet[0].health*(420/pMaxHealth),16,0x6DAA2C);
+	drawRect(528,32,420,16,0xd04648);
+	drawRect(528,48,420,16,0x597dce);
+	for (int i=0; i<INVLIMIT; i++) {
+		if (pInv.items[i].type) hudDraw(tileset[getItemSprite(pInv.items[i].type)], TS*i, 8, TS, TS);
+		hudDraw(tileset[83], TS*i, 8, TS, TS);
+	}
+	drawRect((pInv.selection*TS)+4,8,TS-8,4,0xFFFF00);
 }
 
 void flip() {
@@ -361,10 +416,10 @@ void loop() {
 		refresh=0;
 	}
 	image(bgLayer,0,0,SW*TS,SH*TS);
-	deadEntityKiller();
 	spriteCollisions();
 	entityLogic();
 	deadEntityKiller();
+	hudRefresh();
 	flip();
 	if(animationG<30) animationG+=2;
 	else animationG=0;

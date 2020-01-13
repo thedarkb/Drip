@@ -42,13 +42,35 @@ void entityLogic() {
 							entSet[i].status[3]=10;
 							entSet[i].status[0]=30;
 						}
-					}	
+					}
 
+					if (keyboard[SDL_SCANCODE_1]) {
+						pInv.selection=0;
+					} else if (keyboard[SDL_SCANCODE_2]) {
+						pInv.selection=1;
+					} else if (keyboard[SDL_SCANCODE_3]) {
+						pInv.selection=2;
+					} else if (keyboard[SDL_SCANCODE_4]) {
+						pInv.selection=3;
+					} else if (keyboard[SDL_SCANCODE_5]) {
+						pInv.selection=4;
+					} else if (keyboard[SDL_SCANCODE_6]) {
+						pInv.selection=5;
+					} else if (keyboard[SDL_SCANCODE_7]) {
+						pInv.selection=6;
+					} else if (keyboard[SDL_SCANCODE_8]) {
+						pInv.selection=7;
+					}
+
+					if (keyboard[SDL_SCANCODE_D] && pInv.items[pInv.selection].type) {
+						entitySpawn(ent_item(entSet[i].x, entSet[i].y, pInv.items[pInv.selection].type, 255));
+						fastMoveY(&entSet[spawnSlot-1], 1, TS);
+						pInv.items[pInv.selection].type=0;
+					}
 					if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
 					if (keyboard[SDL_SCANCODE_J]) {
-						unsigned char* aP = &entSet[0];
-						for (int k=0; k< sizeof entSet[0]; k++) {
-							printf("%u\n", aP[k]);
+						for (int k=0; k<ELIMIT; k++) {
+							printf("%u\n", entSet[k].behaviourId);
 						}
 					}
 					if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);                            
@@ -149,6 +171,47 @@ void entityLogic() {
 					break;
 				}
 				if(entSet[entSet[i].status[1]].status[3] != 0) image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+			break;
+
+			case 11:
+				printf("Up\n");
+				fastMoveY(&entSet[i], -1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+			break;
+			case 12:
+				printf("Down\n");
+				fastMoveY(&entSet[i], 1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+			break;
+			case 13:
+				printf("Left\n");
+				fastMoveX(&entSet[i], -1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+			break;
+			case 14:
+				printf("Right\n");
+				fastMoveX(&entSet[i], 1, 8);
+				if(entSet[i].status[1]>0) entSet[i].status[1]--;
+				else {
+					entSet[i].behaviourId=entSet[i].status[0];
+					entSet[i].collisionClass=entSet[i].status[2];
+				}
+				image(tileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 		}
 	}

@@ -18,7 +18,7 @@ entity ent_player() {
 	me.behaviourId=1;
 	me.x=280;
 	me.y=20;
-	me.health=100;
+	me.health=pMaxHealth;
 	me.attack=5;
 	me.xSub=14;
 	me.ySub=1;
@@ -130,7 +130,7 @@ entity ent_nonsolid(unsigned char x, unsigned char y, unsigned char tile) {
 	return me;
 }
 
-entity ent_item(unsigned int x, unsigned int y, unsigned char type) {
+entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned char status) {
 	entity me;
 	memset(&me, 0, sizeof me);
 	me.health=10;

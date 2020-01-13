@@ -4,7 +4,7 @@
 
 #define ENABLESCROLL 0
 
-#define ELIMIT 32
+#define ELIMIT 10
 #define FLIMIT 32
 #define INVLIMIT 8
 #define ENTFRAMES 32
@@ -28,6 +28,7 @@ SDL_Surface* s = NULL;
 SDL_Surface* loader = NULL;
 SDL_Renderer* r = NULL;
 SDL_Texture* t = NULL;
+SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
 uint8_t* keyboard = NULL;
 
@@ -54,9 +55,15 @@ typedef struct entity {
 	unsigned char drop[4];
 } entity;
 
+typedef struct item {
+	unsigned char type;
+	unsigned char status;
+} item;
+
 typedef struct inventory {
-	unsigned char items[INVLIMIT];
+	item items[INVLIMIT];
 	unsigned char selection;
+	unsigned char weapon;
 } inventory;
 
 typedef struct screen {
@@ -71,6 +78,8 @@ unsigned char nspawnSlot=1;
 uint16_t sX = 1;
 uint16_t sY = 1;
 char scroll = 0;
+
+unsigned char pMaxHealth=100;
 
 unsigned char animationG=0;
 
@@ -107,6 +116,8 @@ void scrollMap();
 void image(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
+void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
+void hudRefresh();
 void flip();
 char collisionCheck(int x, int y);
 void moveX(entity* movEnt, char amount);
