@@ -32,9 +32,12 @@ SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
 uint8_t* keyboard = NULL;
 
+void* nodangle=NULL;
+
 SDL_Surface* swtileset[TILECOUNT]; 
 SDL_Texture* hwtileset[TILECOUNT];
 SDL_Surface* bgLayer = NULL;
+SDL_Texture* bgTex=NULL;
 SDL_Surface* scrollLayer = NULL;
 
 typedef struct entity {

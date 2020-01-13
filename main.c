@@ -28,7 +28,7 @@ void entityReset() {
 }
 
 void entitySpawn(entity in) {
-	if (spawnSlot > ELIMIT) {
+	if (spawnSlot > ELIMIT-1) {
 		printf("Spawn limit exceeded.\n");
 		corpseDisposal();
 	}
@@ -44,7 +44,7 @@ void nentityReset() {
 }
 
 void nentitySpawn(entity in) {
-	if (nspawnSlot > ELIMIT) {
+	if (nspawnSlot > ELIMIT-1) {
 		printf("Spawn failed, limit exceeded. (Off the current screen.)\n");
 		return;
 	}
@@ -66,7 +66,7 @@ void deadEntityKiller() {
 }
 
 void corpseDisposal() {
-	printf("Despawning dead entities.");
+	printf("Despawning dead entities.\n");
 	memcpy(&nentSet, &entSet, sizeof entSet);
 	entityReset();
 	for (int i=1; i<ELIMIT; i++) {
@@ -79,7 +79,7 @@ void corpseDisposal() {
 }
 
 int overlap(unsigned char i, unsigned char j){
-	if (!entSet[j].collisionClass) return 0;
+	if (!entSet[j].collisionClass) return 0; //Collisio
 	if (entSet[j].collisionClass>128) return 0;
 	if (entSet[i].collisionClass == entSet[j].collisionClass) return 0;
 	if ((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub)) {
@@ -169,7 +169,7 @@ void spriteCollisions() {
 					case 130:
 						if (j != 0) break;
 						for (int k=0; k<INVLIMIT; k++) {
-							if (pInv.items[k].type == 0) {
+							if (!pInv.items[k].type) {
 								pInv.items[k].type=entSet[i].status[0];
 								entSet[i].health=0;
 								break;
@@ -238,6 +238,7 @@ int main () {
 		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, 64, i);
 		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
 	}
+	nodangle=swtileset[0];
 	for (int i=0; i<TILECOUNT; i++) {
 		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
 	}
@@ -253,7 +254,6 @@ int main () {
 		SDL_PollEvent(&keyIn);
 		if (keyIn.type == SDL_QUIT) goto quit;
 		loop();
-		assert(ent_sword(1,1,1,0).behaviourId==9);
 	}
 	quit:
 	#endif
@@ -430,9 +430,10 @@ void loop() {
 		memcpy(&cScreen, &nScreen, sizeof nScreen);
 		memcpy(&layers, &nlayers, sizeof nlayers);
 		bgDraw();
+		bgTex=SDL_CreateTextureFromSurface(r, bgLayer);
 		refresh=0;
 	}
-	simage(bgLayer,0,0,SW*TS,SH*TS);
+	image(bgTex,0,0,SW*TS,SH*TS);
 	spriteCollisions();
 	entityLogic();
 	deadEntityKiller();

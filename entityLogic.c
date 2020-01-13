@@ -37,7 +37,7 @@ void entityLogic() {
 						if (pmotion == 0) entSet[i].animation=0;
 
 						if (keyboard[SDL_SCANCODE_X] && entSet[i].status[3] == 0 && entSet[i].status[0] == 0) {
-							printf("Detected: %u\n", spawnSlot);
+							printf("Spawn slot: %u\n", spawnSlot);
 							entitySpawn(ent_sword(entSet[i].direction, entSet[i].x, entSet[i].y, i));
 							entSet[i].status[3]=10;
 							entSet[i].status[0]=30;
@@ -170,7 +170,7 @@ void entityLogic() {
 						entSet[i].y=entSet[entSet[i].status[1]].y;
 					break;
 				}
-				if(entSet[entSet[i].status[1]].status[3] != 0) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				if(entSet[entSet[i].status[1]].status[3]) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 
 			case 11:

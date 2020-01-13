@@ -143,4 +143,6 @@ void scrollMap() {
 		scroll=0;
 		break;
 	}
+	SDL_DestroyTexture(bgTex);
+	bgTex=SDL_CreateTextureFromSurface(r, bgLayer);
 }
