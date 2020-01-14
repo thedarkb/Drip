@@ -35,6 +35,8 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 		memcpy(&nScreen, testhouse().tileLayer, sizeof nScreen);
 		nentitySpawn(ent_item(120,120,1,255));
 		nentSet[nspawnSlot-1].health=255;
+		pushMsg("Blobby's Dungeon\0");
+		pushMsg("Level 1:\0");
 	}
 }
 

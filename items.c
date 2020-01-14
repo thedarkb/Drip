@@ -14,6 +14,7 @@ unsigned char getItemSprite(unsigned char type) {
 }
 
 void itemEffects(unsigned char type) {
+	printf("Item type: %u\n", type);
 	switch (type) {
 		case 0:
 			printf("I am a potato.\n");

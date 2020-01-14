@@ -11,6 +11,8 @@
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 30
 #define HUDHEIGHT 80
+#define MSGDEPTH 8
+#define MSGTIME 30
 
 #define SHEETX 128 //Tile sheet size
 #define SHEETY 480
@@ -32,13 +34,14 @@ SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
 uint8_t* keyboard = NULL;
 
-void* nodangle=NULL;
 
 SDL_Surface* swtileset[TILECOUNT]; 
 SDL_Texture* hwtileset[TILECOUNT];
 SDL_Surface* bgLayer = NULL;
 SDL_Texture* bgTex=NULL;
 SDL_Surface* scrollLayer = NULL;
+
+TTF_Font* font;
 
 typedef struct entity {
 	unsigned int x;
@@ -92,6 +95,9 @@ unsigned char nScreen[SW][SH];
 unsigned char layers[SW*TS][SH*TS];
 unsigned char nlayers[SW*TS][SH*TS];
 
+char* msgBuffer[MSGDEPTH];
+unsigned char msgSlot=0;
+unsigned int msgTimeout=0;
 
 unsigned char refresh = 1;
 
@@ -119,6 +125,7 @@ void setCollision(int iX, int iY, char stat);
 void worldgen(uint16_t xPos, uint16_t yPos);
 void scrollMap();
 void image(SDL_Texture* imgIn, int x, int y, int w, int h);
+void simage(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
 void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);

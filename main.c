@@ -4,6 +4,7 @@
 #include <SDL2/SDL_image.h>
 #include <assert.h>
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include "main.h"
 #include "items.c"
@@ -216,12 +217,14 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 int main () {
 	printf("Scroll status: %u\n", ENABLESCROLL);
 	SDL_Init(SDL_INIT_VIDEO);
+	TTF_Init();
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS, SH*TS+HUDHEIGHT, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	s = SDL_GetWindowSurface(w);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	scrollLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 
+	font = TTF_OpenFont("slkscr.ttf", 4); //IMPLEMENT PROPER FONT SCALING WITH BUILT IN FUNCTION.
 	keyboard = SDL_GetKeyboardState(NULL);
 
 	loader = IMG_Load("sheet.png"); //tilesheet
@@ -238,7 +241,6 @@ int main () {
 		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, 64, i);
 		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
 	}
-	nodangle=swtileset[0];
 	for (int i=0; i<TILECOUNT; i++) {
 		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
 	}
@@ -261,6 +263,27 @@ int main () {
 	emscripten_set_main_loop(loop, 30, 1);
 	#endif
 	return 0;
+}
+
+void pushMsg(char* inStr) {
+	mode=1;
+	msgBuffer[msgSlot]=inStr;
+	msgSlot++;
+}
+
+void popMsg(){
+	SDL_Color white={255,255,255,255};
+	SDL_Surface* text=TTF_RenderText_Solid(font,msgBuffer[msgSlot-1],white);
+	printf(msgBuffer[msgSlot-1]);
+	simage(text,0,90,SW*TS,SH*TS);
+	SDL_FreeSurface(text);
+	if (keyboard[SDL_SCANCODE_X] && msgTimeout > 30) {
+		msgSlot--;
+		if (!msgSlot) mode=0;
+		else msgTimeout=0;
+		return;
+	}
+	msgTimeout++;
 }
 
 unsigned int get_diff (int val1, int val2) {
@@ -433,9 +456,11 @@ void loop() {
 		bgTex=SDL_CreateTextureFromSurface(r, bgLayer);
 		refresh=0;
 	}
-	image(bgTex,0,0,SW*TS,SH*TS);
-	spriteCollisions();
-	entityLogic();
+	if (!mode) {
+		image(bgTex,0,0,SW*TS,SH*TS);
+		spriteCollisions();
+		entityLogic();
+	} else popMsg();
 	deadEntityKiller();
 	hudRefresh();
 	flip();

@@ -68,6 +68,8 @@ void entityLogic() {
 						pInv.items[pInv.selection].type=0;
 					}
 					if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
+					if (keyboard[SDL_SCANCODE_L]) pushMsg("Test\0");
+					if (keyboard[SDL_SCANCODE_A]) itemEffects(pInv.items[pInv.selection].type);
 					if (keyboard[SDL_SCANCODE_J]) {
 						for (int k=0; k<ELIMIT; k++) {
 							printf("%u\n", entSet[k].behaviourId);
