@@ -16,7 +16,7 @@ void entityLogic() {
 			case 1: //The player.
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
-				for (int j=0; j<7; j++) { //number of pixels to move per frame.
+				for (int j=0; j<TS/9; j++) { //number of pixels to move per frame.
 					if (entSet[i].status[3]==0) {
 						if (keyboard[SDL_SCANCODE_RIGHT]) {
 							moveX(&entSet[i], 1);
@@ -94,7 +94,7 @@ void entityLogic() {
 
 			case 3://Chase state.
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE live in main.h
-				for (int j=0; j<4; j++) {
+				for (int j=0; j<TS/16; j++) {
 					if (entSet[0].x > entSet[i].x) moveX(&entSet[i], 1);
 					if (entSet[0].x < entSet[i].x) moveX(&entSet[i], -1);
 					if (entSet[0].y > entSet[i].y) moveY(&entSet[i], 1);
@@ -110,8 +110,8 @@ void entityLogic() {
 			break; //End wait state.
 
 			case 5:
-				fastMoveX(&entSet[i], -1, 8);
-				fastMoveY(&entSet[i], -1, 8);
+				fastMoveX(&entSet[i], -1, TS/8);
+				fastMoveY(&entSet[i], -1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];
@@ -120,8 +120,8 @@ void entityLogic() {
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 6:
-				fastMoveX(&entSet[i], 1, 8);
-				fastMoveY(&entSet[i], -1, 8);
+				fastMoveX(&entSet[i], 1, TS/8);
+				fastMoveY(&entSet[i], -1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];
@@ -130,8 +130,8 @@ void entityLogic() {
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 7:
-				fastMoveX(&entSet[i], -1, 8);
-				fastMoveY(&entSet[i], 1, 8);
+				fastMoveX(&entSet[i], -1, TS/8);
+				fastMoveY(&entSet[i], 1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];
@@ -140,8 +140,8 @@ void entityLogic() {
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 8:
-				fastMoveX(&entSet[i], 1, 8);
-				fastMoveY(&entSet[i], 1, 8);
+				fastMoveX(&entSet[i], 1, TS/8);
+				fastMoveY(&entSet[i], 1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];
@@ -177,7 +177,7 @@ void entityLogic() {
 
 			case 11:
 				printf("Up\n");
-				fastMoveY(&entSet[i], -1, 8);
+				fastMoveY(&entSet[i], -1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];
@@ -187,7 +187,7 @@ void entityLogic() {
 			break;
 			case 12:
 				printf("Down\n");
-				fastMoveY(&entSet[i], 1, 8);
+				fastMoveY(&entSet[i], 1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];
@@ -197,7 +197,7 @@ void entityLogic() {
 			break;
 			case 13:
 				printf("Left\n");
-				fastMoveX(&entSet[i], -1, 8);
+				fastMoveX(&entSet[i], -1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];
@@ -207,7 +207,7 @@ void entityLogic() {
 			break;
 			case 14:
 				printf("Right\n");
-				fastMoveX(&entSet[i], 1, 8);
+				fastMoveX(&entSet[i], 1, TS/8);
 				if(entSet[i].status[1]>0) entSet[i].status[1]--;
 				else {
 					entSet[i].behaviourId=entSet[i].status[0];

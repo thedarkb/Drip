@@ -300,7 +300,7 @@ uint32_t lfsr (uint32_t shift) {
 		shift ^= (shift >> 31) << 30;
 		shift = shift << 1;
 	}
-	return shift;
+	return shift >> 1;
 }
 
 uint32_t getrandom() {

@@ -24,7 +24,7 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 
 	for (int x=0; x<SW; x++) { //adds trees
 		for (int y=0; y<SH; y++) {
-			if ((screenHash & BIT(5)) && (screenHash & BIT(7))) {
+			if ((screenHash & BIT(5)) && (screenHash & BIT(7)) && (screenHash & BIT(10))) {
 				nScreen[x][y] = (30);
 				setCollision(x,y,1);
 			}
@@ -43,6 +43,7 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 void scrollMap() {
 	int checkX = entSet[0].x;
 	int checkY = entSet[0].y;
+	const int speed=(TS*SW)/24;
 	SDL_BlitSurface(s, &hudStripper, scrollLayer, NULL);
 	switch (scroll) {
 		case 1:
@@ -57,11 +58,12 @@ void scrollMap() {
 			spawnSlot=nspawnSlot;
 			bgDraw();
 			#ifndef NOSCROLL
-				for (int i=0; i<SH*TS; i+=5) {
+				for (int i=0; i<SH*TS; i+=speed) {
 					if(entSet[0].y<TS*SH-TS) entSet[0].y=entSet[0].y+5;
 					simage(bgLayer,0,i-SH*TS,SW*TS,SH*TS);
 					simage(scrollLayer,0,i,SW*TS,SH*TS);
 					hudRefresh();
+					wait();
 					flip();
 				}
 			#endif
@@ -82,11 +84,12 @@ void scrollMap() {
 			spawnSlot=nspawnSlot;
 			bgDraw();
 			#ifndef NOSCROLL
-				for (int i=SH*TS; i>0; i=i-5) {
+				for (int i=SH*TS; i>0; i-=speed) {
 					if(entSet[0].y>0) entSet[0].y=entSet[0].y-5;
 					simage(bgLayer,0,i,SW*TS,SH*TS);
 					simage(scrollLayer,0,i-SH*TS,SW*TS,SH*TS);
 					hudRefresh();
+					wait();
 					flip();
 				}
 			#endif
@@ -106,11 +109,12 @@ void scrollMap() {
 			spawnSlot=nspawnSlot;
 			bgDraw();
 			#ifndef NOSCROLL
-				for (int i=0; i<SW*TS; i+=5) {
+				for (int i=0; i<SW*TS; i+=speed) {
 					if(entSet[0].x<SW*TS-TS) entSet[0].x+=5;
 					simage(bgLayer,i-SW*TS,0,SW*TS,SH*TS);
 					simage(scrollLayer,i,0,SW*TS,SH*TS);
 					hudRefresh();
+					wait();
 					flip();
 				}
 			#endif
@@ -131,10 +135,11 @@ void scrollMap() {
 			spawnSlot=nspawnSlot;
 			bgDraw();
 			#ifndef NOSCROLL
-				for (int i=SW*TS; i>0; i-=5) {
+				for (int i=SW*TS; i>0; i-=speed) {
 					if(entSet[0].x>0) entSet[0].x-=5;
 					simage(bgLayer,i,0,SW*TS,SH*TS);
 					simage(scrollLayer,i-SW*TS,0,SW*TS,SH*TS);
+					wait();
 					hudRefresh();
 					flip();
 				}

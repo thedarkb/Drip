@@ -20,7 +20,7 @@ entity ent_player() {
 	me.y=20;
 	me.health=pMaxHealth;
 	me.attack=5;
-	me.xSub=14;
+	me.xSub=TS/5;
 	me.ySub=1;
 	me.direction=1;
 	me.collisionClass=1;
@@ -72,23 +72,23 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	switch(direction){
 		case 0:
 			me.y-=TS;
-			me.xSub=16;
+			me.xSub=TS/4;
 			me.ySub=1;
 		break;
 		case 1:
 			me.y+=TS;
-			me.xSub=16;
+			me.xSub=TS/4;
 			me.ySub=1;			
 		break;
 		case 2:
 			me.x-=TS;
 			me.xSub=1;
-			me.ySub=16;
+			me.ySub=TS/4;
 		break;
 		case 3:
 			me.x+=TS;
 			me.xSub=1;
-			me.ySub=16;
+			me.ySub=TS/4;
 		break;
 	}
 	me.frame[0]=67;
