@@ -1,14 +1,16 @@
 void worldgen(uint16_t xPos, uint16_t yPos) {
-	uint32_t hashme;
-	uint16_t* hashCom = &hashme;
+	union hashCom {
+		uint16_t x;
+		uint16_t y;
+		uint32_t hashme;
+	} hashCom;
 
-	*hashCom = xPos;
-	hashCom++;
-	*hashCom = yPos;
+	hashCom.x = xPos;
+	hashCom.y = yPos;
 
-	uint32_t screenHash = lfsr(hashme);
+	uint32_t screenHash = lfsr(hashCom.hashme);
 
-	printf("%u\n",hashme);
+	printf("%u\n",hashCom.hashme);
 
 	memcpy(&nentSet, &entSet, sizeof nentSet);
 	nentityReset();
@@ -35,8 +37,8 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 		memcpy(&nScreen, testhouse().tileLayer, sizeof nScreen);
 		nentitySpawn(ent_item(120,120,1,255));
 		nentSet[nspawnSlot-1].health=255;
-		pushMsg("Blobby's Dungeon\0");
-		pushMsg("Level 1:\0");
+		//pushMsg("Blobby's Dungeon\0");
+		//pushMsg("Level 1:\0");
 	}
 }
 
@@ -83,16 +85,6 @@ void scrollMap() {
 			memcpy(&entSet, &nentSet, sizeof nentSet);
 			spawnSlot=nspawnSlot;
 			bgDraw();
-			#ifndef NOSCROLL
-				for (int i=SH*TS; i>0; i-=speed) {
-					if(entSet[0].y>0) entSet[0].y=entSet[0].y-5;
-					simage(bgLayer,0,i,SW*TS,SH*TS);
-					simage(scrollLayer,0,i-SH*TS,SW*TS,SH*TS);
-					hudRefresh();
-					wait();
-					flip();
-				}
-			#endif
 			entSet[0].y=1;
 		}
 		else sY--;
@@ -108,16 +100,6 @@ void scrollMap() {
 			memcpy(&entSet, &nentSet, sizeof nentSet);
 			spawnSlot=nspawnSlot;
 			bgDraw();
-			#ifndef NOSCROLL
-				for (int i=0; i<SW*TS; i+=speed) {
-					if(entSet[0].x<SW*TS-TS) entSet[0].x+=5;
-					simage(bgLayer,i-SW*TS,0,SW*TS,SH*TS);
-					simage(scrollLayer,i,0,SW*TS,SH*TS);
-					hudRefresh();
-					wait();
-					flip();
-				}
-			#endif
 			entSet[0].x=TS*SW-TS;
 		}
 		else sX++;
@@ -134,22 +116,12 @@ void scrollMap() {
 			memcpy(&entSet, &nentSet, sizeof nentSet);
 			spawnSlot=nspawnSlot;
 			bgDraw();
-			#ifndef NOSCROLL
-				for (int i=SW*TS; i>0; i-=speed) {
-					if(entSet[0].x>0) entSet[0].x-=5;
-					simage(bgLayer,i,0,SW*TS,SH*TS);
-					simage(scrollLayer,i-SW*TS,0,SW*TS,SH*TS);
-					wait();
-					hudRefresh();
-					flip();
-				}
-			#endif
 			entSet[0].x=1;
 		}
 		else sX--;
 		scroll=0;
 		break;
 	}
-	SDL_DestroyTexture(bgTex);
-	bgTex=SDL_CreateTextureFromSurface(r, bgLayer);
+	SDL_DestroyTexture(bgTex[1][1]);
+	bgTex[1][1]=SDL_CreateTextureFromSurface(r, bgLayer);
 }

@@ -215,12 +215,12 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 }
 
 int main () {
-	printf("Scroll status: %u\n", ENABLESCROLL);
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS, SH*TS+HUDHEIGHT, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	s = SDL_GetWindowSurface(w);
+	memset(&bgTex, 0, sizeof bgTex);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	scrollLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 
@@ -316,7 +316,7 @@ void setCollision(int iX, int iY, char stat) { //Leaves a 1 pixel border to allo
 }
 
 void image(SDL_Texture* imgIn, int x, int y, int w, int h) {
-	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h};
+	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h};
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }
 
@@ -453,14 +453,48 @@ void loop() {
 		memcpy(&cScreen, &nScreen, sizeof nScreen);
 		memcpy(&layers, &nlayers, sizeof nlayers);
 		bgDraw();
-		bgTex=SDL_CreateTextureFromSurface(r, bgLayer);
+		bgTex[1][1]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX-1,sY-1);
+		bgDraw();
+		bgTex[0][0]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX,sY-1);
+		bgDraw();
+		bgTex[1][0]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX+1,sY-1);
+		bgDraw();
+		bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX-1,sY);
+		bgDraw();
+		bgTex[0][1]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX+1,sY);
+		bgDraw();
+		bgTex[2][1]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX-1,sY+1);
+		bgDraw();
+		bgTex[0][2]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX,sY+1);
+		bgDraw();
+		bgTex[1][2]=SDL_CreateTextureFromSurface(r, bgLayer);
+		worldgen(sX+1,sY+1);
+		bgDraw();
+		bgTex[2][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 		refresh=0;
 	}
 	if (!mode) {
-		image(bgTex,0,0,SW*TS,SH*TS);
+		image(bgTex[0][0],-SW*TS,-SH*TS,SW*TS,SH*TS);
+		image(bgTex[1][0],0,-SH*TS,SW*TS,SH*TS);
+		image(bgTex[2][0],SW*TS,-SH*TS,SW*TS,SH*TS);
+		image(bgTex[0][1],-SW*TS,0,SW*TS,SH*TS);
+		image(bgTex[1][1],0,0,SW*TS,SH*TS);
+		image(bgTex[2][1],SW*TS,0,SW*TS,SH*TS);
+		image(bgTex[0][2],-SH*TS,SH*TS,SW*TS,SH*TS);
+		image(bgTex[1][2],0,SH*TS,SW*TS,SH*TS);
+		image(bgTex[2][2],SW*TS,SH*TS,SW*TS,SH*TS);
 		spriteCollisions();
 		entityLogic();
 	} else popMsg();
+	cameraX=entSet[0].x;
+	cameraY=entSet[0].y;
 	deadEntityKiller();
 	hudRefresh();
 	flip();

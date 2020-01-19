@@ -2,7 +2,7 @@
 #define SW 15 //Screen Width
 #define TS 64 //Tile Size
 
-#define ENABLESCROLL 0
+#define NOSCROLL
 
 #define ELIMIT 10
 #define FLIMIT 32
@@ -37,8 +37,8 @@ uint8_t* keyboard = NULL;
 
 SDL_Surface* swtileset[TILECOUNT]; 
 SDL_Texture* hwtileset[TILECOUNT];
-SDL_Surface* bgLayer = NULL;
-SDL_Texture* bgTex=NULL;
+SDL_Surface* bgLayer=NULL;
+SDL_Texture* bgTex[3][3];
 SDL_Surface* scrollLayer = NULL;
 
 TTF_Font* font;
@@ -82,8 +82,8 @@ typedef struct screen {
 unsigned char spawnSlot=1;
 unsigned char nspawnSlot=1;
 
-uint16_t sX = 1;
-uint16_t sY = 1;
+uint16_t sX = 2;
+uint16_t sY = 2;
 char scroll = 0;
 
 unsigned char pMaxHealth=100;
@@ -109,6 +109,9 @@ entity nentSet[ELIMIT];
 inventory pInv;
 
 SDL_Surface* sf1 = NULL;
+
+int cameraX=0;
+int cameraY=0;
 
 void entityInitialise();
 void entityReset();
