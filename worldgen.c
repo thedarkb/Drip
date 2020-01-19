@@ -1,4 +1,4 @@
-void worldgen(uint16_t xPos, uint16_t yPos) {
+void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	union hashCom {
 		uint16_t x;
 		uint16_t y;
@@ -17,24 +17,24 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 
 	for (int x=0; x<SW; x++) { //first pass clears the tileset, adds flowers.
 		for (int y=0; y<SH; y++) {
-			nScreen[x][y] = 11; //shifts left to account for the collision bit.
-			if ((screenHash & BIT(2)) && (screenHash & BIT(5)) && (screenHash & BIT(9))) nScreen[x][y] = 12;
+			in->screen[x][y] = 11; //shifts left to account for the collision bit.
+			if ((screenHash & BIT(2)) && (screenHash & BIT(5)) && (screenHash & BIT(9))) in->screen[x][y] = 12;
 			screenHash = lfsr(screenHash);
-			setCollision(x,y,0);
+			setCollision(in,x,y,0);
 		}
 	}
 
 	for (int x=0; x<SW; x++) { //adds trees
 		for (int y=0; y<SH; y++) {
 			if ((screenHash & BIT(5)) && (screenHash & BIT(7)) && (screenHash & BIT(10))) {
-				nScreen[x][y] = (30);
-				setCollision(x,y,1);
+				in->screen[x][y] = (30);
+				setCollision(in,x,y,1);
 			}
 			screenHash = lfsr(screenHash);
 		}
 	}
 	if(xPos == 0 && yPos == 0) {
-		memcpy(&nScreen, testhouse().tileLayer, sizeof nScreen);
+		memcpy(&in->screen, testhouse().tileLayer, sizeof in->screen);
 		nentitySpawn(ent_item(120,120,1,255));
 		nentSet[nspawnSlot-1].health=255;
 		//pushMsg("Blobby's Dungeon\0");
@@ -43,7 +43,7 @@ void worldgen(uint16_t xPos, uint16_t yPos) {
 }
 
 void scrollMap() {
-	int checkX = entSet[0].x;
+	/*int checkX = entSet[0].x;
 	int checkY = entSet[0].y;
 	const int speed=(TS*SW)/24;
 	SDL_BlitSurface(s, &hudStripper, scrollLayer, NULL);
@@ -123,5 +123,5 @@ void scrollMap() {
 		break;
 	}
 	SDL_DestroyTexture(bgTex[1][1]);
-	bgTex[1][1]=SDL_CreateTextureFromSurface(r, bgLayer);
+	bgTex[1][1]=SDL_CreateTextureFromSurface(r, bgLayer);*/
 }

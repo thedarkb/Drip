@@ -1,6 +1,6 @@
 #define SH 10 //Screen Height
 #define SW 15 //Screen Width
-#define TS 64 //Tile Size
+#define TS 16 //Tile Size
 
 #define NOSCROLL
 
@@ -10,7 +10,7 @@
 #define ENTFRAMES 32
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 30
-#define HUDHEIGHT 80
+#define HUDHEIGHT 20
 #define MSGDEPTH 8
 #define MSGTIME 30
 
@@ -79,20 +79,25 @@ typedef struct screen {
 	unsigned char* entities;
 } screen;
 
+typedef struct view {
+	unsigned char screen[SW][SH];
+	unsigned char layers[SW*TS][SH*TS];
+} view;
+
+view tilewrapper[3][3];	
+
 unsigned char spawnSlot=1;
 unsigned char nspawnSlot=1;
 
-uint16_t sX = 2;
-uint16_t sY = 2;
+uint16_t sX = 1;
+uint16_t sY = 1;
 char scroll = 0;
 
 unsigned char pMaxHealth=100;
 
 unsigned char animationG=0;
 
-unsigned char cScreen[SW][SH];
 unsigned char nScreen[SW][SH];
-unsigned char layers[SW*TS][SH*TS];
 unsigned char nlayers[SW*TS][SH*TS];
 
 char* msgBuffer[MSGDEPTH];
@@ -124,8 +129,8 @@ void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
 unsigned int get_diff (int val1, int val2);
 uint32_t lfsr (uint32_t shift);
-void setCollision(int iX, int iY, char stat);
-void worldgen(uint16_t xPos, uint16_t yPos);
+void setCollision(view* in, int iX, int iY, char stat);
+void worldgen(view* in, uint16_t xPos, uint16_t yPos);
 void scrollMap();
 void image(SDL_Texture* imgIn, int x, int y, int w, int h);
 void simage(SDL_Surface* imgIn, int x, int y, int w, int h);

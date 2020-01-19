@@ -16,7 +16,7 @@ entity ent_player() {
 	entity me;
 	memset(&me, 0, sizeof me);
 	me.behaviourId=1;
-	me.x=280;
+	me.x=20;
 	me.y=20;
 	me.health=pMaxHealth;
 	me.attack=5;
@@ -112,7 +112,7 @@ entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
 	me.y=y*TS;
 	me.frame[0]=tile;
 	me.setframe=0;
-	setCollision(x,y,1);
+	setCollision(&tilewrapper[1][1],x,y,1);
 	return me;
 }
 

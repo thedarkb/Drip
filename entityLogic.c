@@ -2,7 +2,7 @@ void entityLogic() {
 	for (int i=0; i<spawnSlot; i++) { //Bottom entity layer, affectionately known as the corpse pit.
 		switch (entSet[i].behaviourId) {
 			case 255:
-				if (entSet[i].deathframe != 0) image(hwtileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
+				if (entSet[i].deathframe) image(hwtileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 			case 10:
 				image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
@@ -16,7 +16,7 @@ void entityLogic() {
 			case 1: //The player.
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
-				for (int j=0; j<TS/9; j++) { //number of pixels to move per frame.
+				for (int j=0; j<TS/8; j++) { //number of pixels to move per frame.
 					if (entSet[i].status[3]==0) {
 						if (keyboard[SDL_SCANCODE_RIGHT]) {
 							moveX(&entSet[i], 1);

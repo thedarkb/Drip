@@ -186,7 +186,7 @@ void spriteCollisions() {
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {
 	for (int x=0; x<SW; x++) {
 		for (int y=0; y<SH; y++) {
-			if(collisions[x][y]>0) setCollision(x,y,collisions[x][y]);
+			if(collisions[x][y]>0) setCollision(&tilewrapper[1][1],x,y,collisions[x][y]);
 		}
 	}
 	for (int x=0; x<SW; x++) {
@@ -217,9 +217,11 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 int main () {
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
-	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS, SH*TS+HUDHEIGHT, SDL_WINDOW_OPENGL);
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS)*4+HUDHEIGHT, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
+	SDL_RenderSetScale(r,4,4);
 	s = SDL_GetWindowSurface(w);
+	memset(&tilewrapper, 0, sizeof tilewrapper);
 	memset(&bgTex, 0, sizeof bgTex);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	scrollLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
@@ -229,16 +231,11 @@ int main () {
 
 	loader = IMG_Load("sheet.png"); //tilesheet
 
-	for (int x=0; x<SW; x++) {
-		for (int y=0; y<SH; y++) {
-			setCollision(x,y,0);
-		}
-	}
 
 	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
 	tile size as stored, fifth is for the tile number. It reads from the */
 	for (int i = 0; i<TILECOUNT; i++) {
-		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, 64, i);
+		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, TS, i);
 		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
 	}
 	for (int i=0; i<TILECOUNT; i++) {
@@ -248,6 +245,7 @@ int main () {
 	SDL_FreeSurface(loader);
 	unsigned int timer=0;
 	entityInitialise();
+	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
 	#ifndef WEB
 	while(1) {
 		if (SDL_GetTicks()-timer < 1000/FRAMERATE) SDL_Delay(1000/FRAMERATE);
@@ -307,10 +305,10 @@ uint32_t getrandom() {
 	return lfsr(SDL_GetTicks()) >> 1;
 }
 
-void setCollision(int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
+void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
 	for (int x=1; x<TS-1; x++) {
 		for (int y=1; y<TS-1; y++) {
-			nlayers[(iX*TS)+x][(iY*TS)+y] = stat; 
+			in->layers[(iX*TS)+x][(iY*TS)+y] = stat; 
 		}
 	}
 }
@@ -337,10 +335,10 @@ void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) {
 	SDL_BlitSurface(imgIn, NULL, bgLayer, &scaler);
 }
 
-void bgDraw () {
+void bgDraw (view* in) {
 	for (int x=0; x<SW; x++) {
 		for (int y=0; y<SH; y++) {
-			bgBlit(swtileset[cScreen[x][y]],x*TS,y*TS,TS,TS);
+			bgBlit(swtileset[in->screen[x][y]],x*TS,y*TS,TS,TS);
 		}
 	}
 }
@@ -369,14 +367,14 @@ void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
 
 void hudRefresh() {
 	drawRect(0,0,TS*SW,HUDHEIGHT,0);
-	drawRect(528,16,entSet[0].health*(420/pMaxHealth),16,0x6DAA2C);
-	drawRect(528,32,420,16,0xd04648);
-	drawRect(528,48,420,16,0x597dce);
+	drawRect(132,4,entSet[0].health*(105/pMaxHealth),4,0x6DAA2C);
+	drawRect(132,8,105,4,0xd04648);
+	drawRect(132,12,105,4,0x597dce);
 	for (int i=0; i<INVLIMIT; i++) {
-		if (pInv.items[i].type) hudDraw(hwtileset[getItemSprite(pInv.items[i].type)], TS*i, 8, TS, TS);
-		hudDraw(hwtileset[83], TS*i, 8, TS, TS);
+		if (pInv.items[i].type) hudDraw(hwtileset[getItemSprite(pInv.items[i].type)], TS*i, 2, TS, TS);
+		hudDraw(hwtileset[83], TS*i, 2, TS, TS);
 	}
-	drawRect((pInv.selection*TS)+4,8,TS-8,4,0xFFFF00);
+	drawRect((pInv.selection*TS)+1,2,TS-2,1,0xFFFF00);
 }
 
 void flip() {
@@ -387,7 +385,8 @@ void flip() {
 }
 
 char collisionCheck(int x, int y) {
-	return layers[x][y];
+	printf("Collision data at %u,%u: %u\n",x,y,tilewrapper[1][1].layers[x][y]);
+	return tilewrapper[1][1].layers[x][y];
 }
 
 void moveX(entity* movEnt, char amount) {
@@ -449,35 +448,13 @@ void loop() {
 	if (scroll) scrollMap();
 	
 	if (refresh) {
-		worldgen(sX,sY);
-		memcpy(&cScreen, &nScreen, sizeof nScreen);
-		memcpy(&layers, &nlayers, sizeof nlayers);
-		bgDraw();
-		bgTex[1][1]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX-1,sY-1);
-		bgDraw();
-		bgTex[0][0]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX,sY-1);
-		bgDraw();
-		bgTex[1][0]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX+1,sY-1);
-		bgDraw();
-		bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX-1,sY);
-		bgDraw();
-		bgTex[0][1]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX+1,sY);
-		bgDraw();
-		bgTex[2][1]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX-1,sY+1);
-		bgDraw();
-		bgTex[0][2]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX,sY+1);
-		bgDraw();
-		bgTex[1][2]=SDL_CreateTextureFromSurface(r, bgLayer);
-		worldgen(sX+1,sY+1);
-		bgDraw();
-		bgTex[2][2]=SDL_CreateTextureFromSurface(r, bgLayer);
+		for (int x=0; x<3; x++) {
+			for (int y=0; y<3; y++) {
+				worldgen(&tilewrapper[x][y],(sX-1)+x,(sY-1)+y);
+				bgDraw(&tilewrapper[x][y]);
+				bgTex[x][y]=SDL_CreateTextureFromSurface(r, bgLayer);
+			}
+		}
 		refresh=0;
 	}
 	if (!mode) {
