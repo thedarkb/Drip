@@ -4,7 +4,6 @@
 #include <SDL2/SDL_image.h>
 #include <assert.h>
 #include <SDL2/SDL.h>
-#include <SDL2/SDL_ttf.h>
 #include <stdio.h>
 #include "main.h"
 #include "items.c"
@@ -215,7 +214,6 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 
 int main () {
 	SDL_Init(SDL_INIT_VIDEO);
-	TTF_Init();
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
@@ -226,7 +224,6 @@ int main () {
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	scrollLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 
-	font = TTF_OpenFont("slkscr.ttf", 4); //IMPLEMENT PROPER FONT SCALING WITH BUILT IN FUNCTION.
 	keyboard = SDL_GetKeyboardState(NULL);
 
 	loader = IMG_Load("sheet.png"); //tilesheet
@@ -270,18 +267,16 @@ void pushMsg(char* inStr) {
 }
 
 void popMsg(){
-	SDL_Color white={255,255,255,255};
-	SDL_Surface* text=TTF_RenderText_Solid(font,msgBuffer[msgSlot-1],white);
+	/*SDL_Color white={255,255,255,255};
 	printf(msgBuffer[msgSlot-1]);
 	simage(text,0,90,SW*TS,SH*TS);
-	SDL_FreeSurface(text);
 	if (keyboard[SDL_SCANCODE_X] && msgTimeout > 30) {
 		msgSlot--;
 		if (!msgSlot) mode=0;
 		else msgTimeout=0;
 		return;
 	}
-	msgTimeout++;
+	msgTimeout++;*/
 }
 
 unsigned int get_diff (int val1, int val2) {
@@ -386,11 +381,11 @@ void flip() {
 
 char collisionCheck(int x, int y) {
 	int wrapperX=(x+TS*SW)/(TS*SW);
-	printf("WrapperX: %u\n", wrapperX);
 	int wrapperY=(y+TS*SH)/(TS*SH);
-	printf("WrapperY: %u\n", wrapperY);
+	int microX=(x+TS*SW)%(TS*SW);
+	int microY=(y+TS*SH)%(TS*SH);
 	assert(wrapperX<3);
-	return tilewrapper[wrapperX][wrapperY].layers[x][y];
+	return tilewrapper[wrapperX][wrapperY].layers[microX][microY];
 }
 
 void moveX(entity* movEnt, char amount) {
@@ -401,7 +396,7 @@ void moveX(entity* movEnt, char amount) {
 	if (movEnt->animation > 8) movEnt->animation=8;
 
 	unsigned int check = (*movEnt).x + amount;
-	if (check >TS*SW-TS) return;
+	//if (check >TS*SW-TS) return;
 	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
 	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+TS/2)) return;
 	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
@@ -449,8 +444,8 @@ void snapToGrid(entity* movEnt) {
 }
 
 void loop() {
-	//printf("Screen X: %u\n", sX);
-	//printf("Screen Y: %u\n", sY);
+	printf("Screen X: %u\n", sX);
+	printf("Screen Y: %u\n", sY);
 	if (scroll) scrollMap();
 	
 	if (refresh) {

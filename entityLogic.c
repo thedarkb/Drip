@@ -77,8 +77,8 @@ void entityLogic() {
 					}
 					if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);                            
 					
-					if (entSet[i].y == 0) scroll = 1;
-					if (entSet[i].y == TS*SH-TS) scroll=2;
+					if (entSet[i].y < 0) scroll = 1;
+					if (entSet[i].y > TS*SH) scroll=2;
 					if (entSet[i].x < -TS) scroll = 3;
 					if (entSet[i].x > TS*SW-TS-1) scroll = 4;
 				}

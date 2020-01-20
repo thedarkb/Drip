@@ -41,7 +41,6 @@ SDL_Surface* bgLayer=NULL;
 SDL_Texture* bgTex[3][3];
 SDL_Surface* scrollLayer = NULL;
 
-TTF_Font* font;
 
 typedef struct entity {
 	int x;
