@@ -12,7 +12,6 @@
 #include "maps.c"
 #include "worldgen.c"
 #include "entityLogic.c"
-
 void entityInitialise() {
 	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
@@ -378,14 +377,13 @@ void hudRefresh() {
 }
 
 void flip() {
-	t = SDL_CreateTextureFromSurface(r, s);
-	SDL_RenderCopy(r,t,NULL,NULL);
-	SDL_DestroyTexture(t);
+	//t = SDL_CreateTextureFromSurface(r, s);
+	//SDL_RenderCopy(r,t,NULL,NULL);
+	//SDL_DestroyTexture(t);
 	SDL_RenderPresent(r);
 }
 
 char collisionCheck(int x, int y) {
-	printf("Collision data at %u,%u: %u\n",x,y,tilewrapper[1][1].layers[x][y]);
 	return tilewrapper[1][1].layers[x][y];
 }
 
@@ -397,7 +395,7 @@ void moveX(entity* movEnt, char amount) {
 	if (movEnt->animation > 8) movEnt->animation=8;
 
 	unsigned int check = (*movEnt).x + amount;
-	if (check >TS*SW-TS) return;
+	//if (check >TS*SW-TS) return;
 	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
 	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+TS/2)) return;
 	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
@@ -415,7 +413,7 @@ void moveY(entity* movEnt, char amount) {
 	if (movEnt->animation > 8) movEnt->animation=8;
 
 	unsigned int check = (*movEnt).y + amount;
-	if (check > TS*SH-TS) return;
+	//if (check > TS*SH-TS) return;
 	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS/2, check+(*movEnt).ySub)) return;
@@ -464,7 +462,7 @@ void loop() {
 		image(bgTex[0][1],-SW*TS,0,SW*TS,SH*TS);
 		image(bgTex[1][1],0,0,SW*TS,SH*TS);
 		image(bgTex[2][1],SW*TS,0,SW*TS,SH*TS);
-		image(bgTex[0][2],-SH*TS,SH*TS,SW*TS,SH*TS);
+		image(bgTex[0][2],-SW*TS,SH*TS,SW*TS,SH*TS);
 		image(bgTex[1][2],0,SH*TS,SW*TS,SH*TS);
 		image(bgTex[2][2],SW*TS,SH*TS,SW*TS,SH*TS);
 		spriteCollisions();

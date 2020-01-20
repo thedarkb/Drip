@@ -44,8 +44,8 @@ SDL_Surface* scrollLayer = NULL;
 TTF_Font* font;
 
 typedef struct entity {
-	unsigned int x;
-	unsigned int y;
+	int x;
+	int y;
 	unsigned char xSub;
 	unsigned char ySub;
 	unsigned int behaviourId;

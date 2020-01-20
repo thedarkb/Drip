@@ -4,13 +4,14 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		uint16_t y;
 		uint32_t hashme;
 	} hashCom;
+	uint32_t hashme=0;
 
-	hashCom.x = xPos;
-	hashCom.y = yPos;
+	hashme |= xPos;
+	hashme |= yPos << 16;
 
-	uint32_t screenHash = lfsr(hashCom.hashme);
+	uint32_t screenHash = lfsr(hashme);
 
-	printf("%u\n",hashCom.hashme);
+	printf("%u\n",hashme);
 
 	memcpy(&nentSet, &entSet, sizeof nentSet);
 	nentityReset();
@@ -43,37 +44,55 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 }
 
 void scrollMap() {
-	/*int checkX = entSet[0].x;
+	int checkX = entSet[0].x;
 	int checkY = entSet[0].y;
 	const int speed=(TS*SW)/24;
 	SDL_BlitSurface(s, &hudStripper, scrollLayer, NULL);
 	switch (scroll) {
 		case 1:
-		sY--;
-		worldgen(sX,sY);
 		checkY=TS*SH-5;
-		if (nlayers[checkX][checkY] == 0 && nlayers[checkX+TS/2][checkY] == 0 && nlayers[checkX+TS][checkY] == 0 ) {
+		if (tilewrapper[1][0].layers[checkX][checkY] == 0 && tilewrapper[1][0].layers[checkX+TS/2][checkY] == 0 && tilewrapper[1][0].layers[checkX+TS][checkY] == 0 ) {
+			sY--;
+			
+			tilewrapper[0][2]=tilewrapper[0][1];
+			tilewrapper[1][2]=tilewrapper[1][1];
+			tilewrapper[2][2]=tilewrapper[2][1];
+			
+			tilewrapper[0][1]=tilewrapper[0][0];
+			tilewrapper[1][1]=tilewrapper[1][0];
+			tilewrapper[2][1]=tilewrapper[2][0];	
+				
+			
+			bgTex[0][2]=bgTex[0][1];
+			bgTex[1][2]=bgTex[1][1];
+			bgTex[2][2]=bgTex[2][1];
+			
+			bgTex[0][1]=bgTex[0][0];
+			bgTex[1][1]=bgTex[1][0];
+			bgTex[2][1]=bgTex[2][0];
+			
+			
+			worldgen(&tilewrapper[0][0],sX,sY);
+			bgDraw(&tilewrapper[0][0]);
+			bgTex[0][0]=SDL_CreateTextureFromSurface(r, bgLayer);
+			
+			worldgen(&tilewrapper[1][0],sX,sY);
+			bgDraw(&tilewrapper[1][0]);
+			bgTex[1][0]=SDL_CreateTextureFromSurface(r, bgLayer);
+			
+			worldgen(&tilewrapper[2][0],sX,sY);
+			bgDraw(&tilewrapper[2][0]);
+			bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
+			
+			entityReset();
 			entSet[0].x=checkX;
-			memcpy(&cScreen, &nScreen, sizeof nScreen);
-			memcpy(&layers, &nlayers, sizeof nlayers);
-			memcpy(&entSet, &nentSet, sizeof nentSet);
-			spawnSlot=nspawnSlot;
-			bgDraw();
-			#ifndef NOSCROLL
-				for (int i=0; i<SH*TS; i+=speed) {
-					if(entSet[0].y<TS*SH-TS) entSet[0].y=entSet[0].y+5;
-					simage(bgLayer,0,i-SH*TS,SW*TS,SH*TS);
-					simage(scrollLayer,0,i,SW*TS,SH*TS);
-					hudRefresh();
-					wait();
-					flip();
-				}
-			#endif
 			entSet[0].y=TS*SH-TS-1;
+			cameraX=entSet[0].x;
+			cameraY=entSet[0].y;
 		}
 		else sY++;
 		scroll=0;
-		break;
+		break;/*
 		case 2:
 		sY++;
 		worldgen(sX,sY);
@@ -120,8 +139,6 @@ void scrollMap() {
 		}
 		else sX--;
 		scroll=0;
-		break;
+		break;*/
 	}
-	SDL_DestroyTexture(bgTex[1][1]);
-	bgTex[1][1]=SDL_CreateTextureFromSurface(r, bgLayer);*/
 }

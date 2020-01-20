@@ -76,10 +76,12 @@ void entityLogic() {
 						}
 					}
 					if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);                            
-
-					if (entSet[i].y < 1) scroll = 1;
+					
+					//printf("X: %u\n", entSet[i].x);
+					//printf("Y: %u\n", entSet[i].y);
+					if (entSet[i].y < -TS) scroll = 1;
 					if (entSet[i].y+TS > TS*SH-1) scroll=2;
-					if (entSet[i].x < 1) scroll = 3;
+					if (entSet[i].x < -TS) scroll = 3;
 					if (entSet[i].x > TS*SW-TS-1) scroll = 4;
 				}
 				if(entSet[i].status[3]>0) entSet[i].status[3]--;
