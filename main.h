@@ -22,7 +22,7 @@
 #define ANIMPARSE entSet[i].frame[entSet[i].direction+entSet[i].animation]
 #define PRESENTENT entSet[i]
 
-#define TITLE "Eastbound Interloper"
+#define TITLE "Drip"
 
 
 SDL_Window* w = NULL;

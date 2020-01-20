@@ -216,8 +216,9 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 int main () {
 	SDL_Init(SDL_INIT_VIDEO);
 	TTF_Init();
-	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS)*4+HUDHEIGHT, SDL_WINDOW_OPENGL);
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
+	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
 	SDL_RenderSetScale(r,4,4);
 	s = SDL_GetWindowSurface(w);
 	memset(&tilewrapper, 0, sizeof tilewrapper);
@@ -384,7 +385,12 @@ void flip() {
 }
 
 char collisionCheck(int x, int y) {
-	return tilewrapper[1][1].layers[x][y];
+	int wrapperX=(x+TS*SW)/(TS*SW);
+	printf("WrapperX: %u\n", wrapperX);
+	int wrapperY=(y+TS*SH)/(TS*SH);
+	printf("WrapperY: %u\n", wrapperY);
+	assert(wrapperX<3);
+	return tilewrapper[wrapperX][wrapperY].layers[x][y];
 }
 
 void moveX(entity* movEnt, char amount) {
@@ -395,7 +401,7 @@ void moveX(entity* movEnt, char amount) {
 	if (movEnt->animation > 8) movEnt->animation=8;
 
 	unsigned int check = (*movEnt).x + amount;
-	//if (check >TS*SW-TS) return;
+	if (check >TS*SW-TS) return;
 	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
 	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+TS/2)) return;
 	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
@@ -413,7 +419,7 @@ void moveY(entity* movEnt, char amount) {
 	if (movEnt->animation > 8) movEnt->animation=8;
 
 	unsigned int check = (*movEnt).y + amount;
-	//if (check > TS*SH-TS) return;
+	//if (check > TS*SH) return;
 	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS/2, check+(*movEnt).ySub)) return;
@@ -443,6 +449,8 @@ void snapToGrid(entity* movEnt) {
 }
 
 void loop() {
+	//printf("Screen X: %u\n", sX);
+	//printf("Screen Y: %u\n", sY);
 	if (scroll) scrollMap();
 	
 	if (refresh) {

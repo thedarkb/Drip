@@ -11,7 +11,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 
 	uint32_t screenHash = lfsr(hashme);
 
-	printf("%u\n",hashme);
+	//printf("%u\n",hashme);
 
 	memcpy(&nentSet, &entSet, sizeof nentSet);
 	nentityReset();
@@ -72,15 +72,15 @@ void scrollMap() {
 			bgTex[2][1]=bgTex[2][0];
 			
 			
-			worldgen(&tilewrapper[0][0],sX,sY);
+			worldgen(&tilewrapper[0][0],sX-1,sY-1);
 			bgDraw(&tilewrapper[0][0]);
 			bgTex[0][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
-			worldgen(&tilewrapper[1][0],sX,sY);
+			worldgen(&tilewrapper[1][0],sX,sY-1);
 			bgDraw(&tilewrapper[1][0]);
 			bgTex[1][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
-			worldgen(&tilewrapper[2][0],sX,sY);
+			worldgen(&tilewrapper[2][0],sX+1,sY-1);
 			bgDraw(&tilewrapper[2][0]);
 			bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
@@ -90,25 +90,52 @@ void scrollMap() {
 			cameraX=entSet[0].x;
 			cameraY=entSet[0].y;
 		}
-		else sY++;
-		scroll=0;
-		break;/*
-		case 2:
-		sY++;
-		worldgen(sX,sY);
-		checkY=5;
-		if (nlayers[checkX][checkY] == 0 && nlayers[checkX+TS/2][checkY] == 0 && nlayers[checkX+TS][checkY] == 0 ) {
-			entSet[0].x=checkX;
-			memcpy(&cScreen, &nScreen, sizeof nScreen);
-			memcpy(&layers, &nlayers, sizeof nlayers);
-			memcpy(&entSet, &nentSet, sizeof nentSet);
-			spawnSlot=nspawnSlot;
-			bgDraw();
-			entSet[0].y=1;
-		}
-		else sY--;
 		scroll=0;
 		break;
+		case 2:
+		printf("Attempting to downscroll.\n");
+		checkY=5;
+		if (tilewrapper[1][2].layers[checkX][checkY] == 0 && tilewrapper[1][2].layers[checkX+TS/2][checkY] == 0 && tilewrapper[1][2].layers[checkX+TS][checkY] == 0 ) {
+			sY++;
+			
+			tilewrapper[0][0]=tilewrapper[0][1];
+			tilewrapper[1][0]=tilewrapper[1][1];
+			tilewrapper[2][0]=tilewrapper[2][1];
+			
+			tilewrapper[0][1]=tilewrapper[0][2];
+			tilewrapper[1][1]=tilewrapper[1][2];
+			tilewrapper[2][1]=tilewrapper[2][2];	
+				
+			
+			bgTex[0][0]=bgTex[0][1];
+			bgTex[1][0]=bgTex[1][1];
+			bgTex[2][0]=bgTex[2][1];
+			
+			bgTex[0][1]=bgTex[0][2];
+			bgTex[1][1]=bgTex[1][2];
+			bgTex[2][1]=bgTex[2][2];
+			
+			
+			worldgen(&tilewrapper[0][2],sX-1,sY+1);
+			bgDraw(&tilewrapper[0][2]);
+			bgTex[0][2]=SDL_CreateTextureFromSurface(r, bgLayer);
+			
+			worldgen(&tilewrapper[1][2],sX,sY+1);
+			bgDraw(&tilewrapper[1][2]);
+			bgTex[1][2]=SDL_CreateTextureFromSurface(r, bgLayer);
+			
+			worldgen(&tilewrapper[2][2],sX+1,sY+1);
+			bgDraw(&tilewrapper[2][2]);
+			bgTex[2][2]=SDL_CreateTextureFromSurface(r, bgLayer);
+			
+			entityReset();
+			entSet[0].x=checkX;
+			entSet[0].y=1;
+			cameraX=entSet[0].x;
+			cameraY=entSet[0].y;
+		}
+		scroll=0;
+		break;/*
 		case 3:
 		sX--;
 		worldgen(sX,sY);
