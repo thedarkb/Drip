@@ -11,12 +11,22 @@
 #include "maps.c"
 #include "worldgen.c"
 #include "entityLogic.c"
+
 void entityInitialise() {
 	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
 	}
 	entSet[0]=ent_player();
 	memset(&pInv, 0, sizeof pInv);
+}
+
+void entityScroll(int x, int y) {
+	for (int i=0; i<spawnSlot; i++) {
+		entSet[i].x=entSet[i].x+((SW*TS)*x);
+		entSet[i].y=entSet[i].y+((SH*TS)*y);
+		if (entSet[i].x < -SW*TS || entSet[i].x > (SW*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
+		if (entSet[i].y < -SH*TS || entSet[i].y > (SH*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
+	}
 }
 
 void entityReset() {
@@ -26,13 +36,17 @@ void entityReset() {
 	spawnSlot=1;
 }
 
-void entitySpawn(entity in) {
-	if (spawnSlot > ELIMIT-1) {
-		printf("Spawn limit exceeded.\n");
-		corpseDisposal();
+void entitySpawn(entity in, int x, int y) {
+	if(in.behaviourId) {
+		if (spawnSlot > ELIMIT-1) {
+			printf("Spawn limit exceeded.\n");
+			corpseDisposal();
+		}
+		entSet[spawnSlot]=in;
+		entSet[spawnSlot].x+=x;
+		entSet[spawnSlot].y+=y;
+		spawnSlot++;
 	}
-	entSet[spawnSlot]=in;
-	spawnSlot++;
 }
 
 void nentityReset() {
@@ -57,7 +71,7 @@ void deadEntityKiller() {
 			entSet[i].behaviourId=255;
 			entSet[i].collisionClass=0;
 			if(entSet[i].drop[0] != 0) {
-				entitySpawn(ent_item(entSet[i].x, entSet[i].y, entSet[i].drop[0], 255));
+				entitySpawn(ent_item(entSet[i].x, entSet[i].y, entSet[i].drop[0], 255),0,0);
 				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
 			}
 		}
@@ -70,7 +84,7 @@ void corpseDisposal() {
 	entityReset();
 	for (int i=1; i<ELIMIT; i++) {
 		if (nentSet[i].health>0) {
-			entitySpawn(nentSet[i]);
+			entitySpawn(nentSet[i],0,0);
 			printf("Live entity found in position: %u\n", i);
 		}
 	}
@@ -81,8 +95,8 @@ int overlap(unsigned char i, unsigned char j){
 	if (!entSet[j].collisionClass) return 0; //Collisio
 	if (entSet[j].collisionClass>128) return 0;
 	if (entSet[i].collisionClass == entSet[j].collisionClass) return 0;
-	if ((entSet[j].x+TS/2 > entSet[i].x+entSet[i].xSub) && (entSet[j].x+TS/2 < entSet[i].x+TS-entSet[i].xSub)) {
-		if ((entSet[j].y+TS/2 > entSet[i].y+entSet[i].ySub) && (entSet[j].y+TS/2 < entSet[i].y+TS-entSet[i].ySub)) return 1;
+	if (get_diff(entSet[i].x+TS/2,entSet[j].x+TS/2) < 10) {
+		if (get_diff(entSet[i].y+TS/2,entSet[j].y+TS/2) < 10) return 1;
 	}
 	return 0;
 }
@@ -166,7 +180,7 @@ void spriteCollisions() {
 						else entSet[j].health=0;
 					break;
 					case 130:
-						if (j != 0) break;
+						if (j) break;
 						for (int k=0; k<INVLIMIT; k++) {
 							if (!pInv.items[k].type) {
 								pInv.items[k].type=entSet[i].status[0];
@@ -241,6 +255,7 @@ int main () {
 
 	SDL_FreeSurface(loader);
 	unsigned int timer=0;
+	memset(&entSet, 0, sizeof entSet);
 	entityInitialise();
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
 	#ifndef WEB
@@ -444,10 +459,7 @@ void snapToGrid(entity* movEnt) {
 }
 
 void loop() {
-	printf("Screen X: %u\n", sX);
-	printf("Screen Y: %u\n", sY);
 	if (scroll) scrollMap();
-	
 	if (refresh) {
 		for (int x=0; x<3; x++) {
 			for (int y=0; y<3; y++) {

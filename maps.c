@@ -56,6 +56,7 @@ screen testhouse() {
 	nentSet[nspawnSlot-1].x=7*TS;
 	nentSet[nspawnSlot-1].y=4*TS;
 
+	me.collisionLayer=collisions;
 	me.tileLayer=layer1;
 	return me;
 }

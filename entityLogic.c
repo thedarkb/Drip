@@ -38,7 +38,7 @@ void entityLogic() {
 
 						if (keyboard[SDL_SCANCODE_X] && entSet[i].status[3] == 0 && entSet[i].status[0] == 0) {
 							printf("Spawn slot: %u\n", spawnSlot);
-							entitySpawn(ent_sword(entSet[i].direction, entSet[i].x, entSet[i].y, i));
+							entitySpawn(ent_sword(entSet[i].direction, entSet[i].x, entSet[i].y, i),0,0);
 							entSet[i].status[3]=10;
 							entSet[i].status[0]=30;
 						}
@@ -63,12 +63,13 @@ void entityLogic() {
 					}
 
 					if (keyboard[SDL_SCANCODE_D] && pInv.items[pInv.selection].type) {
-						entitySpawn(ent_item(entSet[i].x, entSet[i].y, pInv.items[pInv.selection].type, 255));
+						entitySpawn(ent_item(entSet[i].x, entSet[i].y, pInv.items[pInv.selection].type, 255),0,0);
 						fastMoveY(&entSet[spawnSlot-1], 1, TS);
 						pInv.items[pInv.selection].type=0;
 					}
 					if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
 					if (keyboard[SDL_SCANCODE_L]) pushMsg("Test\0");
+					if (keyboard[SDL_SCANCODE_N]) entitySpawn(ent_aitest(), 0,0);
 					if (keyboard[SDL_SCANCODE_A]) itemEffects(pInv.items[pInv.selection].type);
 					if (keyboard[SDL_SCANCODE_J]) {
 						for (int k=0; k<ELIMIT; k++) {

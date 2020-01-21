@@ -1,9 +1,34 @@
+void entFetch(unsigned int xIn, unsigned int yIn) {
+	uint32_t screenNum=0;
+	screenNum |= sX+(xIn-1);
+	screenNum |= sY+(yIn-1) << 16;
+	
+	int xMult=(xIn-1)*(SW*TS);
+	int yMult=(yIn-1)*(SH*TS);
+	
+	
+	if(screenNum==0) {
+		entitySpawn(ent_aitest(),xMult+80,yMult+120);
+	}
+	tilewrapper[xIn][yIn].flag=0;
+	//return ent_empty();
+}
+
+void loadSpawn() {
+	for(int x=0; x<3; x++) {
+		for(int y=0; y<3; y++) {
+			if (tilewrapper[x][y].flag) {
+				entFetch(x,y);
+				tilewrapper[x][y].flag=0;
+			}
+		}
+	}
+}
+
 void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
-	union hashCom {
-		uint16_t x;
-		uint16_t y;
-		uint32_t hashme;
-	} hashCom;
+
+	loadSpawn();
+
 	uint32_t hashme=0;
 
 	hashme |= xPos;
@@ -34,13 +59,15 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 			screenHash = lfsr(screenHash);
 		}
 	}
-	if(xPos == 0 && yPos == 0) {
+	in->flag=1;
+	/*if(xPos == 0 && yPos == 0) {
 		memcpy(&in->screen, testhouse().tileLayer, sizeof in->screen);
-		nentitySpawn(ent_item(120,120,1,255));
-		nentSet[nspawnSlot-1].health=255;
+		memcpy(&in->layers, testhouse().collisionLayer, sizeof in->screen);
+		entitySpawn(ent_item(120,120,1,255));
+		entSet[nspawnSlot-1].health=255;
 		//pushMsg("Blobby's Dungeon\0");
 		//pushMsg("Level 1:\0");
-	}
+	}*/
 }
 
 void scrollMap() {
@@ -50,7 +77,9 @@ void scrollMap() {
 	SDL_BlitSurface(s, &hudStripper, scrollLayer, NULL);
 	switch (scroll) {
 		case 1:
-		checkY=TS*SH-5;
+			entityScroll(0,1);
+			
+			checkY=TS*SH-5;
 			sY--;
 			
 			tilewrapper[0][2]=tilewrapper[0][1];
@@ -83,16 +112,15 @@ void scrollMap() {
 			bgDraw(&tilewrapper[2][0]);
 			bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
-			entityReset();
-			entSet[0].x=checkX;
-			entSet[0].y=TS*SH;
+			//entSet[0].x=checkX;
+			//entSet[0].y=TS*SH;
 			cameraX=entSet[0].x;
 			cameraY=entSet[0].y;
 		scroll=0;
 		break;
 		case 2:
-		printf("Attempting to downscroll.\n");
 		checkY=5;
+			entityScroll(0,-1);
 			sY++;
 			
 			tilewrapper[0][0]=tilewrapper[0][1];
@@ -125,14 +153,14 @@ void scrollMap() {
 			bgDraw(&tilewrapper[2][2]);
 			bgTex[2][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
-			entityReset();
-			entSet[0].x=checkX;
-			entSet[0].y=1;
+			//entSet[0].x=checkX;
+			//entSet[0].y=1;
 			cameraX=entSet[0].x;
 			cameraY=entSet[0].y;
 			scroll=0;
 		break;
 		case 3:
+			entityScroll(1,0);
 			sX--;
 			
 			tilewrapper[2][0]=tilewrapper[1][0];
@@ -165,13 +193,13 @@ void scrollMap() {
 			bgDraw(&tilewrapper[0][2]);
 			bgTex[0][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
-			entityReset();
-			entSet[0].x=TS*SW-TS;
+			//entSet[0].x=TS*SW-TS;
 			cameraX=entSet[0].x;
 			cameraY=entSet[0].y;
 			scroll=0;
 		break;
 		case 4:
+			entityScroll(-1,0);
 			sX++;
 			
 			tilewrapper[0][0]=tilewrapper[1][0];
@@ -204,8 +232,7 @@ void scrollMap() {
 			bgDraw(&tilewrapper[2][2]);
 			bgTex[2][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
-			entityReset();
-			entSet[0].x=-TS+1;
+			//entSet[0].x=-TS+1;
 			cameraX=entSet[0].x;
 			cameraY=entSet[0].y;
 			scroll=0;

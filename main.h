@@ -4,7 +4,8 @@
 
 #define NOSCROLL
 
-#define ELIMIT 10
+#define ELIMIT 32
+#define MAPELIMIT 8
 #define FLIMIT 32
 #define INVLIMIT 8
 #define ENTFRAMES 32
@@ -81,9 +82,12 @@ typedef struct screen {
 typedef struct view {
 	unsigned char screen[SW][SH];
 	unsigned char layers[SW*TS][SH*TS];
+	unsigned char flag;
 } view;
 
-view tilewrapper[3][3];	
+
+view tilewrapper[3][3];
+uint16_t flags=0;
 
 unsigned char spawnSlot=1;
 unsigned char nspawnSlot=1;
@@ -119,7 +123,7 @@ int cameraY=0;
 
 void entityInitialise();
 void entityReset();
-void entitySpawn(entity in);
+void entitySpawn(entity in, int x, int y);
 void nentityReset();
 void nentitySpawn(entity in);
 void deadEntityKiller();

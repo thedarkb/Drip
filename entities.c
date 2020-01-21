@@ -41,6 +41,7 @@ entity ent_player() {
 
 entity ent_aitest() {
 	entity me;
+	memset(&me, 0, sizeof me);
 	me.behaviourId=4;
 	me.xSub=2;
 	me.ySub=10;
@@ -141,5 +142,11 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 	me.setframe=0;
 	me.status[0]=type;
 	me.collisionClass=130;
+	return me;
+}
+
+entity ent_empty() {
+	entity me;
+	memset(&me,0,sizeof me);
 	return me;
 }
