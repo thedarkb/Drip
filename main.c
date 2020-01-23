@@ -233,6 +233,10 @@ int main () {
 	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
 	SDL_RenderSetScale(r,4,4);
 	s = SDL_GetWindowSurface(w);
+	rng.ui32=4; //SEEDS THE MAIN RNG
+	generateTunnels();
+	tunnels[0].m=1;
+	tunnels[0].c=0;
 	memset(&tilewrapper, 0, sizeof tilewrapper);
 	memset(&bgTex, 0, sizeof bgTex);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
@@ -252,7 +256,16 @@ int main () {
 	for (int i=0; i<TILECOUNT; i++) {
 		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
 	}
-
+	SDL_FreeSurface(loader);
+	loader=IMG_Load("font.png");
+	for (int i=0; i<127; i++) {
+		font[i]=surfLoader(loader, 889, 7, 7, 7, i);
+		SDL_SetColorKey(font[i], SDL_TRUE, 0x00FF00);
+	}
+	for (int i=0; i<127; i++) {
+		hwfont[i]=SDL_CreateTextureFromSurface(r, font[i]);
+		//SDL_FreeSurface(font[i]);
+	}
 	SDL_FreeSurface(loader);
 	unsigned int timer=0;
 	memset(&entSet, 0, sizeof entSet);
@@ -275,6 +288,21 @@ int main () {
 	return 0;
 }
 
+void text(char* inStr, int x, int y) {
+	int i=0;
+	int xb=x;
+	while (inStr[i]) {
+		if (inStr[i]>37) simage(font[inStr[i]], x, y, 7, 7);
+		x+=8;
+		if(inStr[i]==10) {
+			y+=8;
+			x=xb;
+		}
+		i++;
+	}
+		
+}	
+
 void pushMsg(char* inStr) {
 	mode=1;
 	msgBuffer[msgSlot]=inStr;
@@ -282,16 +310,23 @@ void pushMsg(char* inStr) {
 }
 
 void popMsg(){
-	/*SDL_Color white={255,255,255,255};
-	printf(msgBuffer[msgSlot-1]);
-	simage(text,0,90,SW*TS,SH*TS);
-	if (keyboard[SDL_SCANCODE_X] && msgTimeout > 30) {
-		msgSlot--;
-		if (!msgSlot) mode=0;
-		else msgTimeout=0;
-		return;
+	static char keyPressed=0;
+	drawRect(2,120,236,58,0);
+	text(msgBuffer[msgSlot-1],2,102);
+	if (!keyPressed) { 	
+		if (keyboard[SDL_SCANCODE_Z] && msgTimeout>10) {
+			printf("Next slot:\n");
+			msgSlot--;
+			if (!msgSlot) mode=0;
+			else msgTimeout=0;
+			msgTimeout=0;
+			return;
+		}
+		if (keyboard[SDL_SCANCODE_Z]) keyPressed=1;
 	}
-	msgTimeout++;*/
+	if(!keyboard[SDL_SCANCODE_Z]) keyPressed=0;
+	msgTimeout++;
+	printf("Message timeout frames: %u\n", msgTimeout);
 }
 
 unsigned int get_diff (int val1, int val2) {
@@ -301,7 +336,7 @@ unsigned int get_diff (int val1, int val2) {
 }
 
 uint32_t lfsr (uint32_t shift) {
-	for (int i=0; i<32; i++) {
+	for (int i=0; i<33; i++) {
 		shift ^= (shift >> 31);
 		shift ^= (shift >> 31) << 4;
 		shift ^= (shift >> 31) << 5;
@@ -311,8 +346,42 @@ uint32_t lfsr (uint32_t shift) {
 	return shift >> 1;
 }
 
+void reroll() {
+	rng.ui32=lfsr(rng.ui32);
+}
+
+int intersect(unsigned int x, unsigned int y) {
+	for (int i=0; i<TLIMIT; i++) {
+		if (get_diff(y, (tunnels[i].m*x)+tunnels[i].c)==1) return 1;
+		if (get_diff(y, (tunnels[i].m*x)+tunnels[i].c)==0) return 1;	
+	}
+	return 0;
+}
+
+void generateTunnels() {
+	for(char i=0; i<TLIMIT; i++) {
+		duplicate://Dirty, I know.
+		reroll();
+		tunnels[i].m=rng.c>>5;
+		if (!tunnels[i].m) tunnels[i].m++;
+		reroll();
+		tunnels[i].c=((rng.c/8)*8)/2;
+		if (tunnels[i].m>1 || tunnels[i].m<-1) tunnels[i].c *= tunnels[i].m;
+		if (tunnels[i].c>0 && tunnels[i].m>0) tunnels[i].m*=-1;
+		if (tunnels[i].c<0 && tunnels[i].m<0) tunnels[i].m*=-1;
+		for(int j=0; j<i; j++){if(tunnels[i].m == tunnels[j].m && tunnels[i].c == tunnels[j].c) goto duplicate;}
+		//Goes back to the top of the for loop if a duplicate line is detected.
+		printf("Tunnel %d, m=%d; c=%d\n", i, tunnels[i].m, tunnels[i].c);
+	}
+}
+
 uint32_t getrandom() {
-	return lfsr(SDL_GetTicks()) >> 1;
+	union signedOut {
+		uint32_t in;
+		int32_t out;
+	} signedOut;
+	signedOut.in=lfsr(SDL_GetTicks()) >> 1;
+	return signedOut.out;
 }
 
 void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
@@ -325,6 +394,11 @@ void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel bord
 
 void image(SDL_Texture* imgIn, int x, int y, int w, int h) {
 	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h};
+	SDL_RenderCopy(r, imgIn, NULL, &scaler);
+}
+
+void timage(SDL_Texture* imgIn, int x, int y, int w, int h) {
+	SDL_Rect scaler = {x,y,w,h};
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }
 
@@ -401,6 +475,7 @@ char collisionCheck(int x, int y) {
 	int microY=(y+TS*SH)%(TS*SH);
 	assert(wrapperX<3);
 	return tilewrapper[wrapperX][wrapperY].layers[microX][microY];
+	return 0;
 }
 
 void moveX(entity* movEnt, char amount) {
@@ -481,11 +556,11 @@ void loop() {
 		image(bgTex[1][2],0,SH*TS,SW*TS,SH*TS);
 		image(bgTex[2][2],SW*TS,SH*TS,SW*TS,SH*TS);
 		spriteCollisions();
+		deadEntityKiller();
 		entityLogic();
 	} else popMsg();
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
-	deadEntityKiller();
 	hudRefresh();
 	flip();
 	if(animationG<30) animationG+=2;

@@ -7,6 +7,7 @@
 #define ELIMIT 32
 #define MAPELIMIT 8
 #define FLIMIT 32
+#define TLIMIT 16
 #define INVLIMIT 8
 #define ENTFRAMES 32
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
@@ -38,6 +39,8 @@ uint8_t* keyboard = NULL;
 
 SDL_Surface* swtileset[TILECOUNT]; 
 SDL_Texture* hwtileset[TILECOUNT];
+SDL_Surface* font[128];
+SDL_Texture* hwfont[128];
 SDL_Surface* bgLayer=NULL;
 SDL_Texture* bgTex[3][3];
 SDL_Surface* scrollLayer = NULL;
@@ -85,6 +88,18 @@ typedef struct view {
 	unsigned char flag;
 } view;
 
+typedef struct tunnel {
+	int m;
+	int c;
+	unsigned char type;
+} tunnel;
+
+union rng {
+	int32_t i32;
+	uint32_t ui32;
+	char c;
+	unsigned char uc;
+} rng;
 
 view tilewrapper[3][3];
 uint16_t flags=0;
@@ -97,6 +112,7 @@ uint16_t sY = 1;
 char scroll = 0;
 
 unsigned char pMaxHealth=100;
+unsigned char swordOut=0;
 
 unsigned char animationG=0;
 
@@ -113,6 +129,7 @@ char mode = 0;
 
 entity entSet[ELIMIT];
 entity nentSet[ELIMIT];
+tunnel tunnels[TLIMIT];
 
 inventory pInv;
 
@@ -132,6 +149,7 @@ void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
 unsigned int get_diff (int val1, int val2);
 uint32_t lfsr (uint32_t shift);
+uint32_t getrandom();
 void setCollision(view* in, int iX, int iY, char stat);
 void worldgen(view* in, uint16_t xPos, uint16_t yPos);
 void scrollMap();

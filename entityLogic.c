@@ -17,7 +17,7 @@ void entityLogic() {
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
 				for (int j=0; j<TS/8; j++) { //number of pixels to move per frame.
-					if (entSet[i].status[3]==0) {
+					if (entSet[i].status[3]==0 && !swordOut) {
 						if (keyboard[SDL_SCANCODE_RIGHT]) {
 							moveX(&entSet[i], 1);
 							pmotion=1;
@@ -35,14 +35,14 @@ void entityLogic() {
 							pmotion=1;
 						}
 						if (pmotion == 0) entSet[i].animation=0;
+						
 
-						if (keyboard[SDL_SCANCODE_X] && entSet[i].status[3] == 0 && entSet[i].status[0] == 0) {
-							printf("Spawn slot: %u\n", spawnSlot);
+						if (keyboard[SDL_SCANCODE_X] && !swordOut) {
 							entitySpawn(ent_sword(entSet[i].direction, entSet[i].x, entSet[i].y, i),0,0);
-							entSet[i].status[3]=10;
-							entSet[i].status[0]=30;
+							swordOut=1;							
 						}
 					}
+					if(!keyboard[SDL_SCANCODE_X]) swordOut=0;
 
 					if (keyboard[SDL_SCANCODE_1]) {
 						pInv.selection=0;
@@ -68,7 +68,11 @@ void entityLogic() {
 						pInv.items[pInv.selection].type=0;
 					}
 					if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
-					if (keyboard[SDL_SCANCODE_L]) pushMsg("Test\0");
+					if (keyboard[SDL_SCANCODE_L]) {
+						pushMsg("Test\0");
+						pushMsg("Message\0");
+						pushMsg("Stacking\0");
+					}
 					if (keyboard[SDL_SCANCODE_N]) entitySpawn(ent_aitest(), 0,0);
 					if (keyboard[SDL_SCANCODE_A]) itemEffects(pInv.items[pInv.selection].type);
 					if (keyboard[SDL_SCANCODE_J]) {
@@ -82,6 +86,7 @@ void entityLogic() {
 					if (entSet[i].y > TS*SH) scroll=2;
 					if (entSet[i].x < -TS) scroll = 3;
 					if (entSet[i].x > TS*SW-TS-1) scroll = 4;
+					if (entSet[i].health<pMaxHealth && animationG > 29) entSet[i].health++;
 				}
 				if(entSet[i].status[3]>0) entSet[i].status[3]--;
 				if(entSet[i].status[0]>0) entSet[i].status[0]--;
@@ -153,8 +158,7 @@ void entityLogic() {
 
 
 			case 9:
-				if (entSet[i].status[0]==0) entSet[i].health=0;
-				entSet[i].status[0]--;
+				if (!swordOut) entSet[i].health=0;
 				switch(entSet[entSet[i].status[1]].direction) {
 					case 0:
 						entSet[i].x=entSet[entSet[i].status[1]].x;
@@ -173,7 +177,7 @@ void entityLogic() {
 						entSet[i].y=entSet[entSet[i].status[1]].y;
 					break;
 				}
-				if(entSet[entSet[i].status[1]].status[3]) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+				/*if(entSet[entSet[i].status[1]].status[3])*/ image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 
 			case 11:
