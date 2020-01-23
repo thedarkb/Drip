@@ -41,31 +41,33 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	memcpy(&nentSet, &entSet, sizeof nentSet);
 	nentityReset();
 	
-	if(intersect(xPos, yPos) && xPos<360 && xPos<360) {
-		for (int x=0; x<SW; x++) { //first pass clears the tileset, adds flowers.
-			for (int y=0; y<SH; y++) {
-				in->screen[x][y] = 11; //shifts left to account for the collision bit.
-				if ((screenHash & BIT(2)) && (screenHash & BIT(5)) && (screenHash & BIT(9))) in->screen[x][y] = 12;
-				screenHash = lfsr(screenHash);
-				setCollision(in,x,y,0);
-			}
-		}
+	int diff=intersect(xPos, yPos);
 	
-		for (int x=0; x<SW; x++) { //adds trees
-			for (int y=0; y<SH; y++) {
-				if ((screenHash & BIT(5)) && (screenHash & BIT(7)) && (screenHash & BIT(10))) {
-					in->screen[x][y] = (30);
-					setCollision(in,x,y,1);
+	if(diff && xPos<100 && yPos<100) {
+		if (diff==1) {
+			for (int x=0; x<SW; x++) { //first pass clears the tileset, adds flowers.
+				for (int y=0; y<SH; y++) {
+					in->screen[x][y] = 15;
+					if ((screenHash & BIT(2)) && (screenHash & BIT(5)) && (screenHash & BIT(9))) in->screen[x][y] = 12;
+					screenHash = lfsr(screenHash);
+					setCollision(in,x,y,0);
 				}
-				screenHash = lfsr(screenHash);
 			}
+		
+			for (int x=0; x<SW; x++) { //adds trees
+				for (int y=0; y<SH; y++) {
+					if ((screenHash & BIT(5)) && (screenHash & BIT(7)) && (screenHash & BIT(10))) {
+						in->screen[x][y] = (30);
+						setCollision(in,x,y,1);
+					}
+					screenHash = lfsr(screenHash);
+				}
+			}
+		} else {
+			printf("Get else'd");
 		}
 	} else {
-		for (int x=0; x<SW; x++) {
-			for (int y=0; y<SH; y++) {
-				in->screen[x][y]=22;
-			}
-		}
+		memset(&in->screen, 22, sizeof in->screen);
 	}
 	in->flag=1;
 	/*if(xPos == 0 && yPos == 0) {

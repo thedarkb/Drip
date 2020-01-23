@@ -318,7 +318,6 @@ void popMsg(){
 			printf("Next slot:\n");
 			msgSlot--;
 			if (!msgSlot) mode=0;
-			else msgTimeout=0;
 			msgTimeout=0;
 			return;
 		}
@@ -326,7 +325,7 @@ void popMsg(){
 	}
 	if(!keyboard[SDL_SCANCODE_Z]) keyPressed=0;
 	msgTimeout++;
-	printf("Message timeout frames: %u\n", msgTimeout);
+	printf("Reading message slot: %u\n", msgSlot);
 }
 
 unsigned int get_diff (int val1, int val2) {
@@ -352,7 +351,7 @@ void reroll() {
 
 int intersect(unsigned int x, unsigned int y) {
 	for (int i=0; i<TLIMIT; i++) {
-		if (get_diff(y, (tunnels[i].m*x)+tunnels[i].c)==1) return 1;
+		if (get_diff(y, (tunnels[i].m*x)+tunnels[i].c)==1) return 2;
 		if (get_diff(y, (tunnels[i].m*x)+tunnels[i].c)==0) return 1;	
 	}
 	return 0;
