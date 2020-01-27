@@ -42,33 +42,51 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	nentityReset();
 	
 	int diff=intersect(xPos, yPos);
-	
-	if(diff && xPos<100 && yPos<100) {
-		if (diff==1) {
-			for (int x=0; x<SW; x++) { //first pass clears the tileset, adds flowers.
-				for (int y=0; y<SH; y++) {
-					in->screen[x][y] = 15;
-					if ((screenHash & BIT(2)) && (screenHash & BIT(5)) && (screenHash & BIT(9))) in->screen[x][y] = 12;
-					screenHash = lfsr(screenHash);
-					setCollision(in,x,y,0);
+	printf("Difference: %d\n", diff);
+	if(xPos<50 && yPos<50) {
+		if(diff>=0 && diff < 100) {
+			printf("Generated full room.\n");
+			memset(&in->screen, 15, sizeof in->screen);
+			memset(&in->layers, 0, sizeof in->layers);
+			for (int edgePos=1; edgePos<SH-1; edgePos++) {
+				screenHash=lfsr(screenHash);
+				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
+					in->screen[edgeCount][edgePos]=22;
+					setCollision(in,edgeCount,edgePos,1);
 				}
 			}
-		
-			for (int x=0; x<SW; x++) { //adds trees
-				for (int y=0; y<SH; y++) {
-					if ((screenHash & BIT(5)) && (screenHash & BIT(7)) && (screenHash & BIT(10))) {
-						in->screen[x][y] = (30);
-						setCollision(in,x,y,1);
-					}
-					screenHash = lfsr(screenHash);
+			for (int edgePos=1; edgePos<SH-1; edgePos++) {
+				screenHash=lfsr(screenHash);
+				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
+					in->screen[SW-edgeCount][edgePos]=22;
+					setCollision(in,SW-edgeCount,edgePos,1);
 				}
 			}
-		} else {
-			printf("Get else'd");
+			for (int edgePos=5; edgePos<SW-5; edgePos++) {
+				screenHash=lfsr(screenHash);
+				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
+					in->screen[edgePos][edgeCount]=22;
+					setCollision(in,edgePos,edgeCount,1);
+				}
+			}
+			for (int edgePos=5; edgePos<SW-5; edgePos++) {
+				screenHash=lfsr(screenHash);
+				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
+					in->screen[edgePos][SH-edgeCount]=22;
+					setCollision(in,edgePos,SH-edgeCount,1);
+				}
+			}	
 		}
-	} else {
-		memset(&in->screen, 22, sizeof in->screen);
-	}
+		else if(diff>0 && diff<200) {
+			printf("Corner room generated.\n");
+			//memset(&in->layers, 0, sizeof in->layers);
+			*in=cornerRoom;
+			//memset(&in->screen, 16, sizeof in->screen);
+			//setCollision(in,0,0,0);
+		}
+		else memset(&in->screen, 22, sizeof in->screen);
+	} else memset(&in->screen, 22, sizeof in->screen);
+	
 	in->flag=1;
 	/*if(xPos == 0 && yPos == 0) {
 		memcpy(&in->screen, testhouse().tileLayer, sizeof in->screen);
@@ -98,7 +116,12 @@ void scrollMap() {
 			
 			tilewrapper[0][1]=tilewrapper[0][0];
 			tilewrapper[1][1]=tilewrapper[1][0];
-			tilewrapper[2][1]=tilewrapper[2][0];	
+			tilewrapper[2][1]=tilewrapper[2][0];
+			
+			
+			SDL_DestroyTexture(bgTex[0][2]);
+			SDL_DestroyTexture(bgTex[1][2]);
+			SDL_DestroyTexture(bgTex[2][2]);	
 				
 			
 			bgTex[0][2]=bgTex[0][1];
@@ -112,14 +135,17 @@ void scrollMap() {
 			
 			worldgen(&tilewrapper[0][0],sX-1,sY-1);
 			bgDraw(&tilewrapper[0][0]);
+			//SDL_DestroyTexture(bgTex[0][0]);
 			bgTex[0][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[1][0],sX,sY-1);
 			bgDraw(&tilewrapper[1][0]);
+			//SDL_DestroyTexture(bgTex[1][0]);
 			bgTex[1][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[2][0],sX+1,sY-1);
 			bgDraw(&tilewrapper[2][0]);
+			//SDL_DestroyTexture(bgTex[2][0]);
 			bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			//entSet[0].x=checkX;
@@ -133,6 +159,7 @@ void scrollMap() {
 			entityScroll(0,-1);
 			sY++;
 			
+			
 			tilewrapper[0][0]=tilewrapper[0][1];
 			tilewrapper[1][0]=tilewrapper[1][1];
 			tilewrapper[2][0]=tilewrapper[2][1];
@@ -141,6 +168,11 @@ void scrollMap() {
 			tilewrapper[1][1]=tilewrapper[1][2];
 			tilewrapper[2][1]=tilewrapper[2][2];	
 				
+			
+			SDL_DestroyTexture(bgTex[0][0]);
+			SDL_DestroyTexture(bgTex[1][0]);
+			SDL_DestroyTexture(bgTex[2][0]);
+			
 			
 			bgTex[0][0]=bgTex[0][1];
 			bgTex[1][0]=bgTex[1][1];
@@ -153,14 +185,17 @@ void scrollMap() {
 			
 			worldgen(&tilewrapper[0][2],sX-1,sY+1);
 			bgDraw(&tilewrapper[0][2]);
+			//SDL_DestroyTexture(bgTex[0][2]);
 			bgTex[0][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[1][2],sX,sY+1);
 			bgDraw(&tilewrapper[1][2]);
+			//SDL_DestroyTexture(bgTex[1][2]);
 			bgTex[1][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[2][2],sX+1,sY+1);
 			bgDraw(&tilewrapper[2][2]);
+			//SDL_DestroyTexture(bgTex[2][2]);
 			bgTex[2][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			//entSet[0].x=checkX;
@@ -179,7 +214,12 @@ void scrollMap() {
 			
 			tilewrapper[1][0]=tilewrapper[0][0];
 			tilewrapper[1][1]=tilewrapper[0][1];
-			tilewrapper[1][2]=tilewrapper[0][2];	
+			tilewrapper[1][2]=tilewrapper[0][2];
+			
+			
+			SDL_DestroyTexture(bgTex[2][0]);
+			SDL_DestroyTexture(bgTex[2][1]);
+			SDL_DestroyTexture(bgTex[2][2]);
 				
 			
 			bgTex[2][0]=bgTex[1][0];
@@ -193,14 +233,17 @@ void scrollMap() {
 			
 			worldgen(&tilewrapper[0][0],sX-1,sY-1);
 			bgDraw(&tilewrapper[0][0]);
+			//SDL_DestroyTexture(bgTex[0][0]);
 			bgTex[0][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[0][1],sX-1,sY);
 			bgDraw(&tilewrapper[0][1]);
+			//SDL_DestroyTexture(bgTex[0][1]);
 			bgTex[0][1]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[0][2],sX-1,sY+1);
 			bgDraw(&tilewrapper[0][2]);
+			//SDL_DestroyTexture(bgTex[0][2]);
 			bgTex[0][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			//entSet[0].x=TS*SW-TS;
@@ -218,7 +261,12 @@ void scrollMap() {
 			
 			tilewrapper[1][0]=tilewrapper[2][0];
 			tilewrapper[1][1]=tilewrapper[2][1];
-			tilewrapper[1][2]=tilewrapper[2][2];	
+			tilewrapper[1][2]=tilewrapper[2][2];
+			
+			
+			SDL_DestroyTexture(bgTex[0][0]);
+			SDL_DestroyTexture(bgTex[0][1]);
+			SDL_DestroyTexture(bgTex[0][2]);
 				
 			
 			bgTex[0][0]=bgTex[1][0];
@@ -232,14 +280,17 @@ void scrollMap() {
 			
 			worldgen(&tilewrapper[2][0],sX+1,sY-1);
 			bgDraw(&tilewrapper[2][0]);
+			//SDL_DestroyTexture(bgTex[2][0]);
 			bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[2][1],sX+1,sY);
 			bgDraw(&tilewrapper[2][1]);
+			//SDL_DestroyTexture(bgTex[2][1]);
 			bgTex[2][1]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			worldgen(&tilewrapper[2][2],sX+1,sY+1);
 			bgDraw(&tilewrapper[2][2]);
+			//SDL_DestroyTexture(bgTex[2][2]);
 			bgTex[2][2]=SDL_CreateTextureFromSurface(r, bgLayer);
 			
 			//entSet[0].x=-TS+1;

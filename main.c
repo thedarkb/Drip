@@ -92,7 +92,7 @@ void corpseDisposal() {
 }
 
 int overlap(unsigned char i, unsigned char j){
-	if (!entSet[j].collisionClass) return 0; //Collisio
+	if (!entSet[j].collisionClass) return 0;
 	if (entSet[j].collisionClass>128) return 0;
 	if (entSet[i].collisionClass == entSet[j].collisionClass) return 0;
 	if (get_diff(entSet[i].x+TS/2,entSet[j].x+TS/2) < 10) {
@@ -107,7 +107,8 @@ void spriteCollisions() {
 			if(overlap(i,j)){
 				switch (entSet[i].collisionClass) {
 					case 2:
-					entSet[j].health-=20;
+					if (entSet[j].health>20) entSet[j].health-=20;
+					else entSet[j].health=0;
 					if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
 						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 							entSet[j].status[2]=entSet[j].collisionClass;
@@ -271,6 +272,26 @@ int main () {
 	memset(&entSet, 0, sizeof entSet);
 	entityInitialise();
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
+	
+	
+	/*Corner Room definition.*/
+	memset(&cornerRoom.screen, 22, sizeof cornerRoom.screen);
+	cornerRoom.screen[0][0]=15;
+	cornerRoom.screen[0][9]=15;
+	cornerRoom.screen[14][0]=15;
+	cornerRoom.screen[14][9]=15;
+	for (int x=0; x<SW; x++) {
+		for(int y=0; y<SH; y++) {
+			setCollision(&cornerRoom,x,y,1);
+		}
+	}
+	setCollision(&cornerRoom,0,0,0);
+	setCollision(&cornerRoom,0,9,0);
+	setCollision(&cornerRoom,14,0,0);
+	setCollision(&cornerRoom,14,9,0);	
+	/*End of Corner Room definition.*/
+	
+	
 	#ifndef WEB
 	while(1) {
 		if (SDL_GetTicks()-timer < 1000/FRAMERATE) SDL_Delay(1000/FRAMERATE);
@@ -351,10 +372,9 @@ void reroll() {
 
 int intersect(unsigned int x, unsigned int y) {
 	for (int i=0; i<TLIMIT; i++) {
-		if (get_diff(y, (tunnels[i].m*x)+tunnels[i].c)==1) return 2;
-		if (get_diff(y, (tunnels[i].m*x)+tunnels[i].c)==0) return 1;	
+		if (get_diff(y*100, ((tunnels[i].m*x)+tunnels[i].c)*100)<200) return get_diff(y*100, ((tunnels[i].m*x)+tunnels[i].c)*100);
 	}
-	return 0;
+	return -1;
 }
 
 void generateTunnels() {

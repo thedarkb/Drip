@@ -16,8 +16,8 @@ entity ent_player() {
 	entity me;
 	memset(&me, 0, sizeof me);
 	me.behaviourId=1;
-	me.x=20;
-	me.y=20;
+	me.x=0;
+	me.y=0;
 	me.health=pMaxHealth;
 	me.attack=5;
 	me.xSub=TS/5;

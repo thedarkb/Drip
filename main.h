@@ -86,6 +86,8 @@ typedef struct view {
 	unsigned char screen[SW][SH];
 	unsigned char layers[SW*TS][SH*TS];
 	unsigned char flag;
+	unsigned int x;
+	unsigned int y;
 } view;
 
 typedef struct tunnel {
@@ -100,6 +102,8 @@ union rng {
 	char c;
 	unsigned char uc;
 } rng;
+
+view cornerRoom;
 
 view tilewrapper[3][3];
 uint16_t flags=0;
