@@ -189,7 +189,10 @@ void spriteCollisions() {
 								break;
 							}
 						}
-					break;							
+					break;
+					case 131:
+					//TODO dialogue spawner in here.
+					break;												
 				}
 			}
 		}

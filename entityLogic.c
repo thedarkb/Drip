@@ -17,7 +17,7 @@ void entityLogic() {
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 				char pmotion=0;
 				for (int j=0; j<TS/8; j++) { //number of pixels to move per frame.
-					if (entSet[i].status[3]==0 && !swordOut) {
+					if (entSet[i].status[3]==0 && !swordOut && !dialogueOut) {
 						if (keyboard[SDL_SCANCODE_RIGHT]) {
 							moveX(&entSet[i], 1);
 							pmotion=1;
@@ -36,6 +36,10 @@ void entityLogic() {
 						}
 						if (pmotion == 0) entSet[i].animation=0;
 						
+						if(keyboard[SDL_SCANCODE_Z]) {
+							entitySpawn(ent_dialogue(entSet[i].direction, entSet[i].x, entSet[i].y),0,0);
+							dialogueOut=1;
+						}				
 
 						if (keyboard[SDL_SCANCODE_X] && !swordOut) {
 							entitySpawn(ent_sword(entSet[i].direction, entSet[i].x, entSet[i].y, i),0,0);
@@ -43,6 +47,7 @@ void entityLogic() {
 						}
 					}
 					if(!keyboard[SDL_SCANCODE_X]) swordOut=0;
+					if(!keyboard[SDL_SCANCODE_Z]) dialogueOut=0;
 
 					if (keyboard[SDL_SCANCODE_1]) {
 						pInv.selection=0;
@@ -219,6 +224,33 @@ void entityLogic() {
 					entSet[i].collisionClass=entSet[i].status[2];
 				}
 				image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+			break;
+			
+			case 15:
+				if (!dialogueOut) entSet[i].health=0;
+				else {
+					printf("Looking for dialogue...\n");
+					
+					switch(entSet[entSet[i].status[1]].direction) {
+						case 0:
+							entSet[i].x=entSet[entSet[i].status[1]].x;
+							entSet[i].y=entSet[entSet[i].status[1]].y-TS;
+						break;
+						case 1:
+							entSet[i].x=entSet[entSet[i].status[1]].x;
+							entSet[i].y=entSet[entSet[i].status[1]].y+TS;
+						break;
+						case 2:
+							entSet[i].x=entSet[entSet[i].status[1]].x-TS;
+							entSet[i].y=entSet[entSet[i].status[1]].y;
+						break;
+						case 3:
+							entSet[i].x=entSet[entSet[i].status[1]].x+TS;
+							entSet[i].y=entSet[entSet[i].status[1]].y;
+						break;
+					}
+				}
+				/*if(entSet[entSet[i].status[1]].status[3])*/ image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 			break;
 		}
 	}

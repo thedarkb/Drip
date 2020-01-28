@@ -105,6 +105,22 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	return me;
 }
 
+entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
+	entity me;
+	memset(&me, 0, sizeof me);
+	me.frame[0]=67;
+	me.frame[1]=67;
+	me.frame[2]=67;
+	me.frame[3]=67;
+	me.health=255;
+	me.status[0]=10;
+	me.status[1]=0;
+	me.behaviourId=15;
+	me.setframe=direction;
+	me.collisionClass=129;
+	return me;
+}
+
 entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
 	entity me;
 	me.behaviourId=2;

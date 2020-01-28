@@ -63,6 +63,9 @@ typedef struct entity {
 	unsigned char setframe;
 	unsigned char deathframe;
 	unsigned char drop[4];
+	unsigned char hostile;
+	void(*hostileDiag)();
+	void(*passiveDiag)();
 } entity;
 
 typedef struct item {
@@ -117,6 +120,7 @@ char scroll = 0;
 
 unsigned char pMaxHealth=100;
 unsigned char swordOut=0;
+unsigned char dialogueOut=0;
 
 unsigned char animationG=0;
 
