@@ -1,10 +1,59 @@
+//29 chars in 1 line
+//Long story short, this is all a dream. The assets used in this can be reused for random houses in settlements and towns.
+//This is also a good intro quest because it gets the player familiarised with the movement and the interactions and the whole "The WORLD IS FUCKED" dynamic of the main story.
 void diag_blob() {
-    pushMsg("ALRIGHT, WHAT'S ALL THIS\nRUCKUS, THEN?\0"); 
+    pushMsg("ALRIGHT, WHAT'S ALL THIS\nRUCKUS, THEN?\0");
     pushMsg("MUST BE COMING FROM INSIDE\nTHE SHED.\nDA PROBABLY FORGOT TO CLOSE\nTHE WINDOWS AGAIN.\0");
     pushMsg("GOTTA PUT SOMETHING ON AND\nGET DOWN THERE BEFORE\nSOMETHING HAPPENS AND DA\nBLAMES ME.\nAGAIN.\0");
-//try and get a trigger that switches the player sprite from undies to normal fully clothed when you step in front of a wardrobe.
-//also try to get a rustling clothes sound effect that isn't that big. if the GBA could have one, so can i.
+
+
     pushMsg("MUCH BETTER!\nRIGHT, ONTO THE TASK AT HAND...\0");
     pushMsg("BETTER NOT WAKE UP MA OR DA\nOR I'LL GET KILLED, OR WORSE!\0");
     pushMsg("WAIT, WHAT?\n");
 }
+void diag_player() {
+//room, night time
+	pushMsg("ALRIGHT, WHAT'S ALL THIS\nRUCKUS, THEN?\0"); 
+	pushMsg("MUST BE COMING FROM INSIDE\nTHE SHED.\nDA PROBABLY FORGOT TO CLOSE\nTHE WINDOWS AGAIN.\0");
+	pushMsg("GOTTA PUT SOMETHING ON AND\nGET DOWN THERE BEFORE\nSOMETHING HAPPENS AND DA\nBLAMES ME.\nAGAIN.\0");
+//try and get a trigger that switches the player sprite from undies to normal fully clothed when you step in front of a wardrobe.
+//also try to get a rustling clothes sound effect that isn't that big. if the GBA could have one, so can i.
+	pushMsg("MUCH BETTER!\nRIGHT, ONTO THE TASK AT HAND.\0");
+	pushMsg("BETTER NOT WAKE UP MA OR DA\nOR I'LL GET KILLED,\n OR WORSE!\0");
+	pushMsg("WAIT, WHAT?\nI CAN'T GET DOUBLE-KILLED,\n CAN I?\0");
+	pushMsg("PROBABLY ISN'T IN MY BEST INTERESTS TO FIND OUT AT THE MOMENT.");
+//house layout is basically pokemon ripoff
+	pushMsg("RIGHT, GOTTA SNEAK OUT TO THE\n SHED AND CLOSE THAT WINDOW.");
+//                                       |
+//cue quest sequence of getting out the house.
+//outside, night time still.
+	pushMsg("ALMOST THERE. WHAT IS MAKING\n SO MUCH NOISE THOUGH?");
+//just outside of shed
+	pushMsg("WAIT. THE CLANGING'S STOPPED\n STILL HAVE TO CLOSE THAT WINDOW.");
+//creaking noise of shed door
+//protag gets in shed
+//shed is tiny, has 1 thing you can interact with on the far side, maybe get rieno to make that bit of the shed look messed up.
+//protag finds cat in shed
+//ben weeps silently /s
+//cat is now called Jim
+//because this is a dream and the protag is basically Wurzel on steroids, Jim speaks.
+}
+/*void diag_JimAndPlayer() {
+	pushMsg(PlayerName, ":\nHI THERE LITTLE GUY. HOW'D\nYOU GET IN HERE?");
+	pushMsg("CAT:\nI'VE ALWAYS BEEN HERE, KID.\nWHERE ARE YOUR PARENTS?\nI MUST SPEAK TO THEM.");
+	pushMsg("(FAINT VOICES IN THE DISTANCE)");
+	pushMsg("VOICES:\nWE'RE DEAD, JIM...\nWE'RE DEAD, JIM.\nWE'RE DEAD, JIM!");
+//maybe add flash of white for theatrical effect
+	pushMsg("JIM:\n...I APPEAR TO BE TOO LATE.\nI AM SORRY, KID.")
+	pushMsg("JIM:\nGOOD LUCK.\nSEARCH FOR THE LIGHT AT THE\nEND OF THE TUNNEL.\nWAKE UP NOW.\nIT WAS ALL A DREAM.")
+					//He's dead, Jim.
+//fade to white
+//fade back to cave.
+}
+//fade into protag's pal in cave, Jim, waking protag up.
+//jim is humanoid but not exactly human maybe ex-robot serf depending on where you want to go with this.
+//Jim can also reappear in towns or something if you like to give you pointers. 
+void diag_PlayerAndJim() {
+	pushMsg("JIM:\nWAKE UP MAN, WE HAVE A LONG,\nHARD, THROBBING PATH AHEAD\nOF US.");
+	pushMsg(PlayerName, ":\n...LIGHT AT...\n ...END OF TUNNEL...");
+}*/

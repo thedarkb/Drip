@@ -1,0 +1,16 @@
+void playerBehaviour(int i);
+void behav_potato(int i);
+void behav_chase(int i);
+void behav_wait(int i);
+void behav_upLeft(int i);
+void behav_upRight(int i);
+void behav_downLeft(int i);
+void behav_downRight(int i);
+void behav_sword(int i);
+void behav_up(int i);
+void behav_down(int i);
+void behav_left(int i);
+void behav_right(int i);
+void behav_dialogue(int i);
+void behav_dead(int i);
+void behav_item(int i);

@@ -8,6 +8,7 @@
 #include "main.h"
 #include "items.c"
 #include "dialogue.c"
+#include "entityLogic.h"
 #include "entities.c"
 #include "maps.c"
 #include "worldgen.c"
@@ -38,7 +39,7 @@ void entityReset() {
 }
 
 void entitySpawn(entity in, int x, int y) {
-	if(in.behaviourId) {
+	if(in.behaviour) {
 		if (spawnSlot > ELIMIT-1) {
 			printf("Spawn limit exceeded.\n");
 			corpseDisposal();
@@ -69,8 +70,9 @@ void nentitySpawn(entity in) {
 void deadEntityKiller() {
 	for (int i=0; i<spawnSlot; i++) {
 		if(entSet[i].health==0) {
-			entSet[i].behaviourId=255;
+			entSet[i].behaviour=behav_dead;
 			entSet[i].collisionClass=0;
+			entSet[i].layer=0;
 			if(entSet[i].drop[0] != 0) {
 				entitySpawn(ent_item(entSet[i].x, entSet[i].y, entSet[i].drop[0], 255),0,0);
 				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
@@ -114,15 +116,15 @@ void spriteCollisions() {
 						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].status[0]=entSet[j].behaviourId;
-							entSet[j].behaviourId=5; //up left
+							entSet[j].prevState=entSet[j].behaviour;
+							entSet[j].behaviour=behav_upLeft; //up left
 							entSet[j].collisionClass=entSet[i].collisionClass;
 						}
 						else {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].status[0]=entSet[j].behaviourId;
-							entSet[j].behaviourId=6; //up right
+							entSet[j].prevState=entSet[j].behaviour;
+							entSet[j].behaviour=behav_upRight; //up right
 							entSet[j].collisionClass=entSet[i].collisionClass;
 						}
 					}
@@ -130,15 +132,15 @@ void spriteCollisions() {
 						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].status[0]=entSet[j].behaviourId;
-							entSet[j].behaviourId=7; //down left
+							entSet[j].prevState=entSet[j].behaviour;
+							entSet[j].behaviour=behav_downLeft; //down left
 							entSet[j].collisionClass=entSet[i].collisionClass;
 						}
 						else {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].status[0]=entSet[j].behaviourId;
-							entSet[j].behaviourId=8; //down right
+							entSet[j].prevState=entSet[j].behaviour;
+							entSet[j].behaviour=behav_downRight; //down right
 							entSet[j].collisionClass=entSet[i].collisionClass;
 						}
 					}
@@ -150,29 +152,29 @@ void spriteCollisions() {
 							case 0:
 								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
-								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=11; //up
+								entSet[j].prevState=entSet[j].behaviour;
+								entSet[j].behaviour=behav_up; //up
 								entSet[j].collisionClass=entSet[i].collisionClass;
 							break;
 							case 1:
 								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
-								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=12; //down
+								entSet[j].prevState=entSet[j].behaviour;
+								entSet[j].behaviour=behav_down; //down
 								entSet[j].collisionClass=entSet[i].collisionClass;
 							break;
 							case 2:
 								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
-								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=13; //left
+								entSet[j].prevState=entSet[j].behaviour;
+								entSet[j].behaviour=behav_left; //left
 								entSet[j].collisionClass=entSet[i].collisionClass;
 							break;
 							case 3:
 								entSet[j].status[2]=entSet[j].collisionClass;
 								entSet[j].status[1]=10;
-								entSet[j].status[0]=entSet[j].behaviourId;
-								entSet[j].behaviourId=14; //right
+								entSet[j].prevState=entSet[j].behaviour;
+								entSet[j].behaviour=behav_right; //right
 								entSet[j].collisionClass=entSet[i].collisionClass;
 							break;
 							if (entSet[entSet[i].status[1]].attack > entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
@@ -196,7 +198,7 @@ void spriteCollisions() {
 						else if(!entSet[j].hostile && entSet[j].passiveDiag) entSet[j].passiveDiag();
 						else pushMsg("No dialogue found for entity.\n");
 						entSet[i].health=0;
-						entSet[i].behaviourId=0;
+						entSet[i].behaviour=NULL;
 						entSet[i].collisionClass=0;
 					break;												
 				}
@@ -325,7 +327,7 @@ void text(char* inStr, int x, int y) {
 		if (inStr[i]>37) simage(font[inStr[i]], x, y, 7, 7);
 		x+=8;
 		if(inStr[i]==10) {
-			y+=8;
+			y+=10;
 			x=xb;
 		}
 		i++;
@@ -342,12 +344,16 @@ void pushMsg(char* inStr) {
 void popMsg(){
 	static char keyPressed=0;
 	drawRect(2,120,236,58,0);
-	text(msgBuffer[msgSlot-1],2,102);
+	text(msgBuffer[msgOut],2,102);
 	if (!keyPressed) { 	
 		if (keyboard[SDL_SCANCODE_Z] && msgTimeout>10) {
 			printf("Next slot:\n");
-			msgSlot--;
-			if (!msgSlot) mode=0;
+			msgOut++;
+			if (msgSlot==msgOut) {
+				mode=0;
+				msgSlot=0;
+				msgOut=0;
+			}
 			msgTimeout=0;
 			return;
 		}
@@ -562,12 +568,15 @@ void loop() {
 		image(bgTex[0][0],-SW*TS,-SH*TS,SW*TS,SH*TS);
 		image(bgTex[1][0],0,-SH*TS,SW*TS,SH*TS);
 		image(bgTex[2][0],SW*TS,-SH*TS,SW*TS,SH*TS);
+
 		image(bgTex[0][1],-SW*TS,0,SW*TS,SH*TS);
 		image(bgTex[1][1],0,0,SW*TS,SH*TS);
 		image(bgTex[2][1],SW*TS,0,SW*TS,SH*TS);
+
 		image(bgTex[0][2],-SW*TS,SH*TS,SW*TS,SH*TS);
 		image(bgTex[1][2],0,SH*TS,SW*TS,SH*TS);
 		image(bgTex[2][2],SW*TS,SH*TS,SW*TS,SH*TS);
+
 		spriteCollisions();
 		deadEntityKiller();
 		entityLogic();

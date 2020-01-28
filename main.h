@@ -8,6 +8,7 @@
 #define MAPELIMIT 8
 #define FLIMIT 32
 #define TLIMIT 16
+#define SPRITELAYERS 2
 #define INVLIMIT 8
 #define ENTFRAMES 32
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
@@ -51,12 +52,13 @@ typedef struct entity {
 	int y;
 	unsigned char xSub;
 	unsigned char ySub;
-	unsigned int behaviourId;
+	//unsigned int behaviourId;
 	void(*behaviour)(int);
 	void(*prevState)(int);
 	unsigned char direction;
 	unsigned char animation;
 	unsigned char collisionClass;
+	unsigned char layer;
 	unsigned char attack;
 	unsigned char status[4];
 	uint16_t health;
@@ -131,6 +133,7 @@ unsigned char nlayers[SW*TS][SH*TS];
 
 char* msgBuffer[MSGDEPTH];
 unsigned char msgSlot=0;
+unsigned char msgOut=0;
 unsigned int msgTimeout=0;
 
 unsigned char refresh = 1;

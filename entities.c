@@ -15,9 +15,10 @@ IF YOU DON'T FILL ALL OF THESE, YOU'LL GET UNDEFINED BEHAVIOUR.*/
 entity ent_player() {
 	entity me;
 	memset(&me, 0, sizeof me);
-	me.behaviourId=1;
+	me.behaviour=playerBehaviour;
 	me.x=0;
 	me.y=0;
+	me.layer=1;
 	me.health=pMaxHealth;
 	me.attack=5;
 	me.xSub=TS/5;
@@ -42,10 +43,11 @@ entity ent_player() {
 entity ent_aitest() {
 	entity me;
 	memset(&me, 0, sizeof me);
-	me.behaviourId=4;
+	me.behaviour=behav_wait;
 	me.xSub=2;
 	me.ySub=10;
 	me.direction=1;
+	me.layer=1;
 	me.attack=2;
 	me.deathframe=206;
 	me.health=30;
@@ -99,9 +101,10 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	me.frame[2]=67;
 	me.frame[3]=67;
 	me.health=255;
+	me.layer=1;
 	me.status[0]=10;
 	me.status[1]=creator;
-	me.behaviourId=9;
+	me.behaviour=behav_sword;
 	me.setframe=direction;
 	me.collisionClass=129;
 	return me;
@@ -114,10 +117,11 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 	me.frame[1]=67;
 	me.frame[2]=67;
 	me.frame[3]=67;
+	me.layer=1;
 	me.health=255;
 	me.status[0]=10;
 	me.status[1]=0;
-	me.behaviourId=15;
+	me.behaviour=behav_dialogue;
 	me.setframe=direction;
 	me.collisionClass=131;
 	return me;
@@ -125,9 +129,10 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 
 entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
 	entity me;
-	me.behaviourId=2;
+	me.behaviour=behav_potato;
 	me.health=1;
 	me.x=x*TS;
+	me.layer=0;
 	me.y=y*TS;
 	me.frame[0]=tile;
 	me.setframe=0;
@@ -137,11 +142,12 @@ entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
 
 entity ent_nonsolid(unsigned char x, unsigned char y, unsigned char tile) {
 	entity me;
-	me.behaviourId=2;
+	me.behaviour=behav_potato;
 	me.collisionClass=0;
 	me.health=1;
 	me.x=x*TS;
 	me.y=y*TS;
+	me.layer=0;
 	me.animation=0;
 	me.direction=0;
 	me.frame[0]=tile;
@@ -153,9 +159,10 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 	entity me;
 	memset(&me, 0, sizeof me);
 	me.health=10;
-	me.behaviourId=10;
+	me.behaviour=behav_item;
 	me.x=x;
 	me.y=y;
+	me.layer=0;
 	me.frame[0]=getItemSprite(type);
 	me.setframe=0;
 	me.status[0]=type;

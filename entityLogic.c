@@ -1,74 +1,3 @@
-void entityLogic() {
-	for (int i=0; i<spawnSlot; i++) { //Bottom entity layer, affectionately known as the corpse pit.
-		switch (entSet[i].behaviourId) {
-			case 255:
-				if (entSet[i].deathframe) image(hwtileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
-			break;
-			case 10:
-				image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
-			break;
-		}
-	}
-	for (int i=0; i<spawnSlot; i++) {
-		switch(entSet[i].behaviourId) {
-
-			/*The AI state machine starts here.*/	
-			case 1: //The player.
-				playerBehaviour(i);
-			break;//End of player.
-
-
-			case 2://Potato
-				behav_potato(i);
-			break;//End of Potato
-
-
-			case 3://Chase state.
-				behav_chase(i);
-			break;//End of chase state.
-
-
-			case 4://Entity stays still, changes to chase state when player is in range.
-				behav_wait(i);
-			break; //End wait state.
-
-			case 5:
-				behav_upLeft(i);
-			break;
-			case 6:
-				behav_upRight(i);
-			break;
-			case 7:
-				behav_downLeft(i);
-			break;
-			case 8:
-				behav_downRight(i);
-			break;
-
-			case 9:
-				behav_sword(i);
-			break;
-
-			case 11:
-				behav_up(i);
-			break;
-			case 12:
-				behav_down(i);
-			break;
-			case 13:
-				behav_left(i);
-			break;
-			case 14:
-				behav_right(i);
-			break;
-			
-			case 15:
-				behav_dialogue(i);
-			break;
-		}
-	}
-}
-
 void playerBehaviour(int i) {
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 	char pmotion=0;
@@ -136,7 +65,7 @@ void playerBehaviour(int i) {
 		if (keyboard[SDL_SCANCODE_A]) itemEffects(pInv.items[pInv.selection].type);
 		if (keyboard[SDL_SCANCODE_J]) {
 			for (int k=0; k<ELIMIT; k++) {
-				printf("%u\n", entSet[k].behaviourId);
+				printf("%u\n", entSet[k].behaviour);
 			}
 		}
 		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);                            
@@ -169,7 +98,7 @@ void behav_chase(int i) {
 void behav_wait(int i) {
 	entSet[i].animation=0;
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
-	if(get_diff(entSet[i].x,entSet[0].x) < TS*2 && get_diff(entSet[i].y,entSet[0].y) < TS*2) entSet[i].behaviourId=3;
+	if(get_diff(entSet[i].x,entSet[0].x) < TS*2 && get_diff(entSet[i].y,entSet[0].y) < TS*2) entSet[i].behaviour=behav_chase;
 }
 
 void behav_upLeft(int i) {
@@ -177,7 +106,7 @@ void behav_upLeft(int i) {
 	fastMoveY(&entSet[i], -1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);				
@@ -188,7 +117,7 @@ void behav_upRight(int i) {
 	fastMoveY(&entSet[i], -1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);	
@@ -199,7 +128,7 @@ void behav_downLeft(int i) {
 	fastMoveY(&entSet[i], 1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -210,7 +139,7 @@ void behav_downRight(int i) {
 	fastMoveY(&entSet[i], 1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -244,7 +173,7 @@ void behav_up(int i) {
 	fastMoveY(&entSet[i], -1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -255,7 +184,7 @@ void behav_down(int i) {
 	fastMoveY(&entSet[i], 1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -266,7 +195,7 @@ void behav_left(int i) {
 	fastMoveX(&entSet[i], -1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -277,7 +206,7 @@ void behav_right(int i) {
 	fastMoveX(&entSet[i], 1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
-		entSet[i].behaviourId=entSet[i].status[0];
+		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -307,5 +236,22 @@ void behav_dialogue(int i) {
 			break;
 		}
 	}
-	/*if(entSet[entSet[i].status[1]].status[3])*/ image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	//image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 }
+
+void behav_dead(int i) {
+	if (entSet[i].deathframe) image(hwtileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
+}
+
+void behav_item(int i) {
+	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
+}
+
+void entityLogic() {
+	for(int l=0; l<SPRITELAYERS; l++) {
+		for (int i=0; i<spawnSlot; i++) {
+			if(entSet[i].behaviour && entSet[i].layer == l) entSet[i].behaviour(i);
+		}
+	}
+}
+
