@@ -377,23 +377,6 @@ int intersect(unsigned int x, unsigned int y) {
 	return -1;
 }
 
-void generateTunnels() {
-	for(char i=0; i<TLIMIT; i++) {
-		duplicate://Dirty, I know.
-		reroll();
-		tunnels[i].m=rng.c>>5;
-		if (!tunnels[i].m) tunnels[i].m++;
-		reroll();
-		tunnels[i].c=((rng.c/8)*8)/2;
-		if (tunnels[i].m>1 || tunnels[i].m<-1) tunnels[i].c *= tunnels[i].m;
-		if (tunnels[i].c>0 && tunnels[i].m>0) tunnels[i].m*=-1;
-		if (tunnels[i].c<0 && tunnels[i].m<0) tunnels[i].m*=-1;
-		for(int j=0; j<i; j++){if(tunnels[i].m == tunnels[j].m && tunnels[i].c == tunnels[j].c) goto duplicate;}
-		//Goes back to the top of the for loop if a duplicate line is detected.
-		printf("Tunnel %d, m=%d; c=%d\n", i, tunnels[i].m, tunnels[i].c);
-	}
-}
-
 uint32_t getrandom() {
 	union signedOut {
 		uint32_t in;
@@ -404,9 +387,10 @@ uint32_t getrandom() {
 }
 
 void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
-	for (int x=1; x<TS-1; x++) {
-		for (int y=1; y<TS-1; y++) {
-			in->layers[(iX*TS)+x][(iY*TS)+y] = stat; 
+	for (int x=0; x<TS; x++) {
+		for (int y=0; y<TS; y++) {
+			if(y==0 || x==0 || x==TS-1 || y==TS-1) in->layers[(iX*TS)+x][(iY*TS)+y]=0;
+			else in->layers[(iX*TS)+x][(iY*TS)+y] = stat; 
 		}
 	}
 }
@@ -555,6 +539,7 @@ void snapToGrid(entity* movEnt) {
 void loop() {
 	if (scroll) scrollMap();
 	if (refresh) {
+		entityInitialise();
 		for (int x=0; x<3; x++) {
 			for (int y=0; y<3; y++) {
 				worldgen(&tilewrapper[x][y],(sX-1)+x,(sY-1)+y);
