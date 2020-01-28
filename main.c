@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include "main.h"
 #include "items.c"
+#include "dialogue.c"
 #include "entities.c"
 #include "maps.c"
 #include "worldgen.c"
@@ -191,7 +192,12 @@ void spriteCollisions() {
 						}
 					break;
 					case 131:
-					//TODO dialogue spawner in here.
+						if(entSet[j].hostile && entSet[j].hostileDiag) entSet[j].hostileDiag();
+						else if(!entSet[j].hostile && entSet[j].passiveDiag) entSet[j].passiveDiag();
+						else pushMsg("No dialogue found for entity.\n");
+						entSet[i].health=0;
+						entSet[i].behaviourId=0;
+						entSet[i].collisionClass=0;
 					break;												
 				}
 			}

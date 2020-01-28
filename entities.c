@@ -49,6 +49,8 @@ entity ent_aitest() {
 	me.attack=2;
 	me.deathframe=206;
 	me.health=30;
+	me.hostile=1;
+	me.hostileDiag=diag_blob;
 	me.collisionClass=2;
 	me.frame[0]=177;
 	me.frame[1]=153;
@@ -117,7 +119,7 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 	me.status[1]=0;
 	me.behaviourId=15;
 	me.setframe=direction;
-	me.collisionClass=129;
+	me.collisionClass=131;
 	return me;
 }
 

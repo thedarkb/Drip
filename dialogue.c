@@ -1,0 +1,4 @@
+void diag_blob() {
+	pushMsg("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE");
+}
+	
