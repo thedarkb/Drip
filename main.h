@@ -52,7 +52,6 @@ typedef struct entity {
 	int y;
 	unsigned char xSub;
 	unsigned char ySub;
-	//unsigned int behaviourId;
 	void(*behaviour)(int);
 	void(*prevState)(int);
 	unsigned char direction;
