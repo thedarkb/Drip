@@ -6,9 +6,10 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "main.h"
+#include "entities.h"
+#include "entityLogic.h"
 #include "items.c"
 #include "dialogue.c"
-#include "entityLogic.h"
 #include "entities.c"
 #include "maps.c"
 #include "worldgen.c"
@@ -20,6 +21,7 @@ void entityInitialise() {
 	}
 	entSet[0]=ent_player();
 	memset(&pInv, 0, sizeof pInv);
+	pInv.items[0].type=2;
 }
 
 void entityScroll(int x, int y) {
@@ -109,7 +111,7 @@ void spriteCollisions() {
 		for (int j=0; j<spawnSlot; j++) {
 			if(overlap(i,j)){
 				switch (entSet[i].collisionClass) {
-					case 2:
+					case 2: //Blobby with a player.
 					if (entSet[j].health>20) entSet[j].health-=20;
 					else entSet[j].health=0;
 					if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
@@ -145,7 +147,7 @@ void spriteCollisions() {
 						}
 					}
 					break;
-					case 129:
+					case 129: //Sword colliding with enemy.
 						printf("Collision\n");
 						printf("Direction: %u\n", entSet[i].direction);
 						switch(entSet[entSet[i].status[1]].direction) {
@@ -183,7 +185,7 @@ void spriteCollisions() {
 						if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
 						else entSet[j].health=0;
 					break;
-					case 130:
+					case 130: //For when the player collides with an item.
 						if (j) break;
 						for (int k=0; k<INVLIMIT; k++) {
 							if (!pInv.items[k].type) {
@@ -193,7 +195,7 @@ void spriteCollisions() {
 							}
 						}
 					break;
-					case 131:
+					case 131: //Entity dialogue.
 						if(entSet[j].hostile && entSet[j].hostileDiag) entSet[j].hostileDiag();
 						else if(!entSet[j].hostile && entSet[j].passiveDiag) entSet[j].passiveDiag();
 						else pushMsg("No dialogue found for entity.\n");
@@ -309,10 +311,9 @@ int main () {
 		else printf("Frames dropped: %u\n", (SDL_GetTicks()-timer)/(1000/FRAMERATE)+1);
 		timer = SDL_GetTicks();
 		SDL_PollEvent(&keyIn);
-		if (keyIn.type == SDL_QUIT) goto quit;
+		if (keyIn.type == SDL_QUIT) break;
 		loop();
 	}
-	quit:
 	#endif
 	#ifdef WEB
 	emscripten_set_main_loop(loop, 30, 1);
@@ -477,6 +478,7 @@ void hudRefresh() {
 		hudDraw(hwtileset[83], TS*i, 2, TS, TS);
 	}
 	drawRect((pInv.selection*TS)+1,2,TS-2,1,0xFFFF00);
+	drawRect((pInv.weapon*TS)+1,TS+1,TS-2,1,0x00FF00);
 }
 
 void flip() {
@@ -492,6 +494,7 @@ char collisionCheck(int x, int y) {
 	int microX=(x+TS*SW)%(TS*SW);
 	int microY=(y+TS*SH)%(TS*SH);
 	assert(wrapperX<3);
+	if(microX<TS && microY<TS ) return 0;
 	return tilewrapper[wrapperX][wrapperY].layers[microX][microY];
 	return 0;
 }

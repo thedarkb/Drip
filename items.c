@@ -8,7 +8,7 @@ unsigned char getItemSprite(unsigned char type) {
 	
 	sprite[0]=83;
 	sprite[1]=69;
-	sprite[2]=69;
+	sprite[2]=67;
 
 	return sprite[type];
 }
@@ -24,5 +24,10 @@ void itemEffects(unsigned char type) {
 			SDL_Delay(5000);
 			exit(0);
 		break;
+		case 2:
+			printf("SWORD\n");
+			entity spawnMe=ent_sword(entSet[0].direction, 0, 0, 0);
+			entitySpawn(spawnMe,0,0);
+			swordOut=1;
 	}
 }

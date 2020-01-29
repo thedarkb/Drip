@@ -26,28 +26,49 @@ void playerBehaviour(int i) {
 				dialogueOut=1;
 			}				
 			if (keyboard[SDL_SCANCODE_X] && !swordOut) {
-				entitySpawn(ent_sword(entSet[i].direction, entSet[i].x, entSet[i].y, i),0,0);
-				swordOut=1;							
+				itemEffects(pInv.items[pInv.weapon].type);		
 			}
+			if (keyboard[SDL_SCANCODE_C]) itemEffects(pInv.items[pInv.selection].type);
 		}
 		if(!keyboard[SDL_SCANCODE_X]) swordOut=0;
 		if(!keyboard[SDL_SCANCODE_Z]) dialogueOut=0;
-		if (keyboard[SDL_SCANCODE_1]) {
-			pInv.selection=0;
-		} else if (keyboard[SDL_SCANCODE_2]) {
-			pInv.selection=1;
-		} else if (keyboard[SDL_SCANCODE_3]) {
-			pInv.selection=2;
-		} else if (keyboard[SDL_SCANCODE_4]) {
-			pInv.selection=3;
-		} else if (keyboard[SDL_SCANCODE_5]) {
-			pInv.selection=4;
-		} else if (keyboard[SDL_SCANCODE_6]) {
-			pInv.selection=5;
-		} else if (keyboard[SDL_SCANCODE_7]) {
-			pInv.selection=6;
-		} else if (keyboard[SDL_SCANCODE_8]) {
-			pInv.selection=7;
+		if(keyboard[SDL_SCANCODE_LSHIFT]) {
+			if (keyboard[SDL_SCANCODE_1]) {
+				pInv.weapon=0;
+			} else if (keyboard[SDL_SCANCODE_2]) {
+				pInv.weapon=1;
+			} else if (keyboard[SDL_SCANCODE_3]) {
+				pInv.weapon=2;
+			} else if (keyboard[SDL_SCANCODE_4]) {
+				pInv.weapon=3;
+			} else if (keyboard[SDL_SCANCODE_5]) {
+				pInv.weapon=4;
+			} else if (keyboard[SDL_SCANCODE_6]) {
+				pInv.weapon=5;
+			} else if (keyboard[SDL_SCANCODE_7]) {
+				pInv.weapon=6;
+			} else if (keyboard[SDL_SCANCODE_8]) {
+				pInv.weapon=7;
+			}
+		}
+		if(!keyboard[SDL_SCANCODE_LSHIFT]) {
+			if (keyboard[SDL_SCANCODE_1]) {
+				pInv.selection=0;
+			} else if (keyboard[SDL_SCANCODE_2]) {
+				pInv.selection=1;
+			} else if (keyboard[SDL_SCANCODE_3]) {
+				pInv.selection=2;
+			} else if (keyboard[SDL_SCANCODE_4]) {
+				pInv.selection=3;
+			} else if (keyboard[SDL_SCANCODE_5]) {
+				pInv.selection=4;
+			} else if (keyboard[SDL_SCANCODE_6]) {
+				pInv.selection=5;
+			} else if (keyboard[SDL_SCANCODE_7]) {
+				pInv.selection=6;
+			} else if (keyboard[SDL_SCANCODE_8]) {
+				pInv.selection=7;
+			}
 		}
 	
 		if (keyboard[SDL_SCANCODE_D] && pInv.items[pInv.selection].type) {
@@ -62,7 +83,6 @@ void playerBehaviour(int i) {
 			pushMsg("Stacking\0");
 		}
 		if (keyboard[SDL_SCANCODE_N]) entitySpawn(ent_aitest(), 0,0);
-		if (keyboard[SDL_SCANCODE_A]) itemEffects(pInv.items[pInv.selection].type);
 		if (keyboard[SDL_SCANCODE_J]) {
 			for (int k=0; k<ELIMIT; k++) {
 				printf("%u\n", entSet[k].behaviour);

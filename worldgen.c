@@ -77,14 +77,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 				}
 			}	
 		}
-		else if(diff>0 && diff<200) {
-			printf("Corner room generated.\n");
-			//memset(&in->layers, 0, sizeof in->layers);
-			*in=cornerRoom;
-			//memset(&in->screen, 16, sizeof in->screen);
-			//setCollision(in,0,0,0);
-		}
-		else memset(&in->screen, 22, sizeof in->screen);
+		else *in=cornerRoom;
 	} else memset(&in->screen, 22, sizeof in->screen);
 	
 	in->flag=1;
