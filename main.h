@@ -164,6 +164,7 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 void pushMsg(char* inStr);
 unsigned int get_diff (int val1, int val2);
 uint32_t lfsr (uint32_t shift);
+void reroll();
 int intersect(unsigned int x, unsigned int y);
 void generateTunnels();
 uint32_t getrandom();
