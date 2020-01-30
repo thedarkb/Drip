@@ -1,16 +1,25 @@
+#define menuReset() memset(&options, 0, sizeof options);menuText=NULL //I said I'd save ya some typing. -Ben
 //29 chars in 1 line
 //Long story short, this is all a dream. The assets used in this can be reused for random houses in settlements and towns.
 //This is also a good intro quest because it gets the player familiarised with the movement and the interactions and the whole "The WORLD IS FUCKED" dynamic of the main story.
 void diag_blob() {
-    pushMsg("ALRIGHT, WHAT'S ALL THIS\nRUCKUS, THEN?\0");
+	printf("Blob text executing.\n");
+    pushMsg("ALRIGHT, WHAT'S ALL THIS \nRUCKUS, THEN?\0");
     pushMsg("MUST BE COMING FROM INSIDE\nTHE SHED.\nDA PROBABLY FORGOT TO CLOSE\nTHE WINDOWS AGAIN.\0");
     pushMsg("GOTTA PUT SOMETHING ON AND\nGET DOWN THERE BEFORE\nSOMETHING HAPPENS AND DA\nBLAMES ME.\nAGAIN.\0");
-
 
     pushMsg("MUCH BETTER!\nRIGHT, ONTO THE TASK AT HAND...\0");
     pushMsg("BETTER NOT WAKE UP MA OR DA\nOR I'LL GET KILLED, OR WORSE!\0");
     pushMsg("WAIT, WHAT?\n");
 }
+
+void diag_menuTest() {
+	    menuReset(); //CALL THIS FOR EVERY MENU
+	    options[0]=diag_blob; //The function it will run if you select the first option. Each menu can have up to six options.
+	    menuText="Yes\nNo\0"; //Each new line is considered an option. Blank options just exit the menu.
+	    menu(); //Putting stuff in the function after this call may cause weird shit.
+}
+
 void diag_player() {
 //room, night time
 	pushMsg("ALRIGHT, WHAT'S ALL THIS\nRUCKUS, THEN?\0"); 

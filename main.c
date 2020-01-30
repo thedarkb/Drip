@@ -333,8 +333,42 @@ void text(char* inStr, int x, int y) {
 		}
 		i++;
 	}
-		
-}	
+	
+}
+
+void menu() {
+	mode=2;
+	drawRect(2,120,236,58,0);
+	int i=0;
+	int optCount=0;
+	static int optSel=0;
+
+	while(menuText[i]) {
+		if (menuText[i]==10) optCount++;
+		i++;
+	}
+
+	text(menuText,11,102);
+	static int keyPress=1;
+	if(!keyboard[SDL_SCANCODE_UP] && !keyboard[SDL_SCANCODE_DOWN]) keyPress=0;
+
+	if(keyboard[SDL_SCANCODE_UP] && !keyPress && optSel>0) {
+		keyPress=1;
+		optSel--;
+	}
+	if(keyboard[SDL_SCANCODE_DOWN] && !keyPress && optSel<optCount) {
+		keyPress=1;
+		optSel++;
+	}
+	if(!keyboard[SDL_SCANCODE_Z]) dialogueOut=0;
+	if(keyboard[SDL_SCANCODE_Z] && !dialogueOut) {
+		dialogueOut=1;
+		mode=0;
+		if(options[optSel]) options[optSel]();
+	}
+
+	text(">", 2, 102+(optSel*10));  
+}
 
 void pushMsg(char* inStr) {
 	mode=1;
@@ -583,7 +617,8 @@ void loop() {
 		spriteCollisions();
 		deadEntityKiller();
 		entityLogic();
-	} else popMsg();
+	} else if (mode==1) popMsg();
+	else if (mode==2) menu();
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
 	hudRefresh();

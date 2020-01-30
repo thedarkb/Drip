@@ -109,6 +109,8 @@ union rng {
 	unsigned char uc;
 } rng;
 
+void(*options[6])();
+
 view cornerRoom;
 
 view tilewrapper[3][3];
@@ -137,6 +139,7 @@ unsigned int msgTimeout=0;
 
 unsigned char refresh = 1;
 
+char* menuText;
 char mode = 0;
 
 entity entSet[ELIMIT];

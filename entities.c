@@ -52,7 +52,7 @@ entity ent_aitest() {
 	me.deathframe=206;
 	me.health=30;
 	me.hostile=1;
-	me.hostileDiag=diag_blob;
+	me.hostileDiag=diag_menuTest;
 	me.collisionClass=2;
 	me.frame[0]=177;
 	me.frame[1]=153;
