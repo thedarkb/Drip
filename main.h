@@ -35,7 +35,7 @@ SDL_Renderer* r = NULL;
 SDL_Texture* t = NULL;
 SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
-uint8_t* keyboard = NULL;
+const uint8_t* keyboard = NULL;
 
 
 SDL_Surface* swtileset[TILECOUNT]; 
@@ -145,7 +145,6 @@ char menuFlag=0;
 char menuFirstCall=0;
 
 entity entSet[ELIMIT];
-entity nentSet[ELIMIT];
 tunnel tunnels[TLIMIT];
 
 inventory pInv;

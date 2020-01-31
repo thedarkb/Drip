@@ -25,7 +25,7 @@ void itemEffects(unsigned char type) {
 			exit(0);
 		break;
 		case 2:
-			printf("SWORD\n");
+			;
 			entity spawnMe=ent_sword(entSet[0].direction, 0, 0, 0);
 			entitySpawn(spawnMe,0,0);
 			swordOut=1;

@@ -12,6 +12,7 @@ void diag_blob() {
     pushMsg("MUCH BETTER!\nRIGHT, ONTO THE TASK AT HAND...\0");
     pushMsg("BETTER NOT WAKE UP MA OR DA\nOR I'LL GET KILLED, OR WORSE!\0");
     pushMsg("WAIT, WHAT?\n");
+    diag_owl();
 }
 
 void diag_player() {
@@ -33,6 +34,7 @@ void diag_player() {
 	pushMsg("ALMOST THERE. WHAT IS MAKING\n SO MUCH NOISE THOUGH?");
 //just outside of shed
 	pushMsg("WAIT. THE CLANGING'S STOPPED\n STILL HAVE TO CLOSE THAT WINDOW.");
+	diag_owl();
 //creaking noise of shed door
 //protag gets in shed
 //shed is tiny, has 1 thing you can interact with on the far side, maybe get rieno to make that bit of the shed look messed up.
@@ -49,6 +51,7 @@ void diag_JimAndPlayer() {
 //maybe add flash of white for theatrical effect
 	pushMsg("JIM:\n...I APPEAR TO BE TOO LATE.\nI AM SORRY, KID.");
 	pushMsg("JIM:\nGOOD LUCK.\nSEARCH FOR THE LIGHT AT THE\nEND OF THE TUNNEL.\nWAKE UP NOW.\nIT WAS ALL A DREAM.");
+	diag_owl();
 					//He's dead, Jim.
 //fade to white
 //fade back to cave.
@@ -59,6 +62,7 @@ void diag_JimAndPlayer() {
 void diag_PlayerAndJim() {
 	pushMsg("JIM:\nWAKE UP MAN, WE HAVE A LONG,\nHARD, THROBBING PATH AHEAD\nOF US.");
 	pushMsg(/*PlayerName,*/ ":\n...LIGHT AT...\n ...END OF TUNNEL...");
+	diag_owl();
 }
 
 void diag_menuTest() {
@@ -69,4 +73,12 @@ void diag_menuTest() {
 	    options[2]=diag_PlayerAndJim;
 	    menuText="Player\nJim/Player\nPlayer/Jim\nQuit\0"; //Each new line is considered an option. Blank options just exit the menu.
 	    menuCall; //Putting stuff in the function after this call may cause weird shit.
+}
+
+void diag_owl() {
+	pushMsg("Would you like to return to\nthe dialgoue test menu?\0");
+	menuReset;
+	options[0]=diag_menuTest;
+	menuText="Yes\nNo\0";
+	menuCall;
 }

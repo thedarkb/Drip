@@ -122,9 +122,7 @@ void behav_chase(int i) {
 }
 
 void behav_wait(int i) {
-	printf("I am being executed.\n");
 	entSet[i].animation=0;
-	printf("My coordinates are: %d,%d\n", entSet[i].x, entSet[i].y);
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 	if(get_diff(entSet[i].x,entSet[0].x) < TS*2 && get_diff(entSet[i].y,entSet[0].y) < TS*2) entSet[i].behaviour=behav_chase;
 }
@@ -197,7 +195,6 @@ void behav_sword(int i) {
 }
 
 void behav_up(int i) {
-	printf("Up\n");
 	fastMoveY(&entSet[i], -1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
@@ -208,7 +205,6 @@ void behav_up(int i) {
 }
 
 void behav_down(int i) {
-	printf("Down\n");
 	fastMoveY(&entSet[i], 1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
@@ -219,7 +215,6 @@ void behav_down(int i) {
 }
 
 void behav_left(int i) {
-	printf("Left\n");
 	fastMoveX(&entSet[i], -1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
@@ -230,7 +225,6 @@ void behav_left(int i) {
 }
 
 void behav_right(int i) {
-	printf("Right\n");
 	fastMoveX(&entSet[i], 1, TS/8);
 	if(entSet[i].status[1]>0) entSet[i].status[1]--;
 	else {
@@ -284,7 +278,6 @@ void behav_item(int i) {
 }
 
 void entityLogic() {
-	assert(!entSet[ELIMIT-1].behaviour);
 	for(int l=0; l<SPRITELAYERS; l++) {
 		for (int i=0; i<ELIMIT; i++) {
 			if(entSet[i].behaviour && entSet[i].layer == l) {

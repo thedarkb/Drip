@@ -44,7 +44,16 @@ void entitySpawn(entity in, int x, int y) {
 	if(in.behaviour) {
 		printf("Attempting to spawn...\n");
 		for(int i=0; i<ELIMIT; i++) {
-			if (entSet[i].health<=0) {
+			if (!entSet[i].behaviour) {
+				entSet[i]=in;
+				entSet[i].x=x;
+				entSet[i].y=y;
+				return;
+			}
+		}
+		printf("Entity table full, culling.\n");
+		for(int i=0; i<ELIMIT; i++) {
+			if(entSet[i].health<=0) {
 				entSet[i]=in;
 				entSet[i].x=x;
 				entSet[i].y=y;
@@ -59,7 +68,7 @@ void deadEntityKiller() {
 		if(entSet[i].health==0) {
 			if(entSet[i].behaviour && entSet[i].behaviour != &behav_dead) {
 				entSet[i].behaviour=behav_dead;
-				printf("Killing %d\n", i);
+				printf("Killing %d\n with deathframe %u\n", i, entSet[i].deathframe);
 			}
 			entSet[i].collisionClass=0;
 			entSet[i].layer=0;
