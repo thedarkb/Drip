@@ -37,10 +37,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	uint32_t screenHash = lfsr(hashme);
 
 	//printf("%u\n",hashme);
-
-	memcpy(&nentSet, &entSet, sizeof nentSet);
-	nentityReset();
-	
+		
 	int diff=intersect(xPos, yPos);
 	printf("Difference: %d\n", diff);
 	if(xPos<50 && yPos<50) {

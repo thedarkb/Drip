@@ -11,7 +11,7 @@
 #include "items.c"
 #include "dialogue.c"
 #include "entities.c"
-#include "maps.c"
+//#include "maps.c"
 #include "worldgen.c"
 #include "entityLogic.c"
 
@@ -25,7 +25,7 @@ void entityInitialise() {
 }
 
 void entityScroll(int x, int y) {
-	for (int i=0; i<spawnSlot; i++) {
+	for (int i=0; i<ELIMIT; i++) {
 		entSet[i].x=entSet[i].x+((SW*TS)*x);
 		entSet[i].y=entSet[i].y+((SH*TS)*y);
 		if (entSet[i].x < -SW*TS || entSet[i].x > (SW*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
@@ -42,58 +42,34 @@ void entityReset() {
 
 void entitySpawn(entity in, int x, int y) {
 	if(in.behaviour) {
-		if (spawnSlot > ELIMIT-1) {
-			printf("Spawn limit exceeded.\n");
-			corpseDisposal();
-		}
-		entSet[spawnSlot]=in;
-		entSet[spawnSlot].x+=x;
-		entSet[spawnSlot].y+=y;
-		spawnSlot++;
-	}
-}
-
-void nentityReset() {
-	for (int i=1; i<ELIMIT; i++) {
-		memset(&nentSet[i], 0, sizeof entSet[i]);
-	}
-	nspawnSlot=1;
-}
-
-void nentitySpawn(entity in) {
-	if (nspawnSlot > ELIMIT-1) {
-		printf("Spawn failed, limit exceeded. (Off the current screen.)\n");
-		return;
-	}
-	nentSet[nspawnSlot]=in;
-	nspawnSlot++;
-}
-
-void deadEntityKiller() {
-	for (int i=0; i<spawnSlot; i++) {
-		if(entSet[i].health==0) {
-			entSet[i].behaviour=behav_dead;
-			entSet[i].collisionClass=0;
-			entSet[i].layer=0;
-			if(entSet[i].drop[0] != 0) {
-				entitySpawn(ent_item(entSet[i].x, entSet[i].y, entSet[i].drop[0], 255),0,0);
-				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
+		printf("Attempting to spawn...\n");
+		for(int i=0; i<ELIMIT; i++) {
+			if (entSet[i].health<=0) {
+				entSet[i]=in;
+				entSet[i].x=x;
+				entSet[i].y=y;
+				break;
 			}
 		}
 	}
 }
 
-void corpseDisposal() {
-	printf("Despawning dead entities.\n");
-	memcpy(&nentSet, &entSet, sizeof entSet);
-	entityReset();
-	for (int i=1; i<ELIMIT; i++) {
-		if (nentSet[i].health>0) {
-			entitySpawn(nentSet[i],0,0);
-			printf("Live entity found in position: %u\n", i);
+void deadEntityKiller() {
+	for (int i=0; i<ELIMIT; i++) {
+		if(entSet[i].health==0) {
+			if(entSet[i].behaviour && entSet[i].behaviour != &behav_dead) {
+				entSet[i].behaviour=behav_dead;
+				printf("Killing %d\n", i);
+			}
+			entSet[i].collisionClass=0;
+			entSet[i].layer=0;
+			if(entSet[i].drop[0] != 0) {
+				printf("Spawning drop...\n");
+				entitySpawn(ent_item(0, 0, entSet[i].drop[0], 255),entSet[i].x,entSet[i].y);
+				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
+			}
 		}
 	}
-	spawnSlot=nspawnSlot;
 }
 
 int overlap(unsigned char i, unsigned char j){
@@ -107,8 +83,8 @@ int overlap(unsigned char i, unsigned char j){
 }
 
 void spriteCollisions() {
-	for (int i=0; i<spawnSlot; i++) {
-		for (int j=0; j<spawnSlot; j++) {
+	for (int i=0; i<ELIMIT; i++) {
+		for (int j=0; j<ELIMIT; j++) {
 			if(overlap(i,j)){
 				switch (entSet[i].collisionClass) {
 					case 2: //Blobby with a player.
@@ -220,7 +196,7 @@ void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {
 			printf("X: %u\n", x);
 			printf("Y: %u\n", y);
 			printf("Entity: %u\n", entities[x][y]);
-			if(entities[x][y]>0) nentitySpawn(ent_nonsolid(x,y,entities[x][y]));
+			if(entities[x][y]>0) entitySpawn(ent_nonsolid(x,y,entities[x][y]),0,0);
 		}
 	}
 }
@@ -337,7 +313,6 @@ void text(char* inStr, int x, int y) {
 }
 
 void menu() {
-	mode=2;
 	drawRect(2,120,236,58,0);
 	int i=0;
 	int optCount=0;
@@ -350,6 +325,7 @@ void menu() {
 
 	text(menuText,11,102);
 	static int keyPress=1;
+	static int zPress=1;
 	if(!keyboard[SDL_SCANCODE_UP] && !keyboard[SDL_SCANCODE_DOWN]) keyPress=0;
 
 	if(keyboard[SDL_SCANCODE_UP] && !keyPress && optSel>0) {
@@ -360,10 +336,13 @@ void menu() {
 		keyPress=1;
 		optSel++;
 	}
-	if(!keyboard[SDL_SCANCODE_Z]) dialogueOut=0;
-	if(keyboard[SDL_SCANCODE_Z] && !dialogueOut) {
-		dialogueOut=1;
-		mode=0;
+	if(!keyboard[SDL_SCANCODE_Z]) {
+		zPress=0;
+		menuFirstCall=0;
+	}
+	if(keyboard[SDL_SCANCODE_Z] && !zPress && !menuFirstCall) {
+		menuFlag=0;
+		zPress=1;
 		if(options[optSel]) options[optSel]();
 	}
 
@@ -385,7 +364,7 @@ void popMsg(){
 			printf("Next slot:\n");
 			msgOut++;
 			if (msgSlot==msgOut) {
-				mode=0;
+				mode=2;
 				msgSlot=0;
 				msgOut=0;
 			}
@@ -396,7 +375,6 @@ void popMsg(){
 	}
 	if(!keyboard[SDL_SCANCODE_Z]) keyPressed=0;
 	msgTimeout++;
-	printf("Reading message slot: %u\n", msgSlot);
 }
 
 unsigned int get_diff (int val1, int val2) {
@@ -614,11 +592,13 @@ void loop() {
 		image(bgTex[1][2],0,SH*TS,SW*TS,SH*TS);
 		image(bgTex[2][2],SW*TS,SH*TS,SW*TS,SH*TS);
 
-		spriteCollisions();
 		deadEntityKiller();
+		spriteCollisions();
 		entityLogic();
 	} else if (mode==1) popMsg();
-	else if (mode==2) menu();
+	else if (menuFlag) menu();
+	else mode=0;
+
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
 	hudRefresh();

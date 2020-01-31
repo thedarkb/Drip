@@ -14,3 +14,4 @@ void behav_right(int i);
 void behav_dialogue(int i);
 void behav_dead(int i);
 void behav_item(int i);
+void behav_itemStatic(int i);

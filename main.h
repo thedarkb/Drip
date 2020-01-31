@@ -14,7 +14,7 @@
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 30
 #define HUDHEIGHT 20
-#define MSGDEPTH 8
+#define MSGDEPTH 32
 #define MSGTIME 30
 
 #define SHEETX 128 //Tile sheet size
@@ -141,6 +141,8 @@ unsigned char refresh = 1;
 
 char* menuText;
 char mode = 0;
+char menuFlag=0;
+char menuFirstCall=0;
 
 entity entSet[ELIMIT];
 entity nentSet[ELIMIT];
@@ -163,6 +165,7 @@ void deadEntityKiller();
 void corpseDisposal();
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
+void menu();
 void pushMsg(char* inStr);
 unsigned int get_diff (int val1, int val2);
 uint32_t lfsr (uint32_t shift);

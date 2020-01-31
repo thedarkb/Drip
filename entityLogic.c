@@ -1,6 +1,8 @@
 void playerBehaviour(int i) {
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 	char pmotion=0;
+	static int zTimeout=0;
+
 	for (int j=0; j<TS/8; j++) { //number of pixels to move per frame.
 		if (entSet[i].status[3]==0 && !swordOut && !dialogueOut) {	
 			if (keyboard[SDL_SCANCODE_RIGHT]) {
@@ -24,14 +26,19 @@ void playerBehaviour(int i) {
 			if(keyboard[SDL_SCANCODE_Z]) {
 				entitySpawn(ent_dialogue(entSet[i].direction, entSet[i].x, entSet[i].y),0,0);
 				dialogueOut=1;
+				zTimeout=30;
 			}				
 			if (keyboard[SDL_SCANCODE_X] && !swordOut) {
 				itemEffects(pInv.items[pInv.weapon].type);		
 			}
 			if (keyboard[SDL_SCANCODE_C]) itemEffects(pInv.items[pInv.selection].type);
 		}
+
 		if(!keyboard[SDL_SCANCODE_X]) swordOut=0;
-		if(!keyboard[SDL_SCANCODE_Z]) dialogueOut=0;
+		if(!keyboard[SDL_SCANCODE_Z] && !zTimeout) dialogueOut=0;
+
+		if(zTimeout>0) zTimeout--;
+
 		if(keyboard[SDL_SCANCODE_LSHIFT]) {
 			if (keyboard[SDL_SCANCODE_1]) {
 				pInv.weapon=0;
@@ -72,8 +79,7 @@ void playerBehaviour(int i) {
 		}
 	
 		if (keyboard[SDL_SCANCODE_D] && pInv.items[pInv.selection].type) {
-			entitySpawn(ent_item(entSet[i].x, entSet[i].y, pInv.items[pInv.selection].type, 255),0,0);
-			fastMoveY(&entSet[spawnSlot-1], 1, TS);
+			entitySpawn(ent_item(0, 0, pInv.items[pInv.selection].type, 255),entSet[i].x,entSet[i].y);
 			pInv.items[pInv.selection].type=0;
 		}
 		if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
@@ -116,7 +122,9 @@ void behav_chase(int i) {
 }
 
 void behav_wait(int i) {
+	printf("I am being executed.\n");
 	entSet[i].animation=0;
+	printf("My coordinates are: %d,%d\n", entSet[i].x, entSet[i].y);
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 	if(get_diff(entSet[i].x,entSet[0].x) < TS*2 && get_diff(entSet[i].y,entSet[0].y) < TS*2) entSet[i].behaviour=behav_chase;
 }
@@ -263,14 +271,25 @@ void behav_dead(int i) {
 	if (entSet[i].deathframe) image(hwtileset[entSet[i].deathframe], entSet[i].x, entSet[i].y, TS, TS);
 }
 
-void behav_item(int i) {
+
+void behav_itemStatic(int i) {
 	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
 }
 
+void behav_item(int i) {
+	fastMoveY(&entSet[i], 1, TS);
+	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
+	entSet[i].behaviour=behav_itemStatic;
+	entSet[i].collisionClass=130;
+}
+
 void entityLogic() {
+	assert(!entSet[ELIMIT-1].behaviour);
 	for(int l=0; l<SPRITELAYERS; l++) {
-		for (int i=0; i<spawnSlot; i++) {
-			if(entSet[i].behaviour && entSet[i].layer == l) entSet[i].behaviour(i);
+		for (int i=0; i<ELIMIT; i++) {
+			if(entSet[i].behaviour && entSet[i].layer == l) {
+				entSet[i].behaviour(i);
+			}
 		}
 	}
 }

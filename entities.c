@@ -44,6 +44,7 @@ entity ent_aitest() {
 	entity me;
 	memset(&me, 0, sizeof me);
 	me.behaviour=behav_wait;
+	printf("SPAWNING WITH BEHAVIOUR %p\n", me.behaviour);
 	me.xSub=2;
 	me.ySub=10;
 	me.direction=1;
@@ -162,11 +163,12 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 	me.behaviour=behav_item;
 	me.x=x;
 	me.y=y;
+	printf("Spawning item at %d,%d\n", x,y);
 	me.layer=0;
 	me.frame[0]=getItemSprite(type);
 	me.setframe=0;
 	me.status[0]=type;
-	me.collisionClass=130;
+	me.collisionClass=0;
 	return me;
 }
 
