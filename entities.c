@@ -172,6 +172,50 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 	return me;
 }
 
+entity ent_techNpc() {
+	entity me;
+	memset(&me, 0, sizeof me);
+	me.collisionClass=2;
+	me.frame[0]=177;
+	me.frame[1]=153;
+	me.frame[2]=161;
+	me.frame[3]=169;
+	me.frame[4]=176;
+	me.frame[5]=152;
+	me.frame[6]=160;
+	me.frame[7]=168;
+	me.frame[8]=178;
+	me.frame[9]=154;
+	me.frame[10]=162;
+	me.frame[11]=170;
+	me.health=20;
+	me.layer=1;
+	me.behaviour=behav_techNpcSpawn;
+	return me;	
+}
+
+entity ent_agNpc() {
+	entity me;
+	memset(&me, 0, sizeof me);
+	me.collisionClass=1;
+	me.frame[0]=177;
+	me.frame[1]=153;
+	me.frame[2]=161;
+	me.frame[3]=169;
+	me.frame[4]=176;
+	me.frame[5]=152;
+	me.frame[6]=160;
+	me.frame[7]=168;
+	me.frame[8]=178;
+	me.frame[9]=154;
+	me.frame[10]=162;
+	me.frame[11]=170;
+	me.health=20;
+	me.layer=1;
+	me.behaviour=behav_techNpcSpawn;
+	return me;	
+}
+
 entity ent_empty() {
 	entity me;
 	memset(&me,0,sizeof me);

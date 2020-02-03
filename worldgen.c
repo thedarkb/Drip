@@ -9,6 +9,8 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 	
 	if(screenNum==0) {
 		entitySpawn(ent_aitest(),xMult+80,yMult+120);
+		entitySpawn(ent_techNpc(),xMult+50,yMult+120);
+		entitySpawn(ent_agNpc(),xMult+30,yMult+120);
 	}
 	tilewrapper[xIn][yIn].flag=0;
 	//return ent_empty();
@@ -37,7 +39,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	uint32_t screenHash = lfsr(hashme);
 
 	//printf("%u\n",hashme);
-		
+
 	int diff=intersect(xPos, yPos);
 	printf("Difference: %d\n", diff);
 	if(xPos<50 && yPos<50) {

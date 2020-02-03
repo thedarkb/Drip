@@ -76,7 +76,7 @@ void diag_menuTest() {
 }
 
 void diag_owl() {
-	pushMsg("Would you like to return to\nthe dialgoue test menu?\0");
+	pushMsg("Would you like to return to\nthe dialogue test menu?\0");
 	menuReset;
 	options[0]=diag_menuTest;
 	menuText="Yes\nNo\0";

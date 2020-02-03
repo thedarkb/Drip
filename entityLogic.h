@@ -15,3 +15,7 @@ void behav_dialogue(int i);
 void behav_dead(int i);
 void behav_item(int i);
 void behav_itemStatic(int i);
+void behav_techNpcSpawn(int i);
+void behav_techNpc(int i);
+void behav_agNpcSpawn(int i);
+void behav_agNpc(int i);

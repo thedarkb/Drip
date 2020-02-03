@@ -96,6 +96,7 @@ void spriteCollisions() {
 		for (int j=0; j<ELIMIT; j++) {
 			if(overlap(i,j)){
 				switch (entSet[i].collisionClass) {
+					case 1:
 					case 2: //Blobby with a player.
 					if (entSet[j].health>20) entSet[j].health-=20;
 					else entSet[j].health=0;
