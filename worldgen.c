@@ -94,7 +94,6 @@ void scrollMap() {
 	int checkX = entSet[0].x;
 	int checkY = entSet[0].y;
 	const int speed=(TS*SW)/24;
-	SDL_BlitSurface(s, &hudStripper, scrollLayer, NULL);
 	switch (scroll) {
 		case 1:
 			entityScroll(0,1);
