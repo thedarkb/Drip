@@ -46,7 +46,6 @@ SDL_Surface* bgLayer=NULL;
 SDL_Texture* bgTex[3][3];
 SDL_Surface* scrollLayer = NULL;
 
-
 typedef struct entity {
 	int x;
 	int y;
@@ -67,6 +66,8 @@ typedef struct entity {
 	unsigned char deathframe;
 	unsigned char drop[4];
 	unsigned char hostile;
+	char alignment;
+	unsigned char aggroThreshold;
 	void(*hostileDiag)();
 	void(*passiveDiag)();
 } entity;

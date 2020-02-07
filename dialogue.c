@@ -1,6 +1,8 @@
 #define menuReset memset(&options, 0, sizeof options);menuText=NULL //I said I'd save ya some typing. -Ben
 #define menuCall menuFlag=1;menuFirstCall=1
 
+
+void diag_owl();
 //29 chars in 1 line
 //Long story short, this is all a dream. The assets used in this can be reused for random houses in settlements and towns.
 //This is also a good intro quest because it gets the player familiarised with the movement and the interactions and the whole "The WORLD IS FUCKED" dynamic of the main story.

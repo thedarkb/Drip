@@ -174,8 +174,14 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 
 entity ent_techNpc() {
 	entity me;
+	printf("Spawning tech NPC\n");
+
 	memset(&me, 0, sizeof me);
 	me.collisionClass=2;
+	me.xSub=2;
+	me.ySub=10;
+	me.alignment=127;
+	me.aggroThreshold=120;
 	me.frame[0]=177;
 	me.frame[1]=153;
 	me.frame[2]=161;
@@ -188,16 +194,21 @@ entity ent_techNpc() {
 	me.frame[9]=154;
 	me.frame[10]=162;
 	me.frame[11]=170;
-	me.health=20;
+	me.health=255;
 	me.layer=1;
-	me.behaviour=behav_techNpcSpawn;
+	me.behaviour=behav_npcSpawn;
 	return me;	
 }
 
 entity ent_agNpc() {
 	entity me;
+	printf("Spawning AG NPC\n");
 	memset(&me, 0, sizeof me);
-	me.collisionClass=1;
+	me.collisionClass=3;
+	me.xSub=2;
+	me.ySub=10;
+	me.aggroThreshold=120;
+	me.alignment=-127;
 	me.frame[0]=177;
 	me.frame[1]=153;
 	me.frame[2]=161;
@@ -210,9 +221,9 @@ entity ent_agNpc() {
 	me.frame[9]=154;
 	me.frame[10]=162;
 	me.frame[11]=170;
-	me.health=20;
+	me.health=255;
 	me.layer=1;
-	me.behaviour=behav_techNpcSpawn;
+	me.behaviour=behav_npcSpawn;
 	return me;	
 }
 

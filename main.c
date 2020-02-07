@@ -92,12 +92,18 @@ int overlap(unsigned char i, unsigned char j){
 }
 
 void spriteCollisions() {
-	for (int i=0; i<ELIMIT; i++) {
-		for (int j=0; j<ELIMIT; j++) {
+	static int direction=1;
+	direction*=-1;
+	int start;
+	if(direction==1) start=0;
+	else start=ELIMIT-1;
+	for (int i=start; i<ELIMIT && i>=0; i+=direction) {
+		for (int j=start; j<ELIMIT && j>=0; j+=direction) {
 			if(overlap(i,j)){
 				switch (entSet[i].collisionClass) {
-					case 1:
-					case 2: //Blobby with a player.
+					case 2:
+					case 3: //Generic bouncy collisions.
+					printf("Collision detected.\n");
 					if (entSet[j].health>20) entSet[j].health-=20;
 					else entSet[j].health=0;
 					if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {

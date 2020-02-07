@@ -8,9 +8,9 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 	
 	
 	if(screenNum==0) {
-		entitySpawn(ent_aitest(),xMult+80,yMult+120);
-		entitySpawn(ent_techNpc(),xMult+50,yMult+120);
-		entitySpawn(ent_agNpc(),xMult+30,yMult+120);
+	//	entitySpawn(ent_aitest(),xMult+80,yMult+120);
+		entitySpawn(ent_techNpc(),xMult,yMult);
+		entitySpawn(ent_agNpc(),xMult+70,yMult+70);
 	}
 	tilewrapper[xIn][yIn].flag=0;
 	//return ent_empty();
