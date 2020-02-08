@@ -18,25 +18,26 @@ entity ent_player() {
 	me.behaviour=playerBehaviour;
 	me.x=0;
 	me.y=0;
-	me.layer=1;
+	me.layer=2;
 	me.health=pMaxHealth;
 	me.attack=5;
 	me.xSub=TS/5;
 	me.ySub=1;
 	me.direction=1;
+	me.visible=1;
 	me.collisionClass=1;
 	me.frame[0]=148; //up
 	me.frame[1]=124; //down
 	me.frame[2]=132; //left
 	me.frame[3]=140; //right
-	me.frame[4]=147;
-	me.frame[5]=123;
-	me.frame[6]=131;
-	me.frame[7]=139;
-	me.frame[8]=149;
-	me.frame[9]=125;
-	me.frame[10]=133;
-	me.frame[11]=141;
+	me.frame[4]=147; //up step1
+	me.frame[5]=123; //down step1
+	me.frame[6]=131; //left step1
+	me.frame[7]=139; //right step1
+	me.frame[8]=149; //up step2
+	me.frame[9]=125; //down step2
+	me.frame[10]=133; //left step2
+	me.frame[11]=141; //right step2
 	return me;
 }
 
@@ -51,6 +52,7 @@ entity ent_aitest() {
 	me.layer=1;
 	me.attack=2;
 	me.deathframe=206;
+	me.visible=1;
 	me.health=30;
 	me.hostile=1;
 	me.hostileDiag=diag_menuTest;
@@ -103,6 +105,7 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	me.frame[3]=67;
 	me.health=255;
 	me.layer=1;
+	me.visible=0;
 	me.status[0]=10;
 	me.status[1]=creator;
 	me.behaviour=behav_sword;
@@ -124,6 +127,7 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 	me.status[1]=0;
 	me.behaviour=behav_dialogue;
 	me.setframe=direction;
+	me.visible=0;
 	me.collisionClass=131;
 	return me;
 }
@@ -168,6 +172,7 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 	me.frame[0]=getItemSprite(type);
 	me.setframe=0;
 	me.status[0]=type;
+	me.visible=0;
 	me.collisionClass=0;
 	return me;
 }
@@ -182,19 +187,20 @@ entity ent_techNpc() {
 	me.ySub=10;
 	me.alignment=127;
 	me.aggroThreshold=120;
-	me.frame[0]=177;
-	me.frame[1]=153;
-	me.frame[2]=161;
-	me.frame[3]=169;
-	me.frame[4]=176;
-	me.frame[5]=152;
-	me.frame[6]=160;
-	me.frame[7]=168;
-	me.frame[8]=178;
-	me.frame[9]=154;
-	me.frame[10]=162;
-	me.frame[11]=170;
-	me.health=255;
+	me.visible=1;
+	me.frame[0]=145;
+	me.frame[1]=121;
+	me.frame[2]=129;
+	me.frame[3]=137;
+	me.frame[4]=144;
+	me.frame[5]=120;
+	me.frame[6]=128;
+	me.frame[7]=136;
+	me.frame[8]=146;
+	me.frame[9]=122;
+	me.frame[10]=130;
+	me.frame[11]=138;
+	me.health=20;
 	me.layer=1;
 	me.behaviour=behav_npcSpawn;
 	return me;	
@@ -204,9 +210,10 @@ entity ent_agNpc() {
 	entity me;
 	printf("Spawning AG NPC\n");
 	memset(&me, 0, sizeof me);
-	me.collisionClass=3;
+	me.collisionClass=2;
 	me.xSub=2;
 	me.ySub=10;
+	me.visible=1;
 	me.aggroThreshold=120;
 	me.alignment=-127;
 	me.frame[0]=177;
@@ -221,10 +228,34 @@ entity ent_agNpc() {
 	me.frame[9]=154;
 	me.frame[10]=162;
 	me.frame[11]=170;
-	me.health=255;
+	me.health=20;
 	me.layer=1;
 	me.behaviour=behav_npcSpawn;
 	return me;	
+}
+
+entity ent_npc(faction theboys) {
+	entity me;
+	printf("Spawning NPC\n");
+	memset(&me,0,sizeof me);
+	/*me.frame[0]=177;
+	me.frame[1]=153;
+	me.frame[2]=161;
+	me.frame[3]=169;
+	me.frame[4]=176;
+	me.frame[5]=152;
+	me.frame[6]=160;
+	me.frame[7]=168;
+	me.frame[8]=178;
+	me.frame[9]=154;
+	me.frame[10]=162;
+	me.frame[11]=170;*/
+	me.layer=1;
+	me.visible=1;
+	me.health=255;
+	me.collisionClass=2;
+	me.behaviour=behav_chase;
+	return me;
 }
 
 entity ent_empty() {

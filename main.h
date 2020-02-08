@@ -4,11 +4,13 @@
 
 #define NOSCROLL
 
-#define ELIMIT 32
+#define ELIMIT 255
 #define MAPELIMIT 8
 #define FLIMIT 32
+#define ENTVARIETY 1
+#define FACTIONLIMIT 2
 #define TLIMIT 16
-#define SPRITELAYERS 2
+#define SPRITELAYERS 3
 #define INVLIMIT 8
 #define ENTFRAMES 32
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
@@ -46,6 +48,8 @@ SDL_Surface* bgLayer=NULL;
 SDL_Texture* bgTex[3][3];
 SDL_Surface* scrollLayer = NULL;
 
+typedef struct faction faction;
+
 typedef struct entity {
 	int x;
 	int y;
@@ -53,6 +57,7 @@ typedef struct entity {
 	unsigned char ySub;
 	void(*behaviour)(int);
 	void(*prevState)(int);
+	unsigned char visible;
 	unsigned char direction;
 	unsigned char animation;
 	unsigned char collisionClass;
@@ -67,6 +72,7 @@ typedef struct entity {
 	unsigned char drop[4];
 	unsigned char hostile;
 	char alignment;
+	faction* faction;
 	unsigned char aggroThreshold;
 	void(*hostileDiag)();
 	void(*passiveDiag)();
@@ -93,9 +99,20 @@ typedef struct view {
 	unsigned char screen[SW][SH];
 	unsigned char layers[SW*TS][SH*TS];
 	unsigned char flag;
+	unsigned char facFlag;
 	unsigned int x;
 	unsigned int y;
 } view;
+
+typedef struct faction {
+	unsigned int centreX;
+	unsigned int centreY;
+	unsigned int radius;
+	char baseAlignment;
+	unsigned char alignmentFuzz;
+	unsigned char aggroThreshold;
+	entity entPlates[ENTVARIETY];
+} faction;
 
 typedef struct tunnel {
 	int m;
@@ -119,6 +136,8 @@ uint16_t flags=0;
 
 unsigned char spawnSlot=1;
 unsigned char nspawnSlot=1;
+
+unsigned char lastSlot=0;
 
 uint16_t sX = 1;
 uint16_t sY = 1;
@@ -147,6 +166,7 @@ char menuFirstCall=0;
 
 entity entSet[ELIMIT];
 tunnel tunnels[TLIMIT];
+faction factions[FACTIONLIMIT];
 
 inventory pInv;
 
@@ -161,6 +181,7 @@ void entityReset();
 void entitySpawn(entity in, int x, int y);
 void nentityReset();
 void nentitySpawn(entity in);
+void factionSpawn(faction* theboys,int x,int y);
 void deadEntityKiller();
 void corpseDisposal();
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]);

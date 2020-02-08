@@ -5,15 +5,42 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 	
 	int xMult=(xIn-1)*(SW*TS);
 	int yMult=(yIn-1)*(SH*TS);
-	
+	int xOffset=(xIn-1);
+	int yOffset=(yIn-1);	
 	
 	if(screenNum==0) {
 	//	entitySpawn(ent_aitest(),xMult+80,yMult+120);
-		entitySpawn(ent_techNpc(),xMult,yMult);
-		entitySpawn(ent_agNpc(),xMult+70,yMult+70);
+	//	entitySpawn(ent_techNpc(),xMult,yMult);
+	//	entitySpawn(ent_agNpc(),xMult+70,yMult+70);
 	}
 	tilewrapper[xIn][yIn].flag=0;
 	//return ent_empty();
+}
+
+void factionFetch(unsigned int xIn, unsigned int yIn) {
+	int xMult=(xIn-1)*(SW*TS);
+	int yMult=(yIn-1)*(SH*TS);
+	int xOffset=(xIn-1);
+	int yOffset=(yIn-1);
+	static int sOffset=0;
+	if (!sOffset) sOffset=1;
+	else sOffset=0;
+
+	for (int i=0; i<FACTIONLIMIT; i++) {
+		printf("Parsing faction %d\n", i);
+		if(intersect(sX+xOffset,sY+yOffset)<100 && intersect(sX+xOffset,sY+yOffset)>=0 && !sOffset) {
+			printf("Faction %d centre at %d,%d, radius at %d with alignment %d\n",i,factions[i].centreX,factions[i].centreY,factions[i].radius,factions[i].baseAlignment);
+			printf("Faction %d diff is %d,%d\n",i,get_diff(sX+xOffset,factions[i].centreX),get_diff(sY+yOffset,factions[i].centreY));
+			if(get_diff(factions[i].centreX, sX+xOffset) < factions[i].radius && get_diff(factions[i].centreY, sY+yOffset) < factions[i].radius) {
+				for(int j=0;j<3;j++){
+					printf("Spawning entities belonging to faction %d\n", i);
+					reroll();
+					factionSpawn(&factions[i], 70+xMult+sOffset+i*TS, 70+(TS*j)+yMult);
+				}
+			}
+		}
+	}
+	tilewrapper[xIn][yIn].facFlag=1;
 }
 
 void loadSpawn() {
@@ -21,6 +48,7 @@ void loadSpawn() {
 		for(int y=0; y<3; y++) {
 			if (tilewrapper[x][y].flag) {
 				entFetch(x,y);
+				factionFetch(x,y);
 				tilewrapper[x][y].flag=0;
 			}
 		}
@@ -47,6 +75,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 			printf("Generated full room.\n");
 			memset(&in->screen, 15, sizeof in->screen);
 			memset(&in->layers, 0, sizeof in->layers);
+
 			for (int edgePos=1; edgePos<SH-1; edgePos++) {
 				screenHash=lfsr(screenHash);
 				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
@@ -80,6 +109,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	} else memset(&in->screen, 22, sizeof in->screen);
 	
 	in->flag=1;
+	in->facFlag=1;
 	/*if(xPos == 0 && yPos == 0) {
 		memcpy(&in->screen, testhouse().tileLayer, sizeof in->screen);
 		memcpy(&in->layers, testhouse().collisionLayer, sizeof in->screen);

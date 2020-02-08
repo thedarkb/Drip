@@ -94,7 +94,9 @@ void playerBehaviour(int i) {
 				printf("%u\n", entSet[k].behaviour);
 			}
 		}
-		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);                            
+		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		if (keyboard[SDL_SCANCODE_F1]) printf("Entity 0 at %d,%d\n",entSet[i].x,entSet[i].y);
+		if(keyboard[SDL_SCANCODE_F2]) printf("Alignment: %d\n", entSet[i].alignment);
 		
 		if (entSet[i].y < 0) scroll = 1;
 		if (entSet[i].y > TS*SH) scroll=2;
@@ -281,9 +283,9 @@ void behav_npcSpawn(int i) {
 	entSet[i].status[0]=0;
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 	for(int j=0; j<ELIMIT; j++) {
-		if(get_diff(entSet[i].alignment,entSet[j].alignment)>150) {
+		if(get_diff(entSet[i].alignment,entSet[j].alignment)>entSet[i].aggroThreshold && entSet[j].health && entSet[j].visible) {
 			if(i!=j) entSet[i].status[0]=j;
-			printf("Tech NPC with id%u\n Pursuing entity %u\n", i, entSet[i].status[0]);
+			printf("NPC with id%u\n and collision class %d pursuing entity %u\n", i, entSet[i].collisionClass,entSet[i].status[0]);
 			entSet[i].behaviour=behav_npc;
 			return;
 		}
@@ -300,7 +302,7 @@ void behav_npc(int i) {
 		if (entSet[entSet[i].status[0]].y > entSet[i].y) moveY(&entSet[i], 1);
 		if (entSet[entSet[i].status[0]].y < entSet[i].y) moveY(&entSet[i], -1);
 	}
-	//if(!entSet[entSet[i].status[0]].health) entSet[i].behaviour=behav_techNpcSpawn;
+	if(!entSet[entSet[i].status[0]].health || !entSet[entSet[i].status[0]].visible) entSet[i].behaviour=behav_npcSpawn;
 }
 
 void entityLogic() {

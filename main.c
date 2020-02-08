@@ -11,6 +11,7 @@
 #include "items.c"
 #include "dialogue.c"
 #include "entities.c"
+#include "factions.c"
 //#include "maps.c"
 #include "worldgen.c"
 #include "entityLogic.c"
@@ -48,6 +49,7 @@ void entitySpawn(entity in, int x, int y) {
 				entSet[i]=in;
 				entSet[i].x=x;
 				entSet[i].y=y;
+				lastSlot=i;
 				return;
 			}
 		}
@@ -57,10 +59,18 @@ void entitySpawn(entity in, int x, int y) {
 				entSet[i]=in;
 				entSet[i].x=x;
 				entSet[i].y=y;
+				lastSlot=i;
 				break;
 			}
 		}
 	}
+}
+
+void factionSpawn(faction* theboys,int x,int y) {
+	entitySpawn(theboys->entPlates[0],x,y);
+	entSet[lastSlot].faction=theboys;
+	entSet[lastSlot].alignment=theboys->baseAlignment;
+	entSet[lastSlot].aggroThreshold=theboys->aggroThreshold;
 }
 
 void deadEntityKiller() {
@@ -83,8 +93,10 @@ void deadEntityKiller() {
 
 int overlap(unsigned char i, unsigned char j){
 	if (!entSet[j].collisionClass) return 0;
+	if (!entSet[i].collisionClass) return 0;
+	if (i==j) return 0;
 	if (entSet[j].collisionClass>128) return 0;
-	if (entSet[i].collisionClass == entSet[j].collisionClass) return 0;
+	//if (entSet[i].collisionClass == entSet[j].collisionClass) return 0;
 	if (get_diff(entSet[i].x+TS/2,entSet[j].x+TS/2) < 10) {
 		if (get_diff(entSet[i].y+TS/2,entSet[j].y+TS/2) < 10) return 1;
 	}
@@ -100,42 +112,49 @@ void spriteCollisions() {
 	for (int i=start; i<ELIMIT && i>=0; i+=direction) {
 		for (int j=start; j<ELIMIT && j>=0; j+=direction) {
 			if(overlap(i,j)){
+				//printf("Collision detected between %d and %d\n",i,j);
 				switch (entSet[i].collisionClass) {
 					case 2:
+					if(get_diff(entSet[i].alignment, entSet[j].alignment) < entSet[i].aggroThreshold) continue;
+					//Stops NPCs of the same faction murdering eachother.
 					case 3: //Generic bouncy collisions.
-					printf("Collision detected.\n");
 					if (entSet[j].health>20) entSet[j].health-=20;
-					else entSet[j].health=0;
+					else {
+						entSet[j].health=0;
+						if(entSet[i].alignment>entSet[j].alignment) entSet[i].alignment-=10;
+						else entSet[i].alignment+=10;
+						//if(entSet[j].faction) entSet[j].faction->aggroThreshold--;
+					}
 					if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
 						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].prevState=entSet[j].behaviour;
+							if(entSet[j].behaviour!=behav_upLeft) entSet[j].prevState=entSet[j].behaviour;
 							entSet[j].behaviour=behav_upLeft; //up left
-							entSet[j].collisionClass=entSet[i].collisionClass;
+							entSet[j].collisionClass=0;
 						}
 						else {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].prevState=entSet[j].behaviour;
+							if(entSet[j].behaviour!=behav_upRight) entSet[j].prevState=entSet[j].behaviour;
 							entSet[j].behaviour=behav_upRight; //up right
-							entSet[j].collisionClass=entSet[i].collisionClass;
+							entSet[j].collisionClass=0;
 						}
 					}
 					else {
 						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].prevState=entSet[j].behaviour;
+							if(entSet[j].behaviour!=behav_downLeft) entSet[j].prevState=entSet[j].behaviour;
 							entSet[j].behaviour=behav_downLeft; //down left
-							entSet[j].collisionClass=entSet[i].collisionClass;
+							entSet[j].collisionClass=0;
 						}
 						else {
 							entSet[j].status[2]=entSet[j].collisionClass;
 							entSet[j].status[1]=10;
-							entSet[j].prevState=entSet[j].behaviour;
+							if(entSet[j].behaviour!=behav_downRight) entSet[j].prevState=entSet[j].behaviour;
 							entSet[j].behaviour=behav_downRight; //down right
-							entSet[j].collisionClass=entSet[i].collisionClass;
+							entSet[j].collisionClass=0;
 						}
 					}
 					break;
@@ -170,12 +189,21 @@ void spriteCollisions() {
 								entSet[j].prevState=entSet[j].behaviour;
 								entSet[j].behaviour=behav_right; //right
 								entSet[j].collisionClass=entSet[i].collisionClass;
-							break;
-							if (entSet[entSet[i].status[1]].attack > entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
-							else entSet[j].health=0;									
+							break;								
 						}
 						if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
-						else entSet[j].health=0;
+						else {
+							entSet[j].health=0;
+							if(entSet[entSet[i].status[1]].alignment>entSet[j].alignment && entSet[i].alignment) {
+								if(entSet[i].alignment>-85) entSet[entSet[i].status[1]].alignment-=40;
+								else entSet[i].alignment=-126;
+							}
+							else {
+								if(entSet[i].alignment<85) entSet[entSet[i].status[1]].alignment+=40;
+								else entSet[i].alignment=126;
+							}
+							//if(entSet[j].faction) entSet[j].faction->aggroThreshold--;
+						}
 					break;
 					case 130: //For when the player collides with an item.
 						if (j) break;
@@ -241,6 +269,7 @@ int main () {
 	s = SDL_GetWindowSurface(w);
 	rng.ui32=4; //SEEDS THE MAIN RNG
 	generateTunnels();
+	initialiseFactions();
 	tunnels[0].m=1;
 	tunnels[0].c=0;
 	memset(&tilewrapper, 0, sizeof tilewrapper);
@@ -431,8 +460,10 @@ uint32_t getrandom() {
 }
 
 void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
-	for (int x=0; x<TS; x++) {
-		for (int y=0; y<TS; y++) {
+	if(iX>SW-1) return;
+	if(iY>SH-1) return;
+	for (int x=0; x<TS-1; x++) {
+		for (int y=0; y<TS-1; y++) {
 			if(y==0 || x==0 || x==TS-1 || y==TS-1) in->layers[(iX*TS)+x][(iY*TS)+y]=0;
 			else in->layers[(iX*TS)+x][(iY*TS)+y] = stat; 
 		}
@@ -521,7 +552,8 @@ char collisionCheck(int x, int y) {
 	int wrapperY=(y+TS*SH)/(TS*SH);
 	int microX=(x+TS*SW)%(TS*SW);
 	int microY=(y+TS*SH)%(TS*SH);
-	assert(wrapperX<3);
+	if(wrapperX>2 || wrapperY>2) return 1;
+	//assert(wrapperX<3);
 	if(microX<TS && microY<TS ) return 0;
 	return tilewrapper[wrapperX][wrapperY].layers[microX][microY];
 	return 0;
