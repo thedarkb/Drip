@@ -95,7 +95,6 @@ int overlap(unsigned char i, unsigned char j){
 	if (!entSet[i].collisionClass) return 0;
 	if (i==j) return 0;
 	if (entSet[j].collisionClass>128) return 0;
-	//if (entSet[i].collisionClass == entSet[j].collisionClass) return 0;
 	if (get_diff(entSet[i].x+TS/2,entSet[j].x+TS/2) < 10) {
 		if (get_diff(entSet[i].y+TS/2,entSet[j].y+TS/2) < 10) return 1;
 	}
@@ -153,8 +152,8 @@ void spriteCollisions() {
 					}
 					break;
 					case 129: //Sword colliding with enemy.
-						printf("Collision\n");
-						printf("Direction: %u\n", entSet[i].direction);
+						//printf("Collision\n");
+						//printf("Direction: %u\n", entSet[i].direction);
 						switch(entSet[entSet[i].status[1]].direction) {
 							case 0:
 								entSet[j].status[2]=entSet[j].collisionClass;
@@ -213,7 +212,7 @@ void spriteCollisions() {
 	}
 }
 
-void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {
+void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {//This could do with being ripped out.
 	for (int x=0; x<SW; x++) {
 		for (int y=0; y<SH; y++) {
 			if(collisions[x][y]>0) setCollision(&tilewrapper[1][1],x,y,collisions[x][y]);
@@ -229,6 +228,7 @@ void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {
 	}
 }
 
+//Reads tiles from sheet
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum) {
 	SDL_Surface* tileOut;
 	SDL_Rect tile;
@@ -268,14 +268,14 @@ int main () {
 
 	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
 	tile size as stored, fifth is for the tile number. It reads from the */
-	for (int i = 0; i<TILECOUNT; i++) {
+	for (int i = 0; i<TILECOUNT; i++) { //Loads all of the tiles into memory
 		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, TS, i);
 		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
 	}
-	for (int i=0; i<TILECOUNT; i++) {
+	for (int i=0; i<TILECOUNT; i++) { //Streams the tiles from memory into VRAM
 		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
 	}
-	SDL_FreeSurface(loader);
+	SDL_FreeSurface(loader); //Don't want leaks
 	loader=IMG_Load("font.png");
 	for (int i=0; i<127; i++) {
 		font[i]=surfLoader(loader, 889, 7, 7, 7, i);
@@ -287,9 +287,9 @@ int main () {
 	}
 	SDL_FreeSurface(loader);
 	unsigned int timer=0;
-	memset(&entSet, 0, sizeof entSet);
-	entityInitialise();
-	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
+	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
+	entityInitialise(); //Loads the player
+	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
 	
 	
 	/*Corner Room definition.*/
@@ -311,7 +311,7 @@ int main () {
 	
 	
 	#ifndef WEB
-	while(1) {
+	while(1) { //The timing loop leaves a little to be desired.
 		if (SDL_GetTicks()-timer < 1000/FRAMERATE) SDL_Delay(1000/FRAMERATE);
 		else printf("Frames dropped: %u\n", (SDL_GetTicks()-timer)/(1000/FRAMERATE)+1);
 		timer = SDL_GetTicks();
@@ -321,7 +321,7 @@ int main () {
 	}
 	#endif
 	#ifdef WEB
-	emscripten_set_main_loop(loop, 30, 1);
+	emscripten_set_main_loop(loop, 30, 1); //For those of you on WebOS
 	#endif
 	return 0;
 }
@@ -329,11 +329,11 @@ int main () {
 void text(char* inStr, int x, int y) {
 	int i=0;
 	int xb=x;
-	while (inStr[i]) {
-		if (inStr[i]>37) simage(font[inStr[i]], x, y, 7, 7);
-		x+=8;
-		if(inStr[i]==10) {
-			y+=10;
+	while (inStr[i]) { //Breaks if it hits a null terminator.
+		if (inStr[i]>37) simage(font[inStr[i]], x, y, 7, 7); //If character is printing, print character.
+		x+=8; //Moves the cursor
+		if(inStr[i]==10) { //If line feed is detected, reset cursor to left side of the screen.
+			y+=10; //And move the cursor down one line.
 			x=xb;
 		}
 		i++;
@@ -347,12 +347,12 @@ void menu() {
 	int optCount=0;
 	static int optSel=0;
 
-	while(menuText[i]) {
+	while(menuText[i]) { //Counts the number of lines in the menu text.
 		if (menuText[i]==10) optCount++;
 		i++;
 	}
 
-	text(menuText,11,102);
+	text(menuText,11,102); //Displays menu text.
 	static int keyPress=1;
 	static int zPress=1;
 	if(!keyboard[SDL_SCANCODE_UP] && !keyboard[SDL_SCANCODE_DOWN]) keyPress=0;
@@ -372,13 +372,13 @@ void menu() {
 	if(keyboard[SDL_SCANCODE_Z] && !zPress && !menuFirstCall) {
 		menuFlag=0;
 		zPress=1;
-		if(options[optSel]) options[optSel]();
+		if(options[optSel]) options[optSel](); //Options are just function pointers.
 	}
 
-	text(">", 2, 102+(optSel*10));  
+	text(">", 2, 102+(optSel*10));  //Draws the cursor.
 }
 
-void pushMsg(char* inStr) {
+void pushMsg(char* inStr) { //Adds a message to the stack.
 	mode=1;
 	msgBuffer[msgSlot]=inStr;
 	msgSlot++;
@@ -386,13 +386,13 @@ void pushMsg(char* inStr) {
 
 void popMsg(){
 	static char keyPressed=0;
-	drawRect(2,120,236,58,0);
-	text(msgBuffer[msgOut],2,102);
-	if (!keyPressed) { 	
+	drawRect(2,120,236,58,0); //Background.
+	text(msgBuffer[msgOut],2,102); //Renders text
+	if (!keyPressed) { //Pops message off of the stack if you hit Z
 		if (keyboard[SDL_SCANCODE_Z] && msgTimeout>10) {
 			printf("Next slot:\n");
 			msgOut++;
-			if (msgSlot==msgOut) {
+			if (msgSlot==msgOut) { //Breaks out of message mode when the bottom of the stack is hit.
 				mode=2;
 				msgSlot=0;
 				msgOut=0;
@@ -412,7 +412,7 @@ unsigned int get_diff (int val1, int val2) {
 	return 0;
 }
 
-uint32_t lfsr (uint32_t shift) {
+uint32_t lfsr (uint32_t shift) { //Pseudo-random number generator.
 	for (int i=0; i<33; i++) {
 		shift ^= (shift >> 31);
 		shift ^= (shift >> 31) << 4;
@@ -454,34 +454,35 @@ void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel bord
 	}
 }
 
-void image(SDL_Texture* imgIn, int x, int y, int w, int h) {
-	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h};
+void image(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
+	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h}; //Accounts for HUD and camera.
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }
 
+/*
 void timage(SDL_Texture* imgIn, int x, int y, int w, int h) {
 	SDL_Rect scaler = {x,y,w,h};
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
-}
+}*/
 
-void simage(SDL_Surface* imgIn, int x, int y, int w, int h) {
+void simage(SDL_Surface* imgIn, int x, int y, int w, int h) { //Ditto above, but from software buffer.
 	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h};
 	SDL_Texture* imgOut = SDL_CreateTextureFromSurface(r, imgIn);
 	SDL_RenderCopy(r, imgOut, NULL, &scaler);
 	SDL_DestroyTexture(imgOut);
 }
 
-void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h) {
+void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h) { //For drawing to the HUD
 	SDL_Rect scaler = {x,y,w,h};
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }
 
-void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) {
+void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) { //For drawing to the background layer.
 	SDL_Rect scaler = {x,y,w,h};
 	SDL_BlitSurface(imgIn, NULL, bgLayer, &scaler);
 }
 
-void bgDraw (view* in) {
+void bgDraw (view* in) { //Takes a tileset and blits it to the background layer.
 	for (int x=0; x<SW; x++) {
 		for (int y=0; y<SH; y++) {
 			bgBlit(swtileset[in->screen[x][y]],x*TS,y*TS,TS,TS);
@@ -489,7 +490,7 @@ void bgDraw (view* in) {
 	}
 }
 
-void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) {
+void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) { //Draws filled rectangle
 	union htmlDecode {
 		uint32_t htmlCode;
 		unsigned char rgb[3];
@@ -500,7 +501,7 @@ void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, ui
 	SDL_RenderFillRect(r, &scaler);
 }
 
-void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) {
+void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) { //Draws empty rectangle.
 	union htmlDecode {
 		uint32_t htmlCode;
 		unsigned char rgb[3];
@@ -511,7 +512,7 @@ void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
 	SDL_RenderDrawRect(r, &scaler);
 }
 
-void hudRefresh() {
+void hudRefresh() { //Redraws HUD
 	drawRect(0,0,TS*SW,HUDHEIGHT,0);
 	drawRect(132,4,entSet[0].health*(105/pMaxHealth),4,0x6DAA2C);
 	drawRect(132,8,105,4,0xd04648);
@@ -524,14 +525,14 @@ void hudRefresh() {
 	drawRect((pInv.weapon*TS)+1,TS+1,TS-2,1,0x00FF00);
 }
 
-void flip() {
+void flip() { //Updates screen.
 	//t = SDL_CreateTextureFromSurface(r, s);
 	//SDL_RenderCopy(r,t,NULL,NULL);
 	//SDL_DestroyTexture(t);
 	SDL_RenderPresent(r);
 }
 
-char collisionCheck(int x, int y) {
+char collisionCheck(int x, int y) { //Collision detection between map layer and entity.
 	int wrapperX=(x+TS*SW)/(TS*SW);
 	int wrapperY=(y+TS*SH)/(TS*SH);
 	int microX=(x+TS*SW)%(TS*SW);
@@ -543,7 +544,7 @@ char collisionCheck(int x, int y) {
 	return 0;
 }
 
-void moveX(entity* movEnt, char amount) {
+void moveX(entity* movEnt, char amount) { //Pretty self explanatory
 	if (amount>0) movEnt->direction = 3;
 	else movEnt->direction=2;
 
@@ -552,7 +553,7 @@ void moveX(entity* movEnt, char amount) {
 
 	unsigned int check = (*movEnt).x + amount;
 	//if (check >TS*SW-TS) return;
-	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
+	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return; //Checks all the corners, plus a bit in the middle.
 	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+TS/2)) return;
 	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
 	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+TS/2)) return;
@@ -579,7 +580,7 @@ void moveY(entity* movEnt, char amount) {
 	(*movEnt).y = check;
 }
 
-void fastMoveX(entity* movEnt, char direction, char speed) {
+void fastMoveX(entity* movEnt, char direction, char speed) { //Use these for high speed movement to prevent clipping.
 	for (int i=0; i<speed; i++) {
 		moveX(movEnt, direction);
 	}
