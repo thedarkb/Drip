@@ -4,7 +4,7 @@
 
 #define NOSCROLL
 
-#define ELIMIT 255
+#define ELIMIT 256 //Entity limit must not exceed 256
 #define MAPELIMIT 8
 #define FLIMIT 32
 #define ENTVARIETY 1
@@ -51,31 +51,29 @@ SDL_Surface* scrollLayer = NULL;
 typedef struct faction faction;
 
 typedef struct entity {
-	int x;
+	int x; 
 	int y;
-	unsigned char xSub;
-	unsigned char ySub;
-	void(*behaviour)(int);
-	void(*prevState)(int);
-	unsigned char visible;
-	unsigned char direction;
-	unsigned char animation;
-	unsigned char collisionClass;
-	unsigned char layer;
-	unsigned char attack;
-	unsigned char status[4];
+	unsigned char xSub; //Defines hitbox
+	unsigned char ySub; //^
+	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
+	void(*prevState)(int); //Used to hold the main behaviour while a temporary behaviour is in use.
+	unsigned char visible; //1 if entity is visible to NPCs
+	unsigned char direction; //Facing direction
+	unsigned char animation; //Animation frame
+	unsigned char collisionClass; //Collision classes above 128 are not themselves susceptible to collisions.
+	unsigned char layer; //Where they are in the sprite stack.
+	unsigned char attack; //RPG style attack stat.
+	unsigned char status[4]; //General purpose entity specific variables.
 	uint16_t health;
-	unsigned char inventory[INVLIMIT];
-	unsigned char frame[FLIMIT];
-	unsigned char setframe;
-	unsigned char deathframe;
-	unsigned char drop[4];
-	unsigned char hostile;
-	char alignment;
-	faction* faction;
-	unsigned char aggroThreshold;
-	void(*hostileDiag)();
-	void(*passiveDiag)();
+	unsigned char frame[FLIMIT]; //Array of animation frames.
+	unsigned char setframe; //Current frame
+	unsigned char deathframe; //Death sprite
+	unsigned char drop[4]; //Array of items, drop table.
+	int alignment; //Their position in the game's political system.
+	faction* faction; //Points to their faction, if they have one, NULL if they don't.
+	unsigned char aggroThreshold; //The difference in alignment that will provoke them to hostility.
+	unsigned char lastHit; //The last entity to strike them.
+	void(*dialogue)(); //Points to the dialogue, stored in dialogue.c; the domain of the man, the myth, the Merlin.
 } entity;
 
 typedef struct item {
@@ -89,59 +87,52 @@ typedef struct inventory {
 	unsigned char weapon;
 } inventory;
 
-typedef struct screen {
-	unsigned char* tileLayer;
-	unsigned char* collisionLayer;
-	unsigned char* entities;
-} screen;
-
 typedef struct view {
-	unsigned char screen[SW][SH];
-	unsigned char layers[SW*TS][SH*TS];
-	unsigned char flag;
-	unsigned char facFlag;
+	unsigned char screen[SW][SH]; //Tile data.
+	unsigned char layers[SW*TS][SH*TS]; //Bitmap containing collision data.
+	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
+	unsigned char facFlag; //Ditto, but for factions.
 	unsigned int x;
 	unsigned int y;
 } view;
 
-typedef struct faction {
+typedef struct faction { //Faction areas are circular.
 	unsigned int centreX;
 	unsigned int centreY;
 	unsigned int radius;
-	char baseAlignment;
-	unsigned char alignmentFuzz;
-	unsigned char aggroThreshold;
-	entity entPlates[ENTVARIETY];
+	int baseAlignment; //The standard alignment for an entity spawning as part of a faction.
+	unsigned int alignmentFuzz; //Alignment variance
+	unsigned int aggroThreshold; //The threshold of alignment difference that provokes one of its members.
+	entity entPlates[ENTVARIETY]; //Its entity templates.
 } faction;
 
 typedef struct tunnel {
-	int m;
-	int c;
-	unsigned char type;
+	int m; //Slope
+	int c; //Y intercept
+	unsigned char type; //Not yet used.
 } tunnel;
 
-union rng {
+union rng { //All of these variables are refreshed with reroll()
 	int32_t i32;
 	uint32_t ui32;
 	char c;
 	unsigned char uc;
 } rng;
 
-void(*options[6])();
+void(*options[6])(); //Menu options.
 
 view cornerRoom;
 
-view tilewrapper[3][3];
-uint16_t flags=0;
+unsigned char speaker; //Holds entity number which started conversation.
 
-unsigned char spawnSlot=1;
-unsigned char nspawnSlot=1;
+view tilewrapper[3][3]; //Holds all of the visible view structs
+uint16_t flags=0;
 
 unsigned char lastSlot=0;
 
-uint16_t sX = 1;
-uint16_t sY = 1;
-char scroll = 0;
+uint16_t sX = 1; //View struct currently occupied by the player.
+uint16_t sY = 1; //^
+char scroll = 0; //
 
 unsigned char pMaxHealth=100;
 unsigned char swordOut=0;

@@ -54,8 +54,7 @@ entity ent_aitest() {
 	me.deathframe=206;
 	me.visible=1;
 	me.health=30;
-	me.hostile=1;
-	me.hostileDiag=diag_menuTest;
+	me.dialogue=diag_menuTest;
 	me.collisionClass=2;
 	me.frame[0]=177;
 	me.frame[1]=153;
@@ -104,6 +103,7 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	me.frame[2]=67;
 	me.frame[3]=67;
 	me.health=255;
+	me.lastHit=255;
 	me.layer=1;
 	me.visible=0;
 	me.status[0]=10;

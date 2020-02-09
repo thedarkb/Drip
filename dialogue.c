@@ -1,5 +1,6 @@
 #define menuReset memset(&options, 0, sizeof options);menuText=NULL //I said I'd save ya some typing. -Ben
 #define menuCall menuFlag=1;menuFirstCall=1
+#define caller entSet[speaker]
 
 
 void diag_owl();

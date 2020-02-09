@@ -34,13 +34,6 @@ void entityScroll(int x, int y) {
 	}
 }
 
-void entityReset() {
-	for (int i=1; i<ELIMIT; i++) {
-		memset(&entSet[i], 0, sizeof entSet[i]);
-	}
-	spawnSlot=1;
-}
-
 void entitySpawn(entity in, int x, int y) {
 	if(in.behaviour) {
 		printf("Attempting to spawn...\n");
@@ -79,7 +72,13 @@ void deadEntityKiller() {
 			if(entSet[i].behaviour && entSet[i].behaviour != &behav_dead) {
 				entSet[i].behaviour=behav_dead;
 				printf("Killing %d\n with deathframe %u\n", i, entSet[i].deathframe);
+				if(entSet[i].lastHit!=255) {
+					printf("Realigning %u\n", entSet[i].lastHit);
+					if(entSet[entSet[i].lastHit].alignment>entSet[i].alignment) entSet[entSet[i].lastHit].alignment+=40;
+					else entSet[entSet[i].lastHit].alignment-=40;
+				}
 			}
+
 			entSet[i].collisionClass=0;
 			entSet[i].layer=0;
 			if(entSet[i].drop[0] != 0) {
@@ -119,12 +118,7 @@ void spriteCollisions() {
 					//Stops NPCs of the same faction murdering eachother.
 					case 3: //Generic bouncy collisions.
 					if (entSet[j].health>20) entSet[j].health-=20;
-					else {
-						entSet[j].health=0;
-						if(entSet[i].alignment>entSet[j].alignment) entSet[i].alignment-=10;
-						else entSet[i].alignment+=10;
-						//if(entSet[j].faction) entSet[j].faction->aggroThreshold--;
-					}
+					else entSet[j].health=0;
 					if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
 						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
 							entSet[j].status[2]=entSet[j].collisionClass;
@@ -189,21 +183,11 @@ void spriteCollisions() {
 								entSet[j].prevState=entSet[j].behaviour;
 								entSet[j].behaviour=behav_right; //right
 								entSet[j].collisionClass=entSet[i].collisionClass;
-							break;								
+							break;
+							entSet[j].lastHit=i;
 						}
 						if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
-						else {
-							entSet[j].health=0;
-							if(entSet[entSet[i].status[1]].alignment>entSet[j].alignment && entSet[i].alignment) {
-								if(entSet[i].alignment>-85) entSet[entSet[i].status[1]].alignment-=40;
-								else entSet[i].alignment=-126;
-							}
-							else {
-								if(entSet[i].alignment<85) entSet[entSet[i].status[1]].alignment+=40;
-								else entSet[i].alignment=126;
-							}
-							//if(entSet[j].faction) entSet[j].faction->aggroThreshold--;
-						}
+						else entSet[j].health=0;
 					break;
 					case 130: //For when the player collides with an item.
 						if (j) break;
@@ -216,8 +200,8 @@ void spriteCollisions() {
 						}
 					break;
 					case 131: //Entity dialogue.
-						if(entSet[j].hostile && entSet[j].hostileDiag) entSet[j].hostileDiag();
-						else if(!entSet[j].hostile && entSet[j].passiveDiag) entSet[j].passiveDiag();
+						speaker=j;
+						if(entSet[j].dialogue) entSet[j].dialogue();
 						else pushMsg("No dialogue found for entity.\n");
 						entSet[i].health=0;
 						entSet[i].behaviour=NULL;
