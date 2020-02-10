@@ -1,10 +1,7 @@
 east:
 	gcc main.c -O2 -lSDL2 -lSDL2_image -o drip
 fast:
-	gcc main.c -O0 -lSDL2 -lSDL2_image -o drip
-noscroll:
-	gcc main.c -O2 -DNOSCROLL -lSDL2 -lSDL2_image -o drip
-
+	gcc main.c -O0 -lSDL2 -lSDL2_image -g -o drip
 web:
 	mkdir web
 	cp index.html web/

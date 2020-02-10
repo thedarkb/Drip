@@ -4,7 +4,7 @@
 
 #define NOSCROLL
 
-#define ELIMIT 256 //Entity limit must not exceed 256
+#define ELIMIT 64 //Entity limit must not exceed 256
 #define MAPELIMIT 8
 #define FLIMIT 32
 #define ENTVARIETY 1
@@ -132,7 +132,7 @@ unsigned char lastSlot=0;
 
 uint16_t sX = 1; //View struct currently occupied by the player.
 uint16_t sY = 1; //^
-char scroll = 0; //
+unsigned char scroll = 0; //Triggers a screen transition on the next frame.
 
 unsigned char pMaxHealth=100;
 unsigned char swordOut=0;
@@ -196,10 +196,10 @@ void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, ui
 void hudRefresh();
 void flip();
 char collisionCheck(int x, int y);
-void moveX(entity* movEnt, char amount);
-void moveY(entity* movEnt, char amount);
-void fastMoveX(entity* movEnt, char direction, char speed);
-void fastMoveY(entity* movEnt, char direction, char speed);
+void moveX(entity* movEnt, short amount);
+void moveY(entity* movEnt, short amount);
+void fastMoveX(entity* movEnt, short direction, short speed);
+void fastMoveY(entity* movEnt, short direction, short speed);
 void snapToGrid(entity* movEnt);
 void entityLogic();
 void loop();

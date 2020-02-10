@@ -212,22 +212,6 @@ void spriteCollisions() {
 	}
 }
 
-void mapLoader(char entities[SW][SH], char collisions[SW][SH]) {//This could do with being ripped out.
-	for (int x=0; x<SW; x++) {
-		for (int y=0; y<SH; y++) {
-			if(collisions[x][y]>0) setCollision(&tilewrapper[1][1],x,y,collisions[x][y]);
-		}
-	}
-	for (int x=0; x<SW; x++) {
-		for (int y=0; y<SH; y++) {
-			printf("X: %u\n", x);
-			printf("Y: %u\n", y);
-			printf("Entity: %u\n", entities[x][y]);
-			if(entities[x][y]>0) entitySpawn(ent_nonsolid(x,y,entities[x][y]),0,0);
-		}
-	}
-}
-
 //Reads tiles from sheet
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum) {
 	SDL_Surface* tileOut;
@@ -544,7 +528,7 @@ char collisionCheck(int x, int y) { //Collision detection between map layer and 
 	return 0;
 }
 
-void moveX(entity* movEnt, char amount) { //Pretty self explanatory
+void moveX(entity* movEnt, short amount) { //Pretty self explanatory
 	if (amount>0) movEnt->direction = 3;
 	else movEnt->direction=2;
 
@@ -562,7 +546,7 @@ void moveX(entity* movEnt, char amount) { //Pretty self explanatory
 	(*movEnt).x = check;
 }
 
-void moveY(entity* movEnt, char amount) {
+void moveY(entity* movEnt, short amount) {
 	if (amount>0) movEnt->direction = 1;
 	else movEnt->direction=0;
 
@@ -580,13 +564,13 @@ void moveY(entity* movEnt, char amount) {
 	(*movEnt).y = check;
 }
 
-void fastMoveX(entity* movEnt, char direction, char speed) { //Use these for high speed movement to prevent clipping.
+void fastMoveX(entity* movEnt, short direction, short speed) { //Use these for high speed movement to prevent clipping.
 	for (int i=0; i<speed; i++) {
 		moveX(movEnt, direction);
 	}
 }
 
-void fastMoveY(entity* movEnt, char direction, char speed) {
+void fastMoveY(entity* movEnt, short direction, short speed) {
 	for (int i=0; i<speed; i++) {
 		moveY(movEnt, direction);
 	}
