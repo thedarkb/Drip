@@ -18,29 +18,23 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 }
 
 void factionFetch(unsigned int xIn, unsigned int yIn) {
+	int x = sX+(xIn-1);
+	int y = sY+(yIn-1);
+
 	int xMult=(xIn-1)*(SW*TS);
 	int yMult=(yIn-1)*(SH*TS);
-	int xOffset=(xIn-1);
-	int yOffset=(yIn-1);
-	static int sOffset=0;
-	if (!sOffset) sOffset=1;
-	else sOffset=0;
 
-	for (int i=0; i<FACTIONLIMIT; i++) {
-		printf("Parsing faction %d\n", i);
-		if(intersect(sX+xOffset,sY+yOffset)<100 && intersect(sX+xOffset,sY+yOffset)>=0 && !sOffset) {
-			printf("Faction %d centre at %d,%d, radius at %d with alignment %d\n",i,factions[i].centreX,factions[i].centreY,factions[i].radius,factions[i].baseAlignment);
-			printf("Faction %d diff is %d,%d\n",i,get_diff(sX+xOffset,factions[i].centreX),get_diff(sY+yOffset,factions[i].centreY));
-			if(get_diff(factions[i].centreX, sX+xOffset) < factions[i].radius && get_diff(factions[i].centreY, sY+yOffset) < factions[i].radius) {
-				for(int j=0;j<3;j++){
-					printf("Spawning entities belonging to faction %d\n", i);
-					reroll();
-					factionSpawn(&factions[i], 70+xMult+sOffset+i*TS, 70+(TS*j)+yMult);
-				}
-			}
+	faction* position=rootFaction;
+	int counter=0;
+	if(!tilewrapper[xIn][yIn].room) return;
+
+	while(position) {
+		if(get_diff(position->centreX, x) < position->radius && get_diff(position->centreY,y) < position->radius) {
+			printf("Spawning entities belonging to faction in position %d\n",counter++);
+			entitySpawn(position->entPlates[0], xMult+120,yMult+80);
 		}
+		position=position->next;
 	}
-	tilewrapper[xIn][yIn].facFlag=1;
 }
 
 void loadSpawn() {
@@ -69,6 +63,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	//printf("%u\n",hashme);
 
 	int diff=intersect(xPos, yPos);
+	if(!diff) in->room=1;
 	printf("Difference: %d\n", diff);
 	if(xPos<50 && yPos<50) {
 		if(diff>=0 && diff < 100) {
@@ -105,19 +100,12 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 				}
 			}	
 		}
-		else *in=cornerRoom;
-	} else memset(&in->screen, 22, sizeof in->screen);
-	
+		else {
+			*in=cornerRoom;
+			in->room=0;
+		}
+	} else in->room=0;
 	in->flag=1;
-	in->facFlag=1;
-	/*if(xPos == 0 && yPos == 0) {
-		memcpy(&in->screen, testhouse().tileLayer, sizeof in->screen);
-		memcpy(&in->layers, testhouse().collisionLayer, sizeof in->screen);
-		entitySpawn(ent_item(120,120,1,255));
-		entSet[nspawnSlot-1].health=255;
-		//pushMsg("Blobby's Dungeon\0");
-		//pushMsg("Level 1:\0");
-	}*/
 }
 
 void scrollMap() {

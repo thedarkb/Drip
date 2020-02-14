@@ -83,6 +83,8 @@ void playerBehaviour(int i) {
 			pInv.items[pInv.selection].type=0;
 		}
 		if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
+		if (keyboard[SDL_SCANCODE_P]) destroyFac(guineaPig);
+
 		if (keyboard[SDL_SCANCODE_L]) {
 			pushMsg("Test\0");
 			pushMsg("Message\0");

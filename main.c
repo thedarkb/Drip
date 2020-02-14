@@ -16,7 +16,38 @@
 #include "worldgen.c"
 #include "entityLogic.c"
 
-void entityInitialise() {
+faction* attachFac(faction newFac) { //Adds a new faction to the linked list.
+	faction* position=rootFaction;
+	printf("Attaching faction\n");
+	while(1){
+		if(!position->next) break;
+		printf("Counting factions...\n");
+		position=position->next;
+	}
+	position->next=malloc(sizeof newFac);
+	position=position->next;
+	*position=newFac;
+	(*position).next=NULL;
+	return position;
+}
+
+void destroyFac(faction* whigs) {
+	faction* position=rootFaction;
+	faction* nextNext;
+	while(position) {
+		if(position->next==whigs) {
+			position->next=position->next->next;
+			free(whigs);
+			for(int i=0; i<ELIMIT;i++){
+				if(entSet[i].faction==whigs) entSet[i].faction=NULL;
+			}
+			return;
+		}
+		position=position->next;
+	}	
+}
+
+void entityInitialise() { //Clears entity array, spawns player.
 	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
 	}
@@ -25,7 +56,7 @@ void entityInitialise() {
 	pInv.items[0].type=2;
 }
 
-void entityScroll(int x, int y) {
+void entityScroll(int x, int y) { //Corrects entity positions when player moves to a new area.
 	for (int i=0; i<ELIMIT; i++) {
 		entSet[i].x=entSet[i].x+((SW*TS)*x);
 		entSet[i].y=entSet[i].y+((SH*TS)*y);

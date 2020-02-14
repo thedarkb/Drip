@@ -91,7 +91,7 @@ typedef struct view {
 	unsigned char screen[SW][SH]; //Tile data.
 	unsigned char layers[SW*TS][SH*TS]; //Bitmap containing collision data.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
-	unsigned char facFlag; //Ditto, but for factions.
+	unsigned char room; //Tells loadspawn to reset data.
 	unsigned int x;
 	unsigned int y;
 } view;
@@ -104,6 +104,7 @@ typedef struct faction { //Faction areas are circular.
 	unsigned int alignmentFuzz; //Alignment variance
 	unsigned int aggroThreshold; //The threshold of alignment difference that provokes one of its members.
 	entity entPlates[ENTVARIETY]; //Its entity templates.
+	faction* next; //Next faction on the linked list.
 } faction;
 
 typedef struct tunnel {
@@ -157,7 +158,9 @@ char menuFirstCall=0;
 
 entity entSet[ELIMIT];
 tunnel tunnels[TLIMIT];
-faction factions[FACTIONLIMIT];
+faction* rootFaction; //Points to the start of the faction linked list, do not destroy.
+
+faction* guineaPig; //Temporary, remove
 
 inventory pInv;
 
@@ -166,6 +169,8 @@ SDL_Surface* sf1 = NULL;
 int cameraX=0;
 int cameraY=0;
 
+faction* attachFac(faction newFac);
+void destroyFac(faction* whigs);
 void entityInitialise();
 void entityScroll(int x, int y);
 void entityReset();
