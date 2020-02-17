@@ -328,10 +328,10 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 
 int main () {
 	SDL_Init(SDL_INIT_VIDEO);
-	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*RENDERSCALE, (SH*TS+HUDHEIGHT)*RENDERSCALE, SDL_WINDOW_OPENGL);
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
-	SDL_RenderSetScale(r,4,4);
+	SDL_RenderSetScale(r,RENDERSCALE,RENDERSCALE);
 	s = SDL_GetWindowSurface(w);
 	rng.ui32=4; //SEEDS THE MAIN RNG
 	generateTunnels();
@@ -351,7 +351,7 @@ int main () {
 	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
 	tile size as stored, fifth is for the tile number. It reads from the */
 	for (int i = 0; i<TILECOUNT; i++) { //Loads all of the tiles into memory
-		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, TS, i);
+		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 64, TS, i);
 		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
 	}
 	for (int i=0; i<TILECOUNT; i++) { //Streams the tiles from memory into VRAM
@@ -412,10 +412,10 @@ void text(char* inStr, int x, int y) {
 	int i=0;
 	int xb=x;
 	while (inStr[i]) { //Breaks if it hits a null terminator.
-		if (inStr[i]>37) simage(font[inStr[i]], x, y, 7, 7); //If character is printing, print character.
-		x+=8; //Moves the cursor
+		if (inStr[i]>37) simage(font[inStr[i]], x, y, 28, 28); //If character is printing, print character.
+		x+=32; //Moves the cursor
 		if(inStr[i]==10) { //If line feed is detected, reset cursor to left side of the screen.
-			y+=10; //And move the cursor down one line.
+			y+=40; //And move the cursor down one line.
 			x=xb;
 		}
 		i++;
@@ -424,7 +424,7 @@ void text(char* inStr, int x, int y) {
 }
 
 void menu() {
-	drawRect(2,120,236,58,0);
+	drawRect(2,480,944,232,0);
 	int i=0;
 	int optCount=0;
 	static int optSel=0;
@@ -434,7 +434,7 @@ void menu() {
 		i++;
 	}
 
-	text(menuText,11,102); //Displays menu text.
+	text(menuText,44,420); //Displays menu text.
 	static int keyPress=1;
 	static int zPress=1;
 	if(!keyboard[SDL_SCANCODE_UP] && !keyboard[SDL_SCANCODE_DOWN]) keyPress=0;
@@ -457,7 +457,7 @@ void menu() {
 		if(options[optSel]) options[optSel](); //Options are just function pointers.
 	}
 
-	text(">", 2, 102+(optSel*10));  //Draws the cursor.
+	text(">", 8, 420+(optSel*40));  //Draws the cursor.
 }
 
 void pushMsg(char* inStr) { //Adds a message to the stack.
@@ -468,8 +468,8 @@ void pushMsg(char* inStr) { //Adds a message to the stack.
 
 void popMsg(){
 	static char keyPressed=0;
-	drawRect(2,120,236,58,0); //Background.
-	text(msgBuffer[msgOut],2,102); //Renders text
+	drawRect(8,480,944,232,0); //Background.
+	text(msgBuffer[msgOut],8,420); //Renders text
 	if (!keyPressed) { //Pops message off of the stack if you hit Z
 		if (keyboard[SDL_SCANCODE_Z] && msgTimeout>10) {
 			printf("Next slot:\n");
@@ -619,9 +619,9 @@ void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
 
 void hudRefresh() { //Redraws HUD
 	drawRect(0,0,TS*SW,HUDHEIGHT,0);
-	drawRect(132,4,entSet[0].health*(105/pMaxHealth),4,0x6DAA2C);
-	drawRect(132,8,105,4,0xd04648);
-	drawRect(132,12,105,4,0x597dce);
+	drawRect(8*TS,4,entSet[0].health*(7*TS/pMaxHealth),TS/8,0x6DAA2C);
+	drawRect(8*TS,12,105,TS/8,0xd04648);
+	drawRect(8*TS,20,105,TS/8,0x597dce);
 	for (int i=0; i<INVLIMIT; i++) {
 		if (pInv.items[i].type) hudDraw(hwtileset[getItemSprite(pInv.items[i].type)], TS*i, 2, TS, TS);
 		hudDraw(hwtileset[83], TS*i, 2, TS, TS);

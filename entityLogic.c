@@ -284,6 +284,7 @@ void behav_item(int i) {
 void behav_npcSpawn(int i) {
 	entSet[i].status[0]=0;
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
+	drawClothes(&entSet[i]);
 	for(int j=ELIMIT-1; j>=0; j--) {
 		if(get_diff(entSet[i].alignment,entSet[j].alignment)>entSet[i].aggroThreshold && entSet[j].health && entSet[j].visible) {
 			if(i!=j) entSet[i].status[0]=j;
@@ -300,7 +301,7 @@ void behav_npc(int i) {
 	drawClothes(&entSet[i]);
 
 	reroll();
-	pathfind(&entSet[i], entSet[entSet[i].status[0]].x,entSet[entSet[i].status[0]].y,1); //Pointer to entity, target position, speed.
+	pathfind(&entSet[i], entSet[entSet[i].status[0]].x,entSet[entSet[i].status[0]].y,4); //Pointer to entity, target position, speed.
 
 	if(!entSet[entSet[i].status[0]].health || !entSet[entSet[i].status[0]].visible) entSet[i].behaviour=behav_npcSpawn;
 }

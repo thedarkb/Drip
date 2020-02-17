@@ -47,8 +47,8 @@ entity ent_aitest() {
 	memset(&me, 0, sizeof me);
 	me.behaviour=behav_wait;
 	printf("SPAWNING WITH BEHAVIOUR %p\n", me.behaviour);
-	me.xSub=2;
-	me.ySub=10;
+	me.xSub=8;
+	me.ySub=40;
 	me.direction=1;
 	me.layer=1;
 	me.attack=2;
@@ -80,23 +80,23 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	switch(direction){
 		case 0:
 			me.y-=TS;
-			me.xSub=TS/4;
+			me.xSub=TS/2;
 			me.ySub=1;
 		break;
 		case 1:
 			me.y+=TS;
-			me.xSub=TS/4;
+			me.xSub=TS/2;
 			me.ySub=1;			
 		break;
 		case 2:
 			me.x-=TS;
 			me.xSub=1;
-			me.ySub=TS/4;
+			me.ySub=TS/2;
 		break;
 		case 3:
 			me.x+=TS;
 			me.xSub=1;
-			me.ySub=TS/4;
+			me.ySub=TS/2;
 		break;
 	}
 	me.frame[0]=67;
@@ -185,8 +185,8 @@ entity ent_techNpc() {
 
 	memset(&me, 0, sizeof me);
 	me.collisionClass=2;
-	me.xSub=2;
-	me.ySub=10;
+	me.xSub=8;
+	me.ySub=40;
 	me.alignment=127;
 	me.aggroThreshold=120;
 	me.visible=1;
@@ -214,8 +214,8 @@ entity ent_agNpc() {
 	printf("Spawning AG NPC\n");
 	memset(&me, 0, sizeof me);
 	me.collisionClass=2;
-	me.xSub=2;
-	me.ySub=10;
+	me.xSub=8;
+	me.ySub=40;
 	me.visible=1;
 	me.aggroThreshold=110;
 	me.alignment=-127;

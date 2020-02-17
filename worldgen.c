@@ -31,7 +31,7 @@ void factionFetch(unsigned int xIn, unsigned int yIn) {
 	while(position) {
 		if(get_diff(position->centreX, x) < position->radius && get_diff(position->centreY,y) < position->radius) {
 			printf("Spawning entities belonging to faction in position %d\n",counter++);
-			factionSpawn(position, xMult+120, yMult+80);
+			factionSpawn(position, xMult+480, yMult+320);
 		}
 		position=position->next;
 	}
