@@ -26,12 +26,12 @@ void factionFetch(unsigned int xIn, unsigned int yIn) {
 
 	faction* position=rootFaction;
 	int counter=0;
-	if(!tilewrapper[xIn][yIn].room) return;
+	if(intersect(x,y)) return;
 
 	while(position) {
 		if(get_diff(position->centreX, x) < position->radius && get_diff(position->centreY,y) < position->radius) {
 			printf("Spawning entities belonging to faction in position %d\n",counter++);
-			entitySpawn(position->entPlates[0], xMult+120,yMult+80);
+			factionSpawn(position, xMult+120, yMult+80);
 		}
 		position=position->next;
 	}

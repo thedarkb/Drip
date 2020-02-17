@@ -85,3 +85,17 @@ void diag_owl() {
 	menuText="Yes\nNo\0";
 	menuCall;
 }
+
+void warTime() {
+	caller.alignment+=200;
+	if(caller.faction) caller.faction->maxAg=caller.alignment;
+	facFrag();
+}
+
+void diag_civilWar() {
+	pushMsg("Civil war debug menu:\0");
+	menuReset;
+	options[0]=warTime;
+	menuText="Start Civil War\nExit\0";
+	menuCall;
+}

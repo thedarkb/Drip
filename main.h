@@ -50,6 +50,11 @@ SDL_Surface* scrollLayer = NULL;
 
 typedef struct faction faction;
 
+typedef struct outfit {
+	unsigned char frame[FLIMIT];
+	unsigned char colourFrame[FLIMIT];
+} outfit;
+
 typedef struct entity {
 	int x; 
 	int y;
@@ -74,6 +79,10 @@ typedef struct entity {
 	unsigned char aggroThreshold; //The difference in alignment that will provoke them to hostility.
 	unsigned char lastHit; //The last entity to strike them.
 	void(*dialogue)(); //Points to the dialogue, stored in dialogue.c; the domain of the man, the myth, the Merlin.
+	outfit clothes;
+	int pathX; //Used by the pathfinding function to check if the NPC is stuck.
+	int pathY;
+	unsigned char pathType; //Pathfinding mode.
 } entity;
 
 typedef struct item {
@@ -103,6 +112,8 @@ typedef struct faction { //Faction areas are circular.
 	int baseAlignment; //The standard alignment for an entity spawning as part of a faction.
 	unsigned int alignmentFuzz; //Alignment variance
 	unsigned int aggroThreshold; //The threshold of alignment difference that provokes one of its members.
+	int minAg; //The minimum recorded aggression in an extant entity.
+	int maxAg; //The maximum.
 	entity entPlates[ENTVARIETY]; //Its entity templates.
 	faction* next; //Next faction on the linked list.
 } faction;
@@ -169,8 +180,13 @@ SDL_Surface* sf1 = NULL;
 int cameraX=0;
 int cameraY=0;
 
+int frameTotal=0;
+
+void pathfind(entity* in, int x, int y, int speed);
+void drawClothes(entity* in);
 faction* attachFac(faction newFac);
 void destroyFac(faction* whigs);
+void facFrag();
 void entityInitialise();
 void entityScroll(int x, int y);
 void entityReset();
@@ -189,15 +205,17 @@ uint32_t lfsr (uint32_t shift);
 void reroll();
 int intersect(unsigned int x, unsigned int y);
 void generateTunnels();
-uint32_t getrandom();
+int32_t getrandom();
 void setCollision(view* in, int iX, int iY, char stat);
 void worldgen(view* in, uint16_t xPos, uint16_t yPos);
 void scrollMap();
 void image(SDL_Texture* imgIn, int x, int y, int w, int h);
+void tintedImage(SDL_Texture* imgIn, int x, int y, int w, int h, uint32_t colour);
 void simage(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
 void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
+void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
 void hudRefresh();
 void flip();
 char collisionCheck(int x, int y);

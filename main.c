@@ -10,17 +10,61 @@
 #include "entityLogic.h"
 #include "items.c"
 #include "dialogue.c"
+#include "clothes.c"
 #include "entities.c"
 #include "factions.c"
 //#include "maps.c"
 #include "worldgen.c"
 #include "entityLogic.c"
 
+void pathfind(entity* in, int x, int y, int speed) {
+	for(int i=0; i<speed; i++) {
+		in->pathX=in->x;
+		in->pathY=in->y;
+
+		int correctedX=0;
+		int correctedY=0;
+
+		if(in->x>SW*TS) correctedX=in->x-(SW*TS);
+		else if(x<0) correctedX=in->x+(SW*TS);
+		else correctedX=in->x;
+
+		if(in->y>SW*TS) correctedY=in->y-(SH*TS);
+		else if(in->y<0) correctedY=in->y+(SH*TS);
+		else correctedY=in->y;
+
+
+		switch(in->pathType) {
+			case 0:
+			if(x > in->x) moveX(in, 1); //Chase target at x,y
+			if(x < in->x) moveX(in, -1);
+			if(y > in->y) moveY(in, 1);
+			if(y < in->y) moveY(in, -1);
+			break;
+
+			case 1:
+			if(correctedX<(SW*TS)/2) moveX(in,1); //Move toward clear area in room centre.
+			if(correctedX>(SW*TS)/2) moveX(in,-1);
+			if(correctedY>y<(SH*TS)/2) moveY(in,1);
+			if(correctedY>(SH*TS)/2) moveY(in,-1);
+			break;
+		}
+		if(in->x==in->pathX && in->y==in->pathY) in->pathType=1;//If no movement has occurred, return to clear area.
+		if(correctedX>TS*3 && correctedX<(SW*TS)-(TS*3) && correctedY>TS*3 && correctedY<(SH*TS)-(TS*3)) in->pathType=0; //If in clear area, chase target.
+
+	}
+}
+
+void drawClothes(entity* in) {
+	if(!in) return;
+	if(!in->faction) tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,0xFFFFFF);
+	else tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,lfsr(in->faction->baseAlignment));
+}
+
 faction* attachFac(faction newFac) { //Adds a new faction to the linked list.
 	faction* position=rootFaction;
 	printf("Attaching faction\n");
-	while(1){
-		if(!position->next) break;
+	while(position->next){
 		printf("Counting factions...\n");
 		position=position->next;
 	}
@@ -33,7 +77,6 @@ faction* attachFac(faction newFac) { //Adds a new faction to the linked list.
 
 void destroyFac(faction* whigs) {
 	faction* position=rootFaction;
-	faction* nextNext;
 	while(position) {
 		if(position->next==whigs) {
 			position->next=position->next->next;
@@ -45,6 +88,27 @@ void destroyFac(faction* whigs) {
 		}
 		position=position->next;
 	}	
+}
+
+void facFrag() {
+	printf("Fragging factions...\n");
+	faction* position=rootFaction;
+	while(position){
+		if(get_diff(position->maxAg, position->minAg)>position->aggroThreshold) {
+			printf("A faction is dividing.\n");
+			faction* d1=attachFac(fac_fragment(*position, position->minAg));
+			faction* d2=attachFac(fac_fragment(*position, position->maxAg));
+			for(int i=0; i<ELIMIT; i++) {
+				if(entSet[i].faction=position) {
+					if(entSet[i].alignment<(position->minAg+position->maxAg)/2) entSet[i].faction=d1;
+					else entSet[i].faction=d2;
+				}
+			}
+			faction* parent=position;
+			position=position->next;
+			destroyFac(parent);
+		} else position=position->next;
+	}
 }
 
 void entityInitialise() { //Clears entity array, spawns player.
@@ -90,11 +154,14 @@ void entitySpawn(entity in, int x, int y) {
 	}
 }
 
-void factionSpawn(faction* theboys,int x,int y) {
-	entitySpawn(theboys->entPlates[0],x,y);
-	entSet[lastSlot].faction=theboys;
-	entSet[lastSlot].alignment=theboys->baseAlignment;
-	entSet[lastSlot].aggroThreshold=theboys->aggroThreshold;
+void factionSpawn(faction* position,int x,int y) {
+	entitySpawn(position->entPlates[0],x,y);
+	reroll();
+	entSet[lastSlot].faction=position;
+	entSet[lastSlot].alignment=position->baseAlignment+(rng.i32%position->alignmentFuzz); //Sets the entity's alignment to the faction's, accounting for fuzz.
+	entSet[lastSlot].aggroThreshold=position->aggroThreshold;
+	if(entSet[lastSlot].alignment<=position->minAg) entSet[lastSlot].faction->minAg=entSet[lastSlot].alignment;
+	else if(entSet[lastSlot].alignment>position->maxAg) entSet[lastSlot].faction->maxAg=entSet[lastSlot].alignment;
 }
 
 void deadEntityKiller() {
@@ -449,7 +516,7 @@ int intersect(unsigned int x, unsigned int y) {
 	return -1;
 }
 
-uint32_t getrandom() {
+int32_t getrandom() {
 	union signedOut {
 		uint32_t in;
 		int32_t out;
@@ -472,6 +539,18 @@ void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel bord
 void image(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
 	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h}; //Accounts for HUD and camera.
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
+}
+
+void tintedImage(SDL_Texture* imgIn, int x, int y, int w, int h, uint32_t colour) { //Copies an image from the hardware buffer to the screen.
+	union htmlDecode {
+		uint32_t htmlCode;
+		unsigned char rgb[3];
+	} htmlDecode;
+	htmlDecode.htmlCode=colour;
+	if(SDL_SetTextureColorMod(imgIn, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0])) printf("Colour Mod not supported.\n");
+	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h}; //Accounts for HUD and camera.
+	SDL_RenderCopy(r, imgIn, NULL, &scaler);
+	SDL_SetTextureColorMod(imgIn, 255, 255, 255);
 }
 
 /*
@@ -513,6 +592,17 @@ void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, ui
 	htmlDecode.htmlCode=colour;
 	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
 	SDL_Rect scaler={x,y,w,h};
+	SDL_RenderFillRect(r, &scaler);
+}
+
+void drawRectTrack(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) { //Draws filled rectangle
+	union htmlDecode {
+		uint32_t htmlCode;
+		unsigned char rgb[3];
+	} htmlDecode;
+	htmlDecode.htmlCode=colour;
+	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
+	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h};
 	SDL_RenderFillRect(r, &scaler);
 }
 
@@ -618,6 +708,7 @@ void loop() {
 	if (scroll) scrollMap();
 	if (refresh) {
 		entityInitialise();
+		assert(!entSet[0].alignment);
 		for (int x=0; x<3; x++) {
 			for (int y=0; y<3; y++) {
 				worldgen(&tilewrapper[x][y],(sX-1)+x,(sY-1)+y);
@@ -653,4 +744,7 @@ void loop() {
 	flip();
 	if(animationG<30) animationG+=2;
 	else animationG=0;
+	
+	if(!frameTotal%200) facFrag();
+	frameTotal++;
 }

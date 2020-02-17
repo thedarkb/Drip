@@ -83,7 +83,7 @@ void playerBehaviour(int i) {
 			pInv.items[pInv.selection].type=0;
 		}
 		if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
-		if (keyboard[SDL_SCANCODE_P]) destroyFac(guineaPig);
+		if (keyboard[SDL_SCANCODE_P]) facFrag();
 
 		if (keyboard[SDL_SCANCODE_L]) {
 			pushMsg("Test\0");
@@ -284,10 +284,11 @@ void behav_item(int i) {
 void behav_npcSpawn(int i) {
 	entSet[i].status[0]=0;
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
-	for(int j=0; j<ELIMIT; j++) {
+	for(int j=ELIMIT-1; j>=0; j--) {
 		if(get_diff(entSet[i].alignment,entSet[j].alignment)>entSet[i].aggroThreshold && entSet[j].health && entSet[j].visible) {
 			if(i!=j) entSet[i].status[0]=j;
 			printf("NPC with id%u\n and collision class %d pursuing entity %u\n", i, entSet[i].collisionClass,entSet[i].status[0]);
+			printf("\tDifference: %u", get_diff(entSet[i].alignment,entSet[j].alignment));
 			entSet[i].behaviour=behav_npc;
 			return;
 		}
@@ -296,14 +297,11 @@ void behav_npcSpawn(int i) {
 
 void behav_npc(int i) {
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE live in main.h
-	reroll();
+	drawClothes(&entSet[i]);
 
-	for (int j=0; j<1; j++) {
-		if (entSet[entSet[i].status[0]].x > entSet[i].x) moveX(&entSet[i], 1);
-		if (entSet[entSet[i].status[0]].x < entSet[i].x) moveX(&entSet[i], -1);
-		if (entSet[entSet[i].status[0]].y > entSet[i].y) moveY(&entSet[i], 1);
-		if (entSet[entSet[i].status[0]].y < entSet[i].y) moveY(&entSet[i], -1);
-	}
+	reroll();
+	pathfind(&entSet[i], entSet[entSet[i].status[0]].x,entSet[entSet[i].status[0]].y,1); //Pointer to entity, target position, speed.
+
 	if(!entSet[entSet[i].status[0]].health || !entSet[entSet[i].status[0]].visible) entSet[i].behaviour=behav_npcSpawn;
 }
 
