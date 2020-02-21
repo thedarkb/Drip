@@ -1,7 +1,6 @@
 #define SH 10 //Screen Height
 #define SW 15 //Screen Width
-#define TS 64 //Tile Size
-#define RENDERSCALE 1
+#define TS 16 //Tile Size
 
 #define NOSCROLL
 
@@ -16,12 +15,12 @@
 #define ENTFRAMES 32
 #define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 30
-#define HUDHEIGHT 67
+#define HUDHEIGHT 20
 #define MSGDEPTH 32
 #define MSGTIME 30
 
-#define SHEETX 512 //Tile sheet size
-#define SHEETY 1920
+#define SHEETX 128 //Tile sheet size
+#define SHEETY 480
 
 #define BIT(x) (1<<x)
 
