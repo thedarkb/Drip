@@ -13,7 +13,7 @@
 #include "clothes.c"
 #include "entities.c"
 #include "factions.c"
-//#include "maps.c"
+#include "maps.c"
 #include "worldgen.c"
 #include "entityLogic.c"
 
@@ -45,7 +45,7 @@ void pathfind(entity* in, int x, int y, int speed) {
 			case 1:
 			if(correctedX<(SW*TS)/2) moveX(in,1); //Move toward clear area in room centre.
 			if(correctedX>(SW*TS)/2) moveX(in,-1);
-			if(correctedY>y<(SH*TS)/2) moveY(in,1);
+			if(correctedY<(SH*TS)/2) moveY(in,1);
 			if(correctedY>(SH*TS)/2) moveY(in,-1);
 			break;
 		}
@@ -57,6 +57,7 @@ void pathfind(entity* in, int x, int y, int speed) {
 
 void drawClothes(entity* in) {
 	if(!in) return;
+	if(!in->clothes.colourFrame[0]) return;
 	if(!in->faction) tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,0xFFFFFF);
 	else tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,lfsr(in->faction->baseAlignment));
 }
@@ -115,7 +116,7 @@ void entityInitialise() { //Clears entity array, spawns player.
 	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
 	}
-	entSet[0]=ent_player();
+	entSet[0]=ent_playerM();
 	memset(&pInv, 0, sizeof pInv);
 	pInv.items[0].type=2;
 }
@@ -193,8 +194,8 @@ int overlap(unsigned char i, unsigned char j){
 	if (!entSet[i].collisionClass) return 0;
 	if (i==j) return 0;
 	if (entSet[j].collisionClass>128) return 0;
-	if (get_diff(entSet[i].x+TS/2,entSet[j].x+TS/2) < 10) {
-		if (get_diff(entSet[i].y+TS/2,entSet[j].y+TS/2) < 10) return 1;
+	if (get_diff(entSet[i].x+entSet[i].hitX+TS/2,entSet[j].x+entSet[j].hitX+TS/2) < entSet[i].xSub) {
+		if (get_diff(entSet[i].y+entSet[i].hitY+TS/2,entSet[j].y+entSet[j].hitY+TS/2) < entSet[i].ySub) return 1;
 	}
 	return 0;
 }
@@ -390,6 +391,7 @@ int main () {
 	setCollision(&cornerRoom,14,0,0);
 	setCollision(&cornerRoom,14,9,0);	
 	/*End of Corner Room definition.*/
+	loadmap();
 	
 	
 	#ifndef WEB

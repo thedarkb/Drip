@@ -49,7 +49,7 @@ void loadSpawn() {
 	}
 }
 
-void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
+/*void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 
 	loadSpawn();
 
@@ -61,6 +61,11 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	uint32_t screenHash = lfsr(hashme);
 
 	//printf("%u\n",hashme);
+	if(xPos==2 && yPos==2) {
+		view sroom=spawnroom();
+		memcpy(in,&sroom,sizeof sroom);
+		return;
+	}
 
 	int diff=intersect(xPos, yPos);
 	if(!diff) in->room=1;
@@ -106,6 +111,12 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		}
 	} else in->room=0;
 	in->flag=1;
+}*/
+
+void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
+	if(xPos>64 || yPos>64) return;
+	view rVal=world[xPos][yPos];
+	memcpy(in,&rVal,sizeof rVal);
 }
 
 void scrollMap() {

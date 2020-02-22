@@ -1,4 +1,5 @@
 void playerBehaviour(int i) {
+	if(swordOut) entSet[i].animation=8;
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 	char pmotion=0;
 	static int zTimeout=0;
@@ -21,7 +22,7 @@ void playerBehaviour(int i) {
 				moveY(&entSet[i], 1);
 				pmotion=1;
 			}
-			if (pmotion == 0) entSet[i].animation=0;
+			if (!pmotion) entSet[i].animation=0;
 			
 			if(keyboard[SDL_SCANCODE_Z]) {
 				entitySpawn(ent_dialogue(entSet[i].direction, entSet[i].x, entSet[i].y),0,0);
@@ -139,7 +140,8 @@ void behav_upLeft(int i) {
 		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
-	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);				
+	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);	
+	drawClothes(&entSet[i]);			
 }
 
 void behav_upRight(int i) {
@@ -150,7 +152,8 @@ void behav_upRight(int i) {
 		entSet[i].behaviour=entSet[i].prevState;
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
-	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);	
+	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	drawClothes(&entSet[i]);
 }
 
 void behav_downLeft(int i) {
@@ -162,6 +165,7 @@ void behav_downLeft(int i) {
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	drawClothes(&entSet[i]);
 }
 
 void behav_downRight(int i) {
@@ -173,29 +177,38 @@ void behav_downRight(int i) {
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	drawClothes(&entSet[i]);
 }
 
 void behav_sword(int i) {
 	if (!swordOut) entSet[i].health=0;
+	entSet[i].direction=entSet[entSet[i].status[1]].direction;
 	switch(entSet[entSet[i].status[1]].direction) {
 		case 0:
 			entSet[i].x=entSet[entSet[i].status[1]].x;
 			entSet[i].y=entSet[entSet[i].status[1]].y-TS;
+			image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y, TS, TS);
+			image(hwtileset[entSet[i].frame[4]], entSet[i].x, entSet[i].y+TS, TS, TS);
 		break;
 		case 1:
 			entSet[i].x=entSet[entSet[i].status[1]].x;
 			entSet[i].y=entSet[entSet[i].status[1]].y+TS;
+			image(hwtileset[entSet[i].frame[1]], entSet[i].x, entSet[i].y, TS, TS);
+			image(hwtileset[entSet[i].frame[5]], entSet[i].x, entSet[i].y-TS, TS, TS);
 		break;
 		case 2:
 			entSet[i].x=entSet[entSet[i].status[1]].x-TS;
 			entSet[i].y=entSet[entSet[i].status[1]].y;
+			image(hwtileset[entSet[i].frame[2]], entSet[i].x, entSet[i].y, TS, TS);
+			image(hwtileset[entSet[i].frame[6]], entSet[i].x+TS, entSet[i].y, TS, TS);
 		break;
 		case 3:
 			entSet[i].x=entSet[entSet[i].status[1]].x+TS;
 			entSet[i].y=entSet[entSet[i].status[1]].y;
+			image(hwtileset[entSet[i].frame[3]], entSet[i].x, entSet[i].y, TS, TS);
+			image(hwtileset[entSet[i].frame[7]], entSet[i].x-TS, entSet[i].y, TS, TS);
 		break;
 	}
-	/*if(entSet[entSet[i].status[1]].status[3])*/ image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);	
 }
 
 void behav_up(int i) {
@@ -206,6 +219,7 @@ void behav_up(int i) {
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	drawClothes(&entSet[i]);
 }
 
 void behav_down(int i) {
@@ -216,6 +230,7 @@ void behav_down(int i) {
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	drawClothes(&entSet[i]);
 }
 
 void behav_left(int i) {
@@ -226,6 +241,7 @@ void behav_left(int i) {
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	drawClothes(&entSet[i]);
 }
 
 void behav_right(int i) {
@@ -236,6 +252,7 @@ void behav_right(int i) {
 		entSet[i].collisionClass=entSet[i].status[2];
 	}
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	drawClothes(&entSet[i]);
 }
 
 void behav_dialogue(int i) {
@@ -284,6 +301,7 @@ void behav_item(int i) {
 void behav_npcSpawn(int i) {
 	entSet[i].status[0]=0;
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
+	drawClothes(&entSet[i]);
 	for(int j=ELIMIT-1; j>=0; j--) {
 		if(get_diff(entSet[i].alignment,entSet[j].alignment)>entSet[i].aggroThreshold && entSet[j].health && entSet[j].visible) {
 			if(i!=j) entSet[i].status[0]=j;

@@ -12,7 +12,7 @@ unsigned char frame; //Current frame.
 
 IF YOU DON'T FILL ALL OF THESE, YOU'LL GET UNDEFINED BEHAVIOUR.*/
 
-entity ent_player() {
+entity ent_playerM() { //Male
 	entity me;
 	memset(&me, 0, sizeof me);
 	me.behaviour=playerBehaviour;
@@ -39,6 +39,36 @@ entity ent_player() {
 	me.frame[9]=125; //down step2
 	me.frame[10]=133; //left step2
 	me.frame[11]=141; //right step2
+	return me;
+}
+
+entity ent_playerF() { //Female
+	entity me;
+	memset(&me, 0, sizeof me);
+	me.behaviour=playerBehaviour;
+	me.x=0;
+	me.y=0;
+	me.layer=2;
+	me.health=pMaxHealth;
+	me.attack=5;
+	me.xSub=TS/5;
+	me.alignment=0;
+	me.ySub=1;
+	me.direction=1;
+	me.visible=1;
+	me.collisionClass=1;
+	me.frame[0]=177;
+	me.frame[1]=153;
+	me.frame[2]=161;
+	me.frame[3]=169;
+	me.frame[4]=176;
+	me.frame[5]=152;
+	me.frame[6]=160;
+	me.frame[7]=168;
+	me.frame[8]=178;
+	me.frame[9]=154;
+	me.frame[10]=162;
+	me.frame[11]=170;
 	return me;
 }
 
@@ -80,32 +110,40 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	switch(direction){
 		case 0:
 			me.y-=TS;
-			me.xSub=TS/4;
-			me.ySub=1;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY+=5;
 		break;
 		case 1:
 			me.y+=TS;
-			me.xSub=TS/4;
-			me.ySub=1;			
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY-=5;			
 		break;
 		case 2:
 			me.x-=TS;
-			me.xSub=1;
-			me.ySub=TS/4;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX+=5;
 		break;
 		case 3:
 			me.x+=TS;
-			me.xSub=1;
-			me.ySub=TS/4;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX-=5;
 		break;
 	}
-	me.frame[0]=67;
-	me.frame[1]=67;
-	me.frame[2]=67;
-	me.frame[3]=67;
+	me.frame[0]=92;
+	me.frame[1]=101;
+	me.frame[2]=90;
+	me.frame[3]=89;
+	me.frame[4]=100;
+	me.frame[5]=93;
+	me.frame[6]=91;
+	me.frame[7]=88;
 	me.health=255;
 	me.lastHit=255;
-	me.layer=1;
+	me.layer=2;
 	me.visible=0;
 	me.status[0]=10;
 	me.status[1]=creator;

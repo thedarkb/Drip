@@ -27,6 +27,12 @@
 #define ANIMPARSE entSet[i].frame[entSet[i].direction+entSet[i].animation]
 #define PRESENTENT entSet[i]
 
+#define SCALECOLLISIONS(m, c) for(int xMACRO=0;xMACRO<SW;xMACRO++) {\
+								for(int yMACRO=0;yMACRO<SW;yMACRO++) {\
+									setCollision(&m,xMACRO,yMACRO,c[xMACRO][yMACRO]);\
+								}\
+							}
+
 #define TITLE "Drip"
 
 
@@ -60,6 +66,8 @@ typedef struct entity {
 	int y;
 	unsigned char xSub; //Defines hitbox
 	unsigned char ySub; //^
+	short hitX; //Determines the centre of the hitbox during sprite on sprite collision calculations.
+	short hitY; //^
 	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
 	void(*prevState)(int); //Used to hold the main behaviour while a temporary behaviour is in use.
 	unsigned char visible; //1 if entity is visible to NPCs
@@ -160,13 +168,14 @@ unsigned char msgSlot=0;
 unsigned char msgOut=0;
 unsigned int msgTimeout=0;
 
-unsigned char refresh = 1;
+unsigned char refresh=1;
 
 char* menuText;
-char mode = 0;
+char mode=0;
 char menuFlag=0;
 char menuFirstCall=0;
 
+view world[64][64];
 entity entSet[ELIMIT];
 tunnel tunnels[TLIMIT];
 faction* rootFaction; //Points to the start of the faction linked list, do not destroy.
