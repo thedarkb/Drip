@@ -109,8 +109,6 @@ typedef struct view {
 	unsigned char layers[SW*TS][SH*TS]; //Bitmap containing collision data.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
-	unsigned int x;
-	unsigned int y;
 } view;
 
 typedef struct faction { //Faction areas are circular.
