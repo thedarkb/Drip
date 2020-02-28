@@ -1,8 +1,8 @@
 #define SH 10 //Screen Height
 #define SW 15 //Screen Width
 #define TS 16 //Tile Size
-
-#define NOSCROLL
+#define WW 10
+#define WH 10
 
 #define ELIMIT 64 //Entity limit must not exceed 256
 #define MAPELIMIT 8
@@ -28,16 +28,20 @@
 #define PRESENTENT entSet[i]
 
 #define SCALECOLLISIONS(m, c) for(int xMACRO=0;xMACRO<SW;xMACRO++) {\
-								for(int yMACRO=0;yMACRO<SW;yMACRO++) {\
+								for(int yMACRO=0;yMACRO<SH;yMACRO++) {\
 									setCollision(&m,xMACRO,yMACRO,c[xMACRO][yMACRO]);\
 								}\
 							}
-
+#define LOADVIEW(p, x) \
+							_V=x;\
+							p=malloc(sizeof _V);\
+							*p=_V
 #define TITLE "Drip"
 
 
 SDL_Window* w = NULL;
 SDL_Surface* s = NULL;
+SDL_Surface* lOverlay=NULL;
 SDL_Surface* loader = NULL;
 SDL_Renderer* r = NULL;
 SDL_Texture* t = NULL;
@@ -91,6 +95,7 @@ typedef struct entity {
 	int pathX; //Used by the pathfinding function to check if the NPC is stuck.
 	int pathY;
 	unsigned char pathType; //Pathfinding mode.
+	unsigned char brightness;
 } entity;
 
 typedef struct item {
@@ -109,6 +114,7 @@ typedef struct view {
 	unsigned char layers[SW*TS][SH*TS]; //Bitmap containing collision data.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
+	void(*spawnFunc)(unsigned int xIn, unsigned int yIn);
 } view;
 
 typedef struct faction { //Faction areas are circular.
@@ -144,12 +150,13 @@ view cornerRoom;
 unsigned char speaker; //Holds entity number which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
+unsigned char lightLayer[SW][SH];
 uint16_t flags=0;
 
 unsigned char lastSlot=0;
 
-uint16_t sX = 1; //View struct currently occupied by the player.
-uint16_t sY = 1; //^
+uint16_t sX = 2; //View struct currently occupied by the player.
+uint16_t sY = 2; //^
 unsigned char scroll = 0; //Triggers a screen transition on the next frame.
 
 unsigned char pMaxHealth=100;
@@ -173,10 +180,11 @@ char mode=0;
 char menuFlag=0;
 char menuFirstCall=0;
 
-view world[64][64];
+view* world[WW][WH];
 entity entSet[ELIMIT];
 tunnel tunnels[TLIMIT];
 faction* rootFaction; //Points to the start of the faction linked list, do not destroy.
+view _V;
 
 faction* guineaPig; //Temporary, remove
 
@@ -222,6 +230,7 @@ void simage(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
 void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
+void drawRectAlpha(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour, uint8_t alpha);
 void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
 void hudRefresh();
 void flip();

@@ -113,7 +113,7 @@ void playerBehaviour(int i) {
 }
 
 void behav_potato(int i) {
-	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
+	//image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 }
 
 void behav_chase(int i) {

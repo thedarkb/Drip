@@ -42,6 +42,7 @@ void loadSpawn() {
 		for(int y=0; y<3; y++) {
 			if (tilewrapper[x][y].flag) {
 				entFetch(x,y);
+				if(tilewrapper[x][y].spawnFunc) tilewrapper[x][y].spawnFunc(sX+(x-1),sY+(y-1));
 				factionFetch(x,y);
 				tilewrapper[x][y].flag=0;
 			}
@@ -114,9 +115,12 @@ void loadSpawn() {
 }*/
 
 void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
-	if(xPos>64 || yPos>64) return;
-	view rVal=world[xPos][yPos];
+	if(xPos>WW-1 || yPos>WH-1) return;
+	if(!world[xPos][yPos]) return;
+	view rVal=*world[xPos][yPos];
 	memcpy(in,&rVal,sizeof rVal);
+	in->flag=1;
+	loadSpawn();
 }
 
 void scrollMap() {

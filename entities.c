@@ -16,12 +16,13 @@ entity ent_playerM() { //Male
 	entity me;
 	memset(&me, 0, sizeof me);
 	me.behaviour=playerBehaviour;
-	me.x=0;
-	me.y=0;
+	me.x=112;
+	me.y=48;
 	me.layer=2;
 	me.health=pMaxHealth;
 	me.attack=5;
 	me.xSub=TS/5;
+	me.brightness=100;
 	me.alignment=0;
 	me.ySub=1;
 	me.direction=1;
@@ -69,6 +70,16 @@ entity ent_playerF() { //Female
 	me.frame[9]=154;
 	me.frame[10]=162;
 	me.frame[11]=170;
+	return me;
+}
+
+entity ent_light(unsigned char brightness) {
+	entity me;
+	memset(&me,0,sizeof me);
+	//me.brightness=brightness;
+	me.health=255;
+	me.behaviour=behav_potato;
+	printf("Spawning light, apparently.\n");
 	return me;
 }
 
@@ -205,6 +216,8 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 	memset(&me, 0, sizeof me);
 	me.health=10;
 	me.behaviour=behav_item;
+	me.xSub=10;
+	me.ySub=10;
 	me.x=x;
 	me.y=y;
 	printf("Spawning item at %d,%d\n", x,y);
@@ -220,7 +233,7 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 entity ent_techNpc() {
 	entity me;
 	printf("Spawning tech NPC\n");
-
+	me.brightness=50;
 	memset(&me, 0, sizeof me);
 	me.collisionClass=2;
 	me.xSub=2;
@@ -257,6 +270,7 @@ entity ent_agNpc() {
 	me.visible=1;
 	me.aggroThreshold=110;
 	me.alignment=-127;
+	me.brightness=50;
 	me.frame[0]=145;
 	me.frame[1]=121;
 	me.frame[2]=129;

@@ -17,6 +17,67 @@
 #include "worldgen.c"
 #include "entityLogic.c"
 
+void light() {
+	unsigned char lightLevel=255;
+	for(int i=0; i<ELIMIT; i++) {
+		if(entSet[i].behaviour && lightLevel-entSet[i].brightness>0) lightLevel-=entSet[i].brightness;
+		else if(entSet[i].behaviour){
+			lightLevel=0;
+			break;
+		}
+	}
+	drawRectAlpha(0,HUDHEIGHT,SW*TS,SH*TS,0x282600,lightLevel);
+}
+
+/*void light() { //Scans each entity for light emission, adds them onto the shadow layer, then draws the shadow layer to the screen.
+	memset(&lightLayer,255,sizeof lightLayer);
+	int row=0;
+	int col=0;
+	for(int i=0;i<ELIMIT;i++) {
+		if(!entSet[i].brightness) continue;
+		row=((entSet[i].x+(TS*SW)/2-cameraX)/TS)-2;
+		col=((entSet[i].y+(TS*SH)/2-cameraY)/TS)-2;
+		for(int x=0; x<6; x++) {
+			for(int y=0; y<6; y++) {
+				if(row+x<0 || row+x>SW-1) continue;
+				if(col+x<0 || col+y>SH-1) continue;
+				if(lightLayer[row+x][col+y]-entSet[i].brightness>0)lightLayer[row+x][col+y]-=entSet[i].brightness;
+				else lightLayer[row+x][col+y]=0;
+			}
+		}
+		for(int j=0;j<4;j++) {
+			if(row+1+j<0||row+1+j>SW-1) continue;
+			if(col-1<0||col-1>SH-1) continue;
+			if(lightLayer[row+1+j][col-1]-entSet[i].brightness/2>0) lightLayer[row+1+j][col-1]-=entSet[i].brightness/2;
+			else lightLayer[row+1+j][col-1]=0;
+		}
+		for(int j=0;j<4;j++) {
+			if(row+1+j<0||row+1+j>SW-1) continue;
+			if(col+6<0||col+6>SH-1) continue;
+			if(lightLayer[row+1+j][col+6]-entSet[i].brightness/2>0) lightLayer[row+1+j][col+6]-=entSet[i].brightness/2;
+			else lightLayer[row+1+j][col+6]=0;
+		}
+		for(int j=0;j<4;j++) {
+			if(row-1<0||row-1>SW-1) continue;
+			if(col+1+j<0||col+1+j>SH-1) continue;
+			if(lightLayer[row-1][col+1+j]-entSet[i].brightness/2>0) lightLayer[row-1][col+1+j]-=entSet[i].brightness/2;
+			else lightLayer[row-1][col+1+j]=0;
+		}
+		for(int j=0;j<4;j++) {
+			if(row+6<0||row+6>SW-1) continue;
+			if(col+1+j<0||col+1+j>SH-1) continue;
+			if(lightLayer[row+6][col+1+j]-entSet[i].brightness/2>0) lightLayer[row+6][col+1+j]-=entSet[i].brightness/2;
+			else lightLayer[row+6][col+1+j]=0;
+		}
+	}
+	for(int x=0; x<SW; x++) {
+		for(int y=0; y<SH; y++) {
+			if(lightLayer[x][y]<127) drawRectAlpha(x*TS,y*TS+HUDHEIGHT,TS+1,TS+1,0x505100,lightLayer[x][y]);
+			else drawRectAlpha(x*TS,y*TS+HUDHEIGHT,TS+1,TS+1,0x140c1c,lightLayer[x][y]);
+		}
+	}
+}*/
+
 void pathfind(entity* in, int x, int y, int speed) {
 	for(int i=0; i<speed; i++) {
 		in->pathX=in->x;
@@ -327,89 +388,6 @@ SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int si
 	return tileOut;
 }
 
-int main () {
-	SDL_Init(SDL_INIT_VIDEO);
-	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
-	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
-	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
-	SDL_RenderSetScale(r,4,4);
-	s = SDL_GetWindowSurface(w);
-	rng.ui32=4; //SEEDS THE MAIN RNG
-	generateTunnels();
-	initialiseFactions();
-	tunnels[0].m=1;
-	tunnels[0].c=0;
-	memset(&tilewrapper, 0, sizeof tilewrapper);
-	memset(&bgTex, 0, sizeof bgTex);
-	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
-	scrollLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
-
-	keyboard = SDL_GetKeyboardState(NULL);
-
-	loader = IMG_Load("sheet.png"); //tilesheet
-
-
-	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
-	tile size as stored, fifth is for the tile number. It reads from the */
-	for (int i = 0; i<TILECOUNT; i++) { //Loads all of the tiles into memory
-		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, TS, i);
-		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
-	}
-	for (int i=0; i<TILECOUNT; i++) { //Streams the tiles from memory into VRAM
-		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
-	}
-	SDL_FreeSurface(loader); //Don't want leaks
-	loader=IMG_Load("font.png");
-	for (int i=0; i<127; i++) {
-		font[i]=surfLoader(loader, 889, 7, 7, 7, i);
-		SDL_SetColorKey(font[i], SDL_TRUE, 0x00FF00);
-	}
-	for (int i=0; i<127; i++) {
-		hwfont[i]=SDL_CreateTextureFromSurface(r, font[i]);
-		//SDL_FreeSurface(font[i]);
-	}
-	SDL_FreeSurface(loader);
-	unsigned int timer=0;
-	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
-	entityInitialise(); //Loads the player
-	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
-	
-	
-	/*Corner Room definition.*/
-	memset(&cornerRoom.screen, 22, sizeof cornerRoom.screen);
-	cornerRoom.screen[0][0]=15;
-	cornerRoom.screen[0][9]=15;
-	cornerRoom.screen[14][0]=15;
-	cornerRoom.screen[14][9]=15;
-	for (int x=0; x<SW; x++) {
-		for(int y=0; y<SH; y++) {
-			setCollision(&cornerRoom,x,y,1);
-		}
-	}
-	setCollision(&cornerRoom,0,0,0);
-	setCollision(&cornerRoom,0,9,0);
-	setCollision(&cornerRoom,14,0,0);
-	setCollision(&cornerRoom,14,9,0);	
-	/*End of Corner Room definition.*/
-	loadmap();
-	
-	
-	#ifndef WEB
-	while(1) { //The timing loop leaves a little to be desired.
-		if (SDL_GetTicks()-timer < 1000/FRAMERATE) SDL_Delay(1000/FRAMERATE);
-		else printf("Frames dropped: %u\n", (SDL_GetTicks()-timer)/(1000/FRAMERATE)+1);
-		timer = SDL_GetTicks();
-		SDL_PollEvent(&keyIn);
-		if (keyIn.type == SDL_QUIT) break;
-		loop();
-	}
-	#endif
-	#ifdef WEB
-	emscripten_set_main_loop(loop, 30, 1); //For those of you on WebOS
-	#endif
-	return 0;
-}
-
 void text(char* inStr, int x, int y) {
 	int i=0;
 	int xb=x;
@@ -597,6 +575,17 @@ void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, ui
 	SDL_RenderFillRect(r, &scaler);
 }
 
+void drawRectAlpha(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour, uint8_t alpha) { //Draws filled rectangle
+	union htmlDecode {
+		uint32_t htmlCode;
+		unsigned char rgb[3];
+	} htmlDecode;
+	htmlDecode.htmlCode=colour;
+	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], alpha);
+	SDL_Rect scaler={x,y,w,h};
+	SDL_RenderFillRect(r, &scaler);
+}
+
 void drawRectTrack(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) { //Draws filled rectangle
 	union htmlDecode {
 		uint32_t htmlCode;
@@ -637,6 +626,7 @@ void flip() { //Updates screen.
 	//SDL_RenderCopy(r,t,NULL,NULL);
 	//SDL_DestroyTexture(t);
 	SDL_RenderPresent(r);
+	//SDL_RenderClear(r);
 }
 
 char collisionCheck(int x, int y) { //Collision detection between map layer and entity.
@@ -740,8 +730,11 @@ void loop() {
 	else if (menuFlag) menu();
 	else mode=0;
 
+	light();
+
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
+
 	hudRefresh();
 	flip();
 	if(animationG<30) animationG+=2;
@@ -749,4 +742,91 @@ void loop() {
 	
 	if(!frameTotal%200) facFrag();
 	frameTotal++;
+}
+
+int main () {
+	SDL_Init(SDL_INIT_VIDEO);
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
+	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
+	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
+	SDL_RenderSetScale(r,4,4);
+	SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_BLEND);
+	s = SDL_GetWindowSurface(w);
+	rng.ui32=4; //SEEDS THE MAIN RNG
+	generateTunnels();
+	initialiseFactions();
+	tunnels[0].m=1;
+	tunnels[0].c=0;
+	memset(&tilewrapper, 0, sizeof tilewrapper);
+	memset(&bgTex, 0, sizeof bgTex);
+	memset(&lightLayer, 0, sizeof lightLayer);
+	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
+	lOverlay=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
+	SDL_SetSurfaceBlendMode(lOverlay,SDL_BLENDMODE_NONE);
+	scrollLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
+
+	keyboard = SDL_GetKeyboardState(NULL);
+
+	loader = IMG_Load("sheet.png"); //tilesheet
+
+
+	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
+	tile size as stored, fifth is for the tile number. It reads from the */
+	for (int i = 0; i<TILECOUNT; i++) { //Loads all of the tiles into memory
+		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, TS, i);
+		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
+	}
+	for (int i=0; i<TILECOUNT; i++) { //Streams the tiles from memory into VRAM
+		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
+	}
+	SDL_FreeSurface(loader); //Don't want leaks
+	loader=IMG_Load("font.png");
+	for (int i=0; i<127; i++) {
+		font[i]=surfLoader(loader, 889, 7, 7, 7, i);
+		SDL_SetColorKey(font[i], SDL_TRUE, 0x00FF00);
+	}
+	for (int i=0; i<127; i++) {
+		hwfont[i]=SDL_CreateTextureFromSurface(r, font[i]);
+		//SDL_FreeSurface(font[i]);
+	}
+	SDL_FreeSurface(loader);
+	unsigned int timer=0;
+	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
+	entityInitialise(); //Loads the player
+	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
+	
+	
+	/*Corner Room definition.*/
+	memset(&cornerRoom.screen, 22, sizeof cornerRoom.screen);
+	cornerRoom.screen[0][0]=15;
+	cornerRoom.screen[0][9]=15;
+	cornerRoom.screen[14][0]=15;
+	cornerRoom.screen[14][9]=15;
+	for (int x=0; x<SW; x++) {
+		for(int y=0; y<SH; y++) {
+			setCollision(&cornerRoom,x,y,1);
+		}
+	}
+	setCollision(&cornerRoom,0,0,0);
+	setCollision(&cornerRoom,0,9,0);
+	setCollision(&cornerRoom,14,0,0);
+	setCollision(&cornerRoom,14,9,0);	
+	/*End of Corner Room definition.*/
+	loadmap();
+	
+	
+	#ifndef WEB
+	while(1) { //The timing loop leaves a little to be desired.
+		if (SDL_GetTicks()-timer < 1000/FRAMERATE) SDL_Delay(1000/FRAMERATE);
+		else printf("Frames dropped: %u\n", (SDL_GetTicks()-timer)/(1000/FRAMERATE)+1);
+		timer = SDL_GetTicks();
+		SDL_PollEvent(&keyIn);
+		if (keyIn.type == SDL_QUIT) break;
+		loop();
+	}
+	#endif
+	#ifdef WEB
+	emscripten_set_main_loop(loop, 30, 1); //For those of you on WebOS
+	#endif
+	return 0;
 }
