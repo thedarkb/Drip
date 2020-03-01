@@ -37,6 +37,7 @@ void playerBehaviour(int i) {
 
 		if(!keyboard[SDL_SCANCODE_X]) swordOut=0;
 		if(!keyboard[SDL_SCANCODE_Z] && !zTimeout) dialogueOut=0;
+		if(!keyboard[SDL_SCANCODE_F6]) collisionReset=1;
 
 		if(zTimeout>0) zTimeout--;
 

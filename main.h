@@ -29,7 +29,7 @@
 
 #define SCALECOLLISIONS(m, c) for(int xMACRO=0;xMACRO<SW;xMACRO++) {\
 								for(int yMACRO=0;yMACRO<SH;yMACRO++) {\
-									setCollision(&m,xMACRO,yMACRO,c[xMACRO][yMACRO]);\
+									;;//setCollision(&m,xMACRO,yMACRO,c[xMACRO][yMACRO]);\
 								}\
 							}
 #define LOADVIEW(p, x) \
@@ -111,11 +111,15 @@ typedef struct inventory {
 
 typedef struct view {
 	unsigned char screen[SW][SH]; //Tile data.
-	unsigned char layers[SW*TS][SH*TS]; //Bitmap containing collision data.
+	unsigned char layers[SW][SH]; //Bitmap containing collision data.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 	void(*spawnFunc)(unsigned int xIn, unsigned int yIn);
 } view;
+
+typedef struct collisionWrap {
+	unsigned char layers[SW*TS][SH*TS];	
+} collisionWrap;
 
 typedef struct faction { //Faction areas are circular.
 	unsigned int centreX;
@@ -150,7 +154,7 @@ view cornerRoom;
 unsigned char speaker; //Holds entity number which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
-unsigned char lightLayer[SW][SH];
+collisionWrap cwrapper[3][3]; //Holds the corresponding collision data
 uint16_t flags=0;
 
 unsigned char lastSlot=0;
@@ -179,6 +183,7 @@ char* menuText;
 char mode=0;
 char menuFlag=0;
 char menuFirstCall=0;
+char collisionReset=0;
 
 view* world[WW][WH];
 entity entSet[ELIMIT];
@@ -222,6 +227,7 @@ int intersect(unsigned int x, unsigned int y);
 void generateTunnels();
 int32_t getrandom();
 void setCollision(view* in, int iX, int iY, char stat);
+void scaleCollision(collisionWrap* out, view* in);
 void worldgen(view* in, uint16_t xPos, uint16_t yPos);
 void scrollMap();
 void image(SDL_Texture* imgIn, int x, int y, int w, int h);

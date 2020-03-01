@@ -192,7 +192,7 @@ entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
 	me.y=y*TS;
 	me.frame[0]=tile;
 	me.setframe=0;
-	setCollision(&tilewrapper[1][1],x,y,1);
+	//setCollision(&tilewrapper[1][1],x,y,1);
 	return me;
 }
 

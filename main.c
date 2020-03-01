@@ -29,55 +29,6 @@ void light() {
 	drawRectAlpha(0,HUDHEIGHT,SW*TS,SH*TS,0x282600,lightLevel);
 }
 
-/*void light() { //Scans each entity for light emission, adds them onto the shadow layer, then draws the shadow layer to the screen.
-	memset(&lightLayer,255,sizeof lightLayer);
-	int row=0;
-	int col=0;
-	for(int i=0;i<ELIMIT;i++) {
-		if(!entSet[i].brightness) continue;
-		row=((entSet[i].x+(TS*SW)/2-cameraX)/TS)-2;
-		col=((entSet[i].y+(TS*SH)/2-cameraY)/TS)-2;
-		for(int x=0; x<6; x++) {
-			for(int y=0; y<6; y++) {
-				if(row+x<0 || row+x>SW-1) continue;
-				if(col+x<0 || col+y>SH-1) continue;
-				if(lightLayer[row+x][col+y]-entSet[i].brightness>0)lightLayer[row+x][col+y]-=entSet[i].brightness;
-				else lightLayer[row+x][col+y]=0;
-			}
-		}
-		for(int j=0;j<4;j++) {
-			if(row+1+j<0||row+1+j>SW-1) continue;
-			if(col-1<0||col-1>SH-1) continue;
-			if(lightLayer[row+1+j][col-1]-entSet[i].brightness/2>0) lightLayer[row+1+j][col-1]-=entSet[i].brightness/2;
-			else lightLayer[row+1+j][col-1]=0;
-		}
-		for(int j=0;j<4;j++) {
-			if(row+1+j<0||row+1+j>SW-1) continue;
-			if(col+6<0||col+6>SH-1) continue;
-			if(lightLayer[row+1+j][col+6]-entSet[i].brightness/2>0) lightLayer[row+1+j][col+6]-=entSet[i].brightness/2;
-			else lightLayer[row+1+j][col+6]=0;
-		}
-		for(int j=0;j<4;j++) {
-			if(row-1<0||row-1>SW-1) continue;
-			if(col+1+j<0||col+1+j>SH-1) continue;
-			if(lightLayer[row-1][col+1+j]-entSet[i].brightness/2>0) lightLayer[row-1][col+1+j]-=entSet[i].brightness/2;
-			else lightLayer[row-1][col+1+j]=0;
-		}
-		for(int j=0;j<4;j++) {
-			if(row+6<0||row+6>SW-1) continue;
-			if(col+1+j<0||col+1+j>SH-1) continue;
-			if(lightLayer[row+6][col+1+j]-entSet[i].brightness/2>0) lightLayer[row+6][col+1+j]-=entSet[i].brightness/2;
-			else lightLayer[row+6][col+1+j]=0;
-		}
-	}
-	for(int x=0; x<SW; x++) {
-		for(int y=0; y<SH; y++) {
-			if(lightLayer[x][y]<127) drawRectAlpha(x*TS,y*TS+HUDHEIGHT,TS+1,TS+1,0x505100,lightLayer[x][y]);
-			else drawRectAlpha(x*TS,y*TS+HUDHEIGHT,TS+1,TS+1,0x140c1c,lightLayer[x][y]);
-		}
-	}
-}*/
-
 void pathfind(entity* in, int x, int y, int speed) {
 	for(int i=0; i<speed; i++) {
 		in->pathX=in->x;
@@ -505,13 +456,25 @@ int32_t getrandom() {
 	return signedOut.out;
 }
 
-void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
+/*void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
 	if(iX>SW-1) return;
 	if(iY>SH-1) return;
 	for (int x=0; x<TS-1; x++) {
 		for (int y=0; y<TS-1; y++) {
 			if(y==0 || x==0 || x==TS-1 || y==TS-1) in->layers[(iX*TS)+x][(iY*TS)+y]=0;
 			else in->layers[(iX*TS)+x][(iY*TS)+y] = stat; 
+		}
+	}
+}*/
+
+void scaleCollision(collisionWrap* out, view* in) { //Leaves a 1 pixel border to allow for slight sprite overlap.
+	for(int x=0;x<SW;x++) {
+		for(int y=0;y<SH;y++) {
+			for(int c=0;c<TS;c++) {
+				for(int r=0;r<TS;r++) {
+					out->layers[x*TS+c][y*TS+r]=in->layers[x][y];
+				}
+			}
 		}
 	}
 }
@@ -637,7 +600,7 @@ char collisionCheck(int x, int y) { //Collision detection between map layer and 
 	if(wrapperX>2 || wrapperY>2) return 1;
 	//assert(wrapperX<3);
 	if(microX<TS && microY<TS ) return 0;
-	return tilewrapper[wrapperX][wrapperY].layers[microX][microY];
+	return cwrapper[wrapperX][wrapperY].layers[microX][microY];
 	return 0;
 }
 
@@ -698,12 +661,20 @@ void snapToGrid(entity* movEnt) {
 
 void loop() {
 	if (scroll) scrollMap();
-	if (refresh) {
-		entityInitialise();
+	if (refresh || collisionReset) {
+		for (int x=0; x<3; x++) {
+			for (int y=0; y<3; y++) {
+				scaleCollision(&cwrapper[x][y],&tilewrapper[x][y]);
+			}
+		}
+	}
+
+	if (refresh) {		
 		assert(!entSet[0].alignment);
 		for (int x=0; x<3; x++) {
 			for (int y=0; y<3; y++) {
 				worldgen(&tilewrapper[x][y],(sX-1)+x,(sY-1)+y);
+				scaleCollision(&cwrapper[x][y],&tilewrapper[x][y]);
 				bgDraw(&tilewrapper[x][y]);
 				bgTex[x][y]=SDL_CreateTextureFromSurface(r, bgLayer);
 			}
@@ -759,7 +730,7 @@ int main () {
 	tunnels[0].c=0;
 	memset(&tilewrapper, 0, sizeof tilewrapper);
 	memset(&bgTex, 0, sizeof bgTex);
-	memset(&lightLayer, 0, sizeof lightLayer);
+	memset(&cwrapper,0,sizeof cwrapper);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	lOverlay=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	SDL_SetSurfaceBlendMode(lOverlay,SDL_BLENDMODE_NONE);
@@ -804,15 +775,16 @@ int main () {
 	cornerRoom.screen[14][9]=15;
 	for (int x=0; x<SW; x++) {
 		for(int y=0; y<SH; y++) {
-			setCollision(&cornerRoom,x,y,1);
+			//setCollision(&cornerRoom,x,y,1);
 		}
 	}
-	setCollision(&cornerRoom,0,0,0);
-	setCollision(&cornerRoom,0,9,0);
-	setCollision(&cornerRoom,14,0,0);
-	setCollision(&cornerRoom,14,9,0);	
+	//setCollision(&cornerRoom,0,0,0);
+	//setCollision(&cornerRoom,0,9,0);
+	//setCollision(&cornerRoom,14,0,0);
+	//setCollision(&cornerRoom,14,9,0);	
 	/*End of Corner Room definition.*/
 	loadmap();
+	entityInitialise();
 	
 	
 	#ifndef WEB

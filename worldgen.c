@@ -117,8 +117,7 @@ void loadSpawn() {
 void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	if(xPos>WW-1 || yPos>WH-1) return;
 	if(!world[xPos][yPos]) return;
-	view rVal=*world[xPos][yPos];
-	memcpy(in,&rVal,sizeof rVal);
+	*in=*world[xPos][yPos];
 	in->flag=1;
 	loadSpawn();
 }
@@ -126,6 +125,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 void scrollMap() {
 	int checkX = entSet[0].x;
 	int checkY = entSet[0].y;
+	//collisionReset=1;
 	const int speed=(TS*SW)/24;
 	switch (scroll) {
 		case 1:
@@ -141,6 +141,14 @@ void scrollMap() {
 			tilewrapper[0][1]=tilewrapper[0][0];
 			tilewrapper[1][1]=tilewrapper[1][0];
 			tilewrapper[2][1]=tilewrapper[2][0];
+
+			cwrapper[0][2]=cwrapper[0][1];
+			cwrapper[1][2]=cwrapper[1][1];
+			cwrapper[2][2]=cwrapper[2][1];
+			
+			cwrapper[0][1]=cwrapper[0][0];
+			cwrapper[1][1]=cwrapper[1][0];
+			cwrapper[2][1]=cwrapper[2][0];
 			
 			
 			SDL_DestroyTexture(bgTex[0][2]);
@@ -187,7 +195,15 @@ void scrollMap() {
 			
 			tilewrapper[0][1]=tilewrapper[0][2];
 			tilewrapper[1][1]=tilewrapper[1][2];
-			tilewrapper[2][1]=tilewrapper[2][2];	
+			tilewrapper[2][1]=tilewrapper[2][2];
+
+			cwrapper[0][0]=cwrapper[0][1];
+			cwrapper[1][0]=cwrapper[1][1];
+			cwrapper[2][0]=cwrapper[2][1];
+			
+			cwrapper[0][1]=cwrapper[0][2];
+			cwrapper[1][1]=cwrapper[1][2];
+			cwrapper[2][1]=cwrapper[2][2];
 				
 			
 			SDL_DestroyTexture(bgTex[0][0]);
@@ -233,6 +249,14 @@ void scrollMap() {
 			tilewrapper[1][0]=tilewrapper[0][0];
 			tilewrapper[1][1]=tilewrapper[0][1];
 			tilewrapper[1][2]=tilewrapper[0][2];
+
+			cwrapper[2][0]=cwrapper[1][0];
+			cwrapper[2][1]=cwrapper[1][1];
+			cwrapper[2][2]=cwrapper[1][2];
+			
+			cwrapper[1][0]=cwrapper[0][0];
+			cwrapper[1][1]=cwrapper[0][1];
+			cwrapper[1][2]=cwrapper[0][2];
 			
 			
 			SDL_DestroyTexture(bgTex[2][0]);
@@ -277,6 +301,14 @@ void scrollMap() {
 			tilewrapper[1][0]=tilewrapper[2][0];
 			tilewrapper[1][1]=tilewrapper[2][1];
 			tilewrapper[1][2]=tilewrapper[2][2];
+
+			cwrapper[0][0]=cwrapper[1][0];
+			cwrapper[0][1]=cwrapper[1][1];
+			cwrapper[0][2]=cwrapper[1][2];
+			
+			cwrapper[1][0]=cwrapper[2][0];
+			cwrapper[1][1]=cwrapper[2][1];
+			cwrapper[1][2]=cwrapper[2][2];
 			
 			
 			SDL_DestroyTexture(bgTex[0][0]);
@@ -296,6 +328,7 @@ void scrollMap() {
 			worldgen(&tilewrapper[2][0],sX+1,sY-1);
 			bgDraw(&tilewrapper[2][0]);
 			bgTex[2][0]=SDL_CreateTextureFromSurface(r, bgLayer);
+
 			
 			worldgen(&tilewrapper[2][1],sX+1,sY);
 			bgDraw(&tilewrapper[2][1]);
