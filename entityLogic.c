@@ -315,13 +315,17 @@ void behav_npcSpawn(int i) {
 }
 
 void behav_npc(int i) {
-	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE live in main.h
+	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE lives in main.h
 	drawClothes(&entSet[i]);
 
 	reroll();
 	pathfind(&entSet[i], entSet[entSet[i].status[0]].x,entSet[entSet[i].status[0]].y,1); //Pointer to entity, target position, speed.
 
 	if(!entSet[entSet[i].status[0]].health || !entSet[entSet[i].status[0]].visible) entSet[i].behaviour=behav_npcSpawn;
+}
+
+void behav_wall(int i) {
+	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y,TS,TS);
 }
 
 void entityLogic() {

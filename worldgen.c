@@ -42,18 +42,16 @@ void loadSpawn() {
 		for(int y=0; y<3; y++) {
 			if (tilewrapper[x][y].flag) {
 				entFetch(x,y);
-				if(tilewrapper[x][y].spawnFunc) tilewrapper[x][y].spawnFunc(sX+(x-1),sY+(y-1));
-				factionFetch(x,y);
+				//if(tilewrapper[x][y].spawnFunc) tilewrapper[x][y].spawnFunc(sX+(x-1),sY+(y-1));
+				//factionFetch(x,y);
 				tilewrapper[x][y].flag=0;
 			}
 		}
 	}
 }
 
-/*void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
-
+void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	loadSpawn();
-
 	uint32_t hashme=0;
 
 	hashme |= xPos;
@@ -62,65 +60,29 @@ void loadSpawn() {
 	uint32_t screenHash = lfsr(hashme);
 
 	//printf("%u\n",hashme);
-	if(xPos==2 && yPos==2) {
-		view sroom=spawnroom();
+	/*if(xPos==2 && yPos==2) {
+		view sroom=map_spawnroom();
 		memcpy(in,&sroom,sizeof sroom);
 		return;
-	}
+	}*/
 
 	int diff=intersect(xPos, yPos);
 	if(!diff) in->room=1;
 	printf("Difference: %d\n", diff);
 	if(xPos<50 && yPos<50) {
-		if(diff>=0 && diff < 100) {
-			printf("Generated full room.\n");
-			memset(&in->screen, 15, sizeof in->screen);
-			memset(&in->layers, 0, sizeof in->layers);
-
-			for (int edgePos=1; edgePos<SH-1; edgePos++) {
-				screenHash=lfsr(screenHash);
-				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
-					in->screen[edgeCount][edgePos]=22;
-					setCollision(in,edgeCount,edgePos,1);
-				}
-			}
-			for (int edgePos=1; edgePos<SH-1; edgePos++) {
-				screenHash=lfsr(screenHash);
-				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
-					in->screen[SW-edgeCount][edgePos]=22;
-					setCollision(in,SW-edgeCount,edgePos,1);
-				}
-			}
-			for (int edgePos=5; edgePos<SW-5; edgePos++) {
-				screenHash=lfsr(screenHash);
-				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
-					in->screen[edgePos][edgeCount]=22;
-					setCollision(in,edgePos,edgeCount,1);
-				}
-			}
-			for (int edgePos=5; edgePos<SW-5; edgePos++) {
-				screenHash=lfsr(screenHash);
-				for(int edgeCount=0; edgeCount<(screenHash>>29); edgeCount++) {
-					in->screen[edgePos][SH-edgeCount]=22;
-					setCollision(in,edgePos,SH-edgeCount,1);
-				}
-			}	
-		}
-		else {
-			*in=cornerRoom;
-			in->room=0;
-		}
-	} else in->room=0;
+			*in=map_grasslandBase(xPos,yPos);
+	} else memset(in,0,sizeof *in);
+	in->spawnFunc=NULL;
 	in->flag=1;
-}*/
+}
 
-void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
+/*void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	if(xPos>WW-1 || yPos>WH-1) return;
 	if(!world[xPos][yPos]) return;
 	*in=*world[xPos][yPos];
 	in->flag=1;
 	loadSpawn();
-}
+}*/
 
 void scrollMap() {
 	int checkX = entSet[0].x;

@@ -17,6 +17,34 @@
 #include "worldgen.c"
 #include "entityLogic.c"
 
+view offsetBlendMap(view blayer, view tlayer, unsigned int xOff, unsigned int yOff) {
+	view me;
+	me=blayer;
+	for(int x=0;x<SW;x++){
+		for(int y=0;y<SH;y++) {
+			if(tlayer.screen[x][y] && x+xOff < SW-1 && y+yOff < SH-1) {
+				me.screen[x+xOff][y+yOff]=tlayer.screen[x][y];
+				me.layers[x+xOff][y+yOff]=tlayer.layers[x][y];
+			}
+		}
+	}
+	return me;
+}
+
+view blendMap(view blayer, view tlayer) {
+	view me;
+	me=blayer;
+	for(int x=0;x<SW;x++){
+		for(int y=0;y<SH;y++) {
+			if(tlayer.screen[x][y]) {
+				me.screen[x][y]=tlayer.screen[x][y];
+				me.layers[x][y]=tlayer.layers[x][y];
+			}
+		}
+	}
+	return me;
+}
+
 void light() {
 	unsigned char lightLevel=255;
 	for(int i=0; i<ELIMIT; i++) {
@@ -183,7 +211,7 @@ void deadEntityKiller() {
 			if(entSet[i].behaviour && entSet[i].behaviour != &behav_dead) {
 				entSet[i].behaviour=behav_dead;
 				printf("Killing %d\n with deathframe %u\n", i, entSet[i].deathframe);
-				if(entSet[i].lastHit!=255) {
+				if(entSet[i].lastHit!=255 && entSet[entSet[i].lastHit].partisan) {
 					printf("Realigning %u\n", entSet[i].lastHit);
 					if(entSet[entSet[i].lastHit].alignment>entSet[i].alignment) entSet[entSet[i].lastHit].alignment+=40;
 					else entSet[entSet[i].lastHit].alignment-=40;
@@ -311,6 +339,7 @@ void spriteCollisions() {
 					break;
 					case 131: //Entity dialogue.
 						speaker=j;
+						printf("dialogue collision detected.\n");
 						if(entSet[j].dialogue) entSet[j].dialogue();
 						else pushMsg("No dialogue found for entity.\n");
 						entSet[i].health=0;
@@ -470,8 +499,8 @@ int32_t getrandom() {
 void scaleCollision(collisionWrap* out, view* in) { //Leaves a 1 pixel border to allow for slight sprite overlap.
 	for(int x=0;x<SW;x++) {
 		for(int y=0;y<SH;y++) {
-			for(int c=0;c<TS;c++) {
-				for(int r=0;r<TS;r++) {
+			for(int c=1;c<TS-1;c++) {
+				for(int r=1;r<TS-1;r++) {
 					out->layers[x*TS+c][y*TS+r]=in->layers[x][y];
 				}
 			}
@@ -599,7 +628,7 @@ char collisionCheck(int x, int y) { //Collision detection between map layer and 
 	int microY=(y+TS*SH)%(TS*SH);
 	if(wrapperX>2 || wrapperY>2) return 1;
 	//assert(wrapperX<3);
-	if(microX<TS && microY<TS ) return 0;
+	if(microX==0 && microY==0 ) return 0;
 	return cwrapper[wrapperX][wrapperY].layers[microX][microY];
 	return 0;
 }
@@ -701,7 +730,7 @@ void loop() {
 	else if (menuFlag) menu();
 	else mode=0;
 
-	light();
+	//light();
 
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
@@ -783,7 +812,7 @@ int main () {
 	//setCollision(&cornerRoom,14,0,0);
 	//setCollision(&cornerRoom,14,9,0);	
 	/*End of Corner Room definition.*/
-	loadmap();
+	memset(&tilewrapper,0,sizeof tilewrapper);
 	entityInitialise();
 	
 	

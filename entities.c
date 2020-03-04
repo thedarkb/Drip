@@ -17,7 +17,7 @@ entity ent_playerM() { //Male
 	memset(&me, 0, sizeof me);
 	me.behaviour=playerBehaviour;
 	me.x=112;
-	me.y=48;
+	me.y=64;
 	me.layer=2;
 	me.health=pMaxHealth;
 	me.attack=5;
@@ -167,6 +167,32 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 	entity me;
 	memset(&me, 0, sizeof me);
+	switch(direction){
+		case 0:
+			me.y-=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY+=5;
+		break;
+		case 1:
+			me.y+=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY-=5;			
+		break;
+		case 2:
+			me.x-=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX+=5;
+		break;
+		case 3:
+			me.x+=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX-=5;
+		break;
+	}
 	me.frame[0]=67;
 	me.frame[1]=67;
 	me.frame[2]=67;
@@ -183,16 +209,14 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 	return me;
 }
 
-entity ent_wall(unsigned char x, unsigned char y, unsigned char tile) {
+entity ent_wall(unsigned char tile) {
 	entity me;
-	me.behaviour=behav_potato;
+	memset(&me,0,sizeof me);
+	me.behaviour=behav_wall;
 	me.health=1;
-	me.x=x*TS;
 	me.layer=0;
-	me.y=y*TS;
 	me.frame[0]=tile;
 	me.setframe=0;
-	//setCollision(&tilewrapper[1][1],x,y,1);
 	return me;
 }
 
@@ -312,6 +336,7 @@ entity ent_npc(faction theboys) {
 	me.health=255;
 	me.collisionClass=2;
 	me.behaviour=behav_chase;
+	me.dialogue=diag_menuTest;
 	return me;
 }
 

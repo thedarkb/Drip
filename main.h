@@ -4,7 +4,7 @@
 #define WW 10
 #define WH 10
 
-#define ELIMIT 64 //Entity limit must not exceed 256
+#define ELIMIT 128 //Entity limit must not exceed 256
 #define MAPELIMIT 8
 #define FLIMIT 32
 #define ENTVARIETY 1
@@ -75,6 +75,7 @@ typedef struct entity {
 	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
 	void(*prevState)(int); //Used to hold the main behaviour while a temporary behaviour is in use.
 	unsigned char visible; //1 if entity is visible to NPCs
+	unsigned char partisan; //1 if entity is part of the faction system.
 	unsigned char direction; //Facing direction
 	unsigned char animation; //Animation frame
 	unsigned char collisionClass; //Collision classes above 128 are not themselves susceptible to collisions.
@@ -185,7 +186,6 @@ char menuFlag=0;
 char menuFirstCall=0;
 char collisionReset=0;
 
-view* world[WW][WH];
 entity entSet[ELIMIT];
 tunnel tunnels[TLIMIT];
 faction* rootFaction; //Points to the start of the faction linked list, do not destroy.
@@ -202,6 +202,8 @@ int cameraY=0;
 
 int frameTotal=0;
 
+view offsetBlendMap(view blayer, view tlayer, unsigned int xOff, unsigned int yOff);
+view blendMap(view blayer, view tlayer);
 void pathfind(entity* in, int x, int y, int speed);
 void drawClothes(entity* in);
 faction* attachFac(faction newFac);
