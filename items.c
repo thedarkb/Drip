@@ -9,6 +9,7 @@ unsigned char getItemSprite(unsigned char type) {
 	sprite[0]=83;
 	sprite[1]=69;
 	sprite[2]=67;
+	sprite[3]=96;
 
 	return sprite[type];
 }
@@ -28,6 +29,10 @@ void itemEffects(unsigned char type) {
 			;
 			entity spawnMe=ent_sword(entSet[0].direction, 0, 0, 0);
 			entitySpawn(spawnMe,0,0);
+			swordOut=1;
+		break;
+		case 3:
+			entitySpawn(ent_axe(entSet[0].direction, 0, 0, 0),0,0);
 			swordOut=1;
 	}
 }

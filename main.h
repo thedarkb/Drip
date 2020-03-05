@@ -26,12 +26,7 @@
 
 #define ANIMPARSE entSet[i].frame[entSet[i].direction+entSet[i].animation]
 #define PRESENTENT entSet[i]
-
-#define SCALECOLLISIONS(m, c) for(int xMACRO=0;xMACRO<SW;xMACRO++) {\
-								for(int yMACRO=0;yMACRO<SH;yMACRO++) {\
-									;;//setCollision(&m,xMACRO,yMACRO,c[xMACRO][yMACRO]);\
-								}\
-							}
+							
 #define LOADVIEW(p, x) \
 							_V=x;\
 							p=malloc(sizeof _V);\
@@ -74,6 +69,7 @@ typedef struct entity {
 	short hitY; //^
 	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
 	void(*prevState)(int); //Used to hold the main behaviour while a temporary behaviour is in use.
+	unsigned int freezeFrames; //Can be used by weapons to slow player, other uses may vary by entity.
 	unsigned char visible; //1 if entity is visible to NPCs
 	unsigned char partisan; //1 if entity is part of the faction system.
 	unsigned char direction; //Facing direction

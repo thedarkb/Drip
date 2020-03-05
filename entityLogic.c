@@ -3,6 +3,10 @@ void playerBehaviour(int i) {
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 	char pmotion=0;
 	static int zTimeout=0;
+	if(entSet[i].freezeFrames) {
+		entSet[i].freezeFrames--;
+		return;
+	}
 
 	for (int j=0; j<TS/8; j++) { //number of pixels to move per frame.
 		if (entSet[i].status[3]==0 && !swordOut && !dialogueOut) {	
@@ -32,10 +36,10 @@ void playerBehaviour(int i) {
 			if (keyboard[SDL_SCANCODE_X] && !swordOut) {
 				itemEffects(pInv.items[pInv.weapon].type);		
 			}
-			if (keyboard[SDL_SCANCODE_C]) itemEffects(pInv.items[pInv.selection].type);
+			if (keyboard[SDL_SCANCODE_C] && !swordOut) itemEffects(pInv.items[pInv.selection].type);
 		}
 
-		if(!keyboard[SDL_SCANCODE_X]) swordOut=0;
+		if(!keyboard[SDL_SCANCODE_X] && !keyboard[SDL_SCANCODE_C]) swordOut=0;
 		if(!keyboard[SDL_SCANCODE_Z] && !zTimeout) dialogueOut=0;
 		if(!keyboard[SDL_SCANCODE_F6]) collisionReset=1;
 

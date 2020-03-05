@@ -117,6 +117,7 @@ entity ent_aitest() {
 
 entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char creator) {
 	entity me;
+	entSet[creator].freezeFrames=5;
 	memset(&me, 0, sizeof me);
 	switch(direction){
 		case 0:
@@ -152,6 +153,56 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	me.frame[5]=93;
 	me.frame[6]=91;
 	me.frame[7]=88;
+	me.health=255;
+	me.lastHit=255;
+	me.layer=2;
+	me.visible=0;
+	me.status[0]=10;
+	me.status[1]=creator;
+	me.behaviour=behav_sword;
+	me.setframe=direction;
+	me.collisionClass=129;
+	return me;
+}
+
+entity ent_axe(unsigned char direction, uint16_t x, uint16_t y, unsigned char creator) {
+	entity me;
+	entSet[creator].freezeFrames=10;
+	memset(&me, 0, sizeof me);
+	switch(direction){
+		case 0:
+			me.y-=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY+=7;
+		break;
+		case 1:
+			me.y+=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY-=7;			
+		break;
+		case 2:
+			me.x-=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX+=7;
+		break;
+		case 3:
+			me.x+=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX-=7;
+		break;
+	}
+	me.frame[0]=108;
+	me.frame[1]=117;
+	me.frame[2]=106;
+	me.frame[3]=105;
+	me.frame[4]=116;
+	me.frame[5]=109;
+	me.frame[6]=107;
+	me.frame[7]=104;
 	me.health=255;
 	me.lastHit=255;
 	me.layer=2;

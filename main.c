@@ -24,7 +24,7 @@ view offsetBlendMap(view blayer, view tlayer, unsigned int xOff, unsigned int yO
 		for(int y=0;y<SH;y++) {
 			if(tlayer.screen[x][y] && x+xOff < SW-1 && y+yOff < SH-1) {
 				me.screen[x+xOff][y+yOff]=tlayer.screen[x][y];
-				me.layers[x+xOff][y+yOff]=tlayer.layers[x][y];
+				me.layers[x+xOff][y+yOff]|=tlayer.layers[x][y];
 			}
 		}
 	}
@@ -159,6 +159,7 @@ void entityInitialise() { //Clears entity array, spawns player.
 	entSet[0]=ent_playerM();
 	memset(&pInv, 0, sizeof pInv);
 	pInv.items[0].type=2;
+	pInv.items[1].type=3;
 }
 
 void entityScroll(int x, int y) { //Corrects entity positions when player moves to a new area.
@@ -659,7 +660,7 @@ void moveY(entity* movEnt, short amount) {
 	if (movEnt->animation > 8) movEnt->animation=8;
 
 	unsigned int check = (*movEnt).y + amount;
-	//if (check > TS*SH) return;
+
 	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS/2, check+(*movEnt).ySub)) return;

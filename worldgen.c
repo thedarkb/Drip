@@ -69,7 +69,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	int diff=intersect(xPos, yPos);
 	if(!diff) in->room=1;
 	printf("Difference: %d\n", diff);
-	if(xPos<50 && yPos<50) {
+	if(xPos<400 && yPos<400) {
 			*in=map_grasslandBase(xPos,yPos);
 	} else memset(in,0,sizeof *in);
 	in->spawnFunc=NULL;
