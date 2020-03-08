@@ -1,16 +1,4 @@
-/*ENTITY FIELDS:
-
-unsigned int x; //X position
-unsigned int y; //Y position
-unsigned char xSub; //Hitbox width (it's subtractive from tile width)
-unsigned char ySub; //Hitbox height (ditto)
-unsigned int behaviourId; //Pretty self explanatory.
-uint16_t health;
-uint32_t status; //I'd suggest bit packing this.
-unsigned char inventory[INVLIMIT];
-unsigned char frame; //Current frame.
-
-IF YOU DON'T FILL ALL OF THESE, YOU'LL GET UNDEFINED BEHAVIOUR.*/
+//Make sure everything is initialised so you don't get UB, that goes for you in particular, Merlin.
 
 entity ent_playerM() { //Male
 	entity me;

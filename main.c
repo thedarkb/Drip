@@ -627,6 +627,7 @@ char collisionCheck(int x, int y) { //Collision detection between map layer and 
 	int wrapperY=(y+TS*SH)/(TS*SH);
 	int microX=(x+TS*SW)%(TS*SW);
 	int microY=(y+TS*SH)%(TS*SH);
+	return 0;
 	if(wrapperX>2 || wrapperY>2) return 1;
 	//assert(wrapperX<3);
 	if(microX==0 && microY==0 ) return 0;

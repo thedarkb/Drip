@@ -31,6 +31,7 @@
 							_V=x;\
 							p=malloc(sizeof _V);\
 							*p=_V
+#define DIST(x1,y1,x2,y2) ((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))
 #define TITLE "Drip"
 
 
@@ -118,6 +119,14 @@ typedef struct collisionWrap {
 	unsigned char layers[SW*TS][SH*TS];	
 } collisionWrap;
 
+typedef struct axiom {
+	int x1;
+	int x2;
+	int y1;
+	int y2;
+	view(*loader)(unsigned int xIn, unsigned int yIn);
+} axiom;
+
 typedef struct faction { //Faction areas are circular.
 	unsigned int centreX;
 	unsigned int centreY;
@@ -152,12 +161,13 @@ unsigned char speaker; //Holds entity number which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
 collisionWrap cwrapper[3][3]; //Holds the corresponding collision data
+axiom axioms[16];
 uint16_t flags=0;
 
 unsigned char lastSlot=0;
 
-uint16_t sX = 2; //View struct currently occupied by the player.
-uint16_t sY = 2; //^
+uint16_t sX = 300; //View struct currently occupied by the player.
+uint16_t sY = 300; //^
 unsigned char scroll = 0; //Triggers a screen transition on the next frame.
 
 unsigned char pMaxHealth=100;

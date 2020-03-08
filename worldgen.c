@@ -1,3 +1,7 @@
+void axiomLoad() {
+	
+}
+
 void entFetch(unsigned int xIn, unsigned int yIn) {
 	uint32_t screenNum=0;
 	screenNum |= sX+(xIn-1);
@@ -66,12 +70,16 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		return;
 	}*/
 
-	int diff=intersect(xPos, yPos);
-	if(!diff) in->room=1;
-	printf("Difference: %d\n", diff);
-	if(xPos<400 && yPos<400) {
-			*in=map_grasslandBase(xPos,yPos);
-	} else memset(in,0,sizeof *in);
+	//printf("Difference: %d\n", diff);
+	printf("Distance: %u\n",DIST(xPos,yPos,400,400));
+	if(DIST(xPos,yPos,400,400)<40000) {
+		*in=map_grasslandBase(xPos,yPos);
+	} else if(DIST(xPos,yPos,400,400)<40804){
+		*in=map_beach(xPos,yPos);
+	} else {
+		memset(&in->screen,21,sizeof in->screen);
+		memset(&in->layers,1,sizeof in->layers);
+	}
 	in->spawnFunc=NULL;
 	in->flag=1;
 }
