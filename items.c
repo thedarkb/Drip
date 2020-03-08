@@ -8,7 +8,7 @@ unsigned char getItemSprite(unsigned char type) {
 	
 	sprite[0]=83;
 	sprite[1]=69;
-	sprite[2]=67;
+	sprite[2]=84;
 	sprite[3]=96;
 
 	return sprite[type];

@@ -441,7 +441,7 @@ view map_beachtop() {
 view map_beachleft() {
 	view me={
 		{
-			{12,12,12,12,12,12,12,12,12,12},
+			{71,71,71,71,71,71,71,71,71,71},
 			{0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0},
@@ -497,7 +497,7 @@ view map_beachright() {
 			{0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0},
 			{0,0,0,0,0,0,0,0,0,0},
-			{22,22,22,22,22,22,22,22,22,22}
+			{110,110,110,110,110,110,110,110,110,110}
 
 		},
 		{
@@ -547,31 +547,31 @@ view map_beach(unsigned int xPos, unsigned int yPos) {
 		me=blendMap(me,map_beachleft());
 		left=1;
 	}
-	if(up&&left) me.screen[0][0]=78;
-	if(down&&left) me.screen[0][9]=86;
-	if(up&&right) me.screen[14][0]=79;
-	if(down&&right) me.screen[14][9]=87;
+	if(up&&left) me.screen[0][0]=94;
+	if(down&&left) me.screen[0][9]=102;
+	if(up&&right) me.screen[14][0]=95;
+	if(down&&right) me.screen[14][9]=103;
 	return me;
 }
 
 view map_ridge() {
 	view me={
 		{
-			{5,5,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,5,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,5,0,0,0,0,0,0,0,0},
-			{5,5,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,70,0,0,0,0,0,0,0,0},
-			{5,5,0,0,0,0,0,0,0,0}
+			{11,11,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,11,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,11,0,0,0,0,0,0,0,0},
+			{11,11,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,70,0,0,0,0,0,0,0,0},
+			{11,11,0,0,0,0,0,0,0,0}
 		},
 		{
 			{0,0,0,0,0,0,0,0,0,0},
@@ -638,7 +638,7 @@ view map_ruinedhouse() {
 
 view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	view me;
-	memset(&me.screen,5,sizeof me.screen);
+	memset(&me.screen,11,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
 	uint32_t screenHash=0;
 	screenHash |= xIn<<16;
@@ -650,7 +650,7 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 
 	for(int x=0;x<SW;x++){
 		for(int y=0;y<SH;y++) {
-			if(screenHash & BIT(0) && screenHash & BIT(1)) me.screen[x][y]=6;
+			if(screenHash & BIT(0) && screenHash & BIT(1)) me.screen[x][y]=12;
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5)) {
 				entitySpawn(ent_wall(30),eX+(TS*x),eY+(TS*y));
 				me.layers[x][y]=1;
