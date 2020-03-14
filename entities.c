@@ -11,7 +11,6 @@ entity ent_playerM() { //Male
 	me.attack=5;
 	me.xSub=TS/5;
 	me.brightness=100;
-	me.alignment=0;
 	me.ySub=1;
 	me.direction=1;
 	me.visible=1;
@@ -41,7 +40,6 @@ entity ent_playerF() { //Female
 	me.health=pMaxHealth;
 	me.attack=5;
 	me.xSub=TS/5;
-	me.alignment=0;
 	me.ySub=1;
 	me.direction=1;
 	me.visible=1;
@@ -203,6 +201,56 @@ entity ent_axe(unsigned char direction, uint16_t x, uint16_t y, unsigned char cr
 	return me;
 }
 
+entity ent_staff(unsigned char direction, uint16_t x, uint16_t y, unsigned char creator) {
+	entity me;
+	entSet[creator].freezeFrames=1;
+	memset(&me, 0, sizeof me);
+	switch(direction){
+		case 0:
+			me.y-=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY+=7;
+		break;
+		case 1:
+			me.y+=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitY-=7;			
+		break;
+		case 2:
+			me.x-=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX+=7;
+		break;
+		case 3:
+			me.x+=TS;
+			me.xSub=TS/2;
+			me.ySub=TS/2;
+			me.hitX-=7;
+		break;
+	}
+	me.frame[0]=108;
+	me.frame[1]=117;
+	me.frame[2]=106;
+	me.frame[3]=105;
+	me.frame[4]=116;
+	me.frame[5]=109;
+	me.frame[6]=107;
+	me.frame[7]=104;
+	me.health=255;
+	me.lastHit=255;
+	me.layer=2;
+	me.visible=0;
+	me.status[0]=10;
+	me.status[1]=creator;
+	me.behaviour=behav_sword;
+	me.setframe=direction;
+	me.collisionClass=129;
+	return me;
+}
+
 entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 	entity me;
 	memset(&me, 0, sizeof me);
@@ -301,8 +349,6 @@ entity ent_techNpc() {
 	me.collisionClass=2;
 	me.xSub=2;
 	me.ySub=10;
-	me.alignment=127;
-	me.aggroThreshold=120;
 	me.visible=1;
 	me.frame[0]=145;
 	me.frame[1]=121;
@@ -331,8 +377,6 @@ entity ent_agNpc() {
 	me.xSub=2;
 	me.ySub=10;
 	me.visible=1;
-	me.aggroThreshold=110;
-	me.alignment=-127;
 	me.brightness=50;
 	me.frame[0]=145;
 	me.frame[1]=121;
@@ -354,10 +398,11 @@ entity ent_agNpc() {
 	return me;	
 }
 
-entity ent_npc(faction theboys) {
+entity ent_npc() {
 	entity me;
 	printf("Spawning NPC\n");
 	memset(&me,0,sizeof me);
+	me.frame[0]=153;
 	/*me.frame[0]=177;
 	me.frame[1]=153;
 	me.frame[2]=161;
@@ -374,8 +419,52 @@ entity ent_npc(faction theboys) {
 	me.visible=1;
 	me.health=255;
 	me.collisionClass=2;
-	me.behaviour=behav_chase;
+	me.behaviour=behav_wall;
 	me.dialogue=diag_menuTest;
+	return me;
+}
+
+entity ent_door(unsigned char tile, uint16_t destSx, uint16_t destSy, int destX, int destY) {
+	entity me;
+	memset(&me,0,sizeof me);
+	me.collisionClass=132;
+	me.health=255;
+	me.frame[0]=tile;
+	me.status[0]=destSx;
+	me.status[1]=destSy;
+	me.status[2]=destX;
+	me.status[3]=destY;
+	me.xSub=10;
+	me.ySub=10;
+	me.behaviour=behav_wall;
+	return me;
+}
+
+entity ent_doorStacking(unsigned char tile, uint16_t destSx, uint16_t destSy, int destX, int destY) {
+	entity me;
+	memset(&me,0,sizeof me);
+	me.collisionClass=133;
+	me.health=255;
+	me.frame[0]=tile;
+	me.status[0]=destSx;
+	me.status[1]=destSy;
+	me.status[2]=destX;
+	me.status[3]=destY;
+	me.xSub=10;
+	me.ySub=10;
+	me.behaviour=behav_wall;
+	return me;
+}
+
+entity ent_doorReturn(unsigned char tile) {
+	entity me;
+	memset(&me,0,sizeof me);
+	me.collisionClass=133;
+	me.health=255;
+	me.frame[0]=tile;
+	me.xSub=10;
+	me.ySub=10;
+	me.behaviour=behav_wall;
 	return me;
 }
 

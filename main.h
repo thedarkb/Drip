@@ -4,7 +4,7 @@
 #define WW 10
 #define WH 10
 
-#define ELIMIT 128 //Entity limit must not exceed 256
+#define ELIMIT 256 //Entity limit must not exceed 256
 #define MAPELIMIT 8
 #define FLIMIT 32
 #define ENTVARIETY 1
@@ -25,13 +25,14 @@
 #define BIT(x) (1<<x)
 
 #define ANIMPARSE entSet[i].frame[entSet[i].direction+entSet[i].animation]
-#define PRESENTENT entSet[i]
+#define THIS entSet[i]
 							
 #define LOADVIEW(p, x) \
 							_V=x;\
 							p=malloc(sizeof _V);\
 							*p=_V
 #define DIST(x1,y1,x2,y2) ((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))
+#define PAIR(x,y) (((x)<<16)|(y)) //This is very dirty and only designed for use with uint16_t sX/sY pairs.
 #define TITLE "Drip"
 
 
@@ -54,7 +55,7 @@ SDL_Surface* bgLayer=NULL;
 SDL_Texture* bgTex[3][3];
 SDL_Surface* scrollLayer = NULL;
 
-typedef struct faction faction;
+//typedef struct faction faction;
 
 typedef struct outfit {
 	unsigned char frame[FLIMIT];
@@ -78,15 +79,12 @@ typedef struct entity {
 	unsigned char collisionClass; //Collision classes above 128 are not themselves susceptible to collisions.
 	unsigned char layer; //Where they are in the sprite stack.
 	unsigned char attack; //RPG style attack stat.
-	unsigned char status[4]; //General purpose entity specific variables.
+	unsigned int status[4]; //General purpose entity specific variables.
 	uint16_t health;
-	unsigned char frame[FLIMIT]; //Array of animation frames.
+	unsigned int frame[FLIMIT]; //Array of animation frames.
 	unsigned char setframe; //Current frame
 	unsigned char deathframe; //Death sprite
 	unsigned char drop[4]; //Array of items, drop table.
-	int alignment; //Their position in the game's political system.
-	faction* faction; //Points to their faction, if they have one, NULL if they don't.
-	unsigned char aggroThreshold; //The difference in alignment that will provoke them to hostility.
 	unsigned char lastHit; //The last entity to strike them.
 	void(*dialogue)(); //Points to the dialogue, stored in dialogue.c; the domain of the man, the myth, the Merlin.
 	outfit clothes;
@@ -127,7 +125,14 @@ typedef struct axiom {
 	view(*loader)(unsigned int xIn, unsigned int yIn);
 } axiom;
 
-typedef struct faction { //Faction areas are circular.
+typedef struct location {
+	uint16_t sX;
+	uint16_t sY;
+	int x;
+	int y;
+} location;
+
+/*typedef struct faction { //Faction areas are circular.
 	unsigned int centreX;
 	unsigned int centreY;
 	unsigned int radius;
@@ -138,7 +143,7 @@ typedef struct faction { //Faction areas are circular.
 	int maxAg; //The maximum.
 	entity entPlates[ENTVARIETY]; //Its entity templates.
 	faction* next; //Next faction on the linked list.
-} faction;
+} faction;*/
 
 typedef struct tunnel {
 	int m; //Slope
@@ -176,8 +181,8 @@ unsigned char dialogueOut=0;
 
 unsigned char animationG=0;
 
-unsigned char nScreen[SW][SH];
-unsigned char nlayers[SW*TS][SH*TS];
+location entranceStack[10]; //Holds the last 10 warp locations for return from interior warps.
+unsigned char entrySlot=0;
 
 char* msgBuffer[MSGDEPTH];
 unsigned char msgSlot=0;
@@ -194,10 +199,10 @@ char collisionReset=0;
 
 entity entSet[ELIMIT];
 tunnel tunnels[TLIMIT];
-faction* rootFaction; //Points to the start of the faction linked list, do not destroy.
+//faction* rootFaction; //Points to the start of the faction linked list, do not destroy.
 view _V;
 
-faction* guineaPig; //Temporary, remove
+//faction* guineaPig; //Temporary, remove
 
 inventory pInv;
 
@@ -212,16 +217,17 @@ view offsetBlendMap(view blayer, view tlayer, unsigned int xOff, unsigned int yO
 view blendMap(view blayer, view tlayer);
 void pathfind(entity* in, int x, int y, int speed);
 void drawClothes(entity* in);
-faction* attachFac(faction newFac);
-void destroyFac(faction* whigs);
+//faction* attachFac(faction newFac);
+//void destroyFac(faction* whigs);
 void facFrag();
 void entityInitialise();
 void entityScroll(int x, int y);
 void entityReset();
+void mapEntitySpawn(entity in, uint16_t xIn, uint16_t yIn, int x, int y);
 void entitySpawn(entity in, int x, int y);
 void nentityReset();
 void nentitySpawn(entity in);
-void factionSpawn(faction* theboys,int x,int y);
+//void factionSpawn(faction* theboys,int x,int y);
 void deadEntityKiller();
 void corpseDisposal();
 void mapLoader(char entities[SW][SH], char collisions[SW][SH]);

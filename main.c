@@ -12,7 +12,7 @@
 #include "dialogue.c"
 #include "clothes.c"
 #include "entities.c"
-#include "factions.c"
+//#include "factions.c"
 #include "maps.c"
 #include "worldgen.c"
 #include "entityLogic.c"
@@ -98,11 +98,10 @@ void pathfind(entity* in, int x, int y, int speed) {
 void drawClothes(entity* in) {
 	if(!in) return;
 	if(!in->clothes.colourFrame[0]) return;
-	if(!in->faction) tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,0xFFFFFF);
-	else tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,lfsr(in->faction->baseAlignment));
+	tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,0xFFFFFF);
 }
 
-faction* attachFac(faction newFac) { //Adds a new faction to the linked list.
+/*faction* attachFac(faction newFac) { //Adds a new faction to the linked list.
 	faction* position=rootFaction;
 	printf("Attaching faction\n");
 	while(position->next){
@@ -150,7 +149,7 @@ void facFrag() {
 			destroyFac(parent);
 		} else position=position->next;
 	}
-}
+}*/
 
 void entityInitialise() { //Clears entity array, spawns player.
 	for (int i=0; i<ELIMIT; i++) {
@@ -171,9 +170,14 @@ void entityScroll(int x, int y) { //Corrects entity positions when player moves 
 	}
 }
 
+void mapEntitySpawn(entity in, uint16_t xIn, uint16_t yIn, int x, int y) {
+	int eX=(xIn-sX)*(SW*TS);
+	int eY=(yIn-sY)*(SH*TS);
+	entitySpawn(in,eX+x,eY+y);
+}
+
 void entitySpawn(entity in, int x, int y) {
 	if(in.behaviour) {
-		printf("Attempting to spawn...\n");
 		for(int i=0; i<ELIMIT; i++) {
 			if (!entSet[i].behaviour) {
 				entSet[i]=in;
@@ -196,7 +200,7 @@ void entitySpawn(entity in, int x, int y) {
 	}
 }
 
-void factionSpawn(faction* position,int x,int y) {
+/*void factionSpawn(faction* position,int x,int y) {
 	entitySpawn(position->entPlates[0],x,y);
 	reroll();
 	entSet[lastSlot].faction=position;
@@ -204,7 +208,7 @@ void factionSpawn(faction* position,int x,int y) {
 	entSet[lastSlot].aggroThreshold=position->aggroThreshold;
 	if(entSet[lastSlot].alignment<=position->minAg) entSet[lastSlot].faction->minAg=entSet[lastSlot].alignment;
 	else if(entSet[lastSlot].alignment>position->maxAg) entSet[lastSlot].faction->maxAg=entSet[lastSlot].alignment;
-}
+}*/
 
 void deadEntityKiller() {
 	for (int i=0; i<ELIMIT; i++) {
@@ -212,11 +216,6 @@ void deadEntityKiller() {
 			if(entSet[i].behaviour && entSet[i].behaviour != &behav_dead) {
 				entSet[i].behaviour=behav_dead;
 				printf("Killing %d\n with deathframe %u\n", i, entSet[i].deathframe);
-				if(entSet[i].lastHit!=255 && entSet[entSet[i].lastHit].partisan) {
-					printf("Realigning %u\n", entSet[i].lastHit);
-					if(entSet[entSet[i].lastHit].alignment>entSet[i].alignment) entSet[entSet[i].lastHit].alignment+=40;
-					else entSet[entSet[i].lastHit].alignment-=40;
-				}
 			}
 
 			entSet[i].collisionClass=0;
@@ -253,7 +252,7 @@ void spriteCollisions() {
 				//printf("Collision detected between %d and %d\n",i,j);
 				switch (entSet[i].collisionClass) {
 					case 2:
-					if(get_diff(entSet[i].alignment, entSet[j].alignment) < entSet[i].aggroThreshold) continue;
+					//if(get_diff(entSet[i].alignment, entSet[j].alignment) < entSet[i].aggroThreshold) continue;
 					//Stops NPCs of the same faction murdering eachother.
 					case 3: //Generic bouncy collisions.
 					if (entSet[j].health>20) entSet[j].health-=20;
@@ -346,7 +345,42 @@ void spriteCollisions() {
 						entSet[i].health=0;
 						entSet[i].behaviour=NULL;
 						entSet[i].collisionClass=0;
-					break;												
+					break;
+					case 132: //Door
+						printf("Collision detected with door.\n");
+						sX=entSet[i].status[0];
+						sY=entSet[i].status[1];
+						entSet[j].x=entSet[i].status[2];
+						entSet[j].y=entSet[i].status[3];
+						refresh=1;
+					break;
+					case 133: //Door that caches previous position
+						printf("Collision detected with stackable door.\n");
+						entranceStack[entrySlot].sX=sX;
+						entranceStack[entrySlot].sY=sY;
+						entranceStack[entrySlot].x=entSet[j].x;
+						entranceStack[entrySlot].y=entSet[j].y;
+						entrySlot++;
+
+						sX=entSet[i].status[0];
+						sY=entSet[i].status[1];
+						entSet[j].x=entSet[i].status[2];
+						entSet[j].y=entSet[i].status[3];
+						refresh=1;
+					break;
+					case 134: //Door that caches previous position
+						printf("Collision detected with stackable door.\n");
+						if(!entrySlot) {
+							printf("An error in level design has left this door without a destination.\n");
+							break;
+						}
+						sX=entranceStack[entrySlot].sX;
+						sY=entranceStack[entrySlot].sY;
+						entSet[j].x=entranceStack[entrySlot].x;
+						entSet[j].y=entranceStack[entrySlot].y+TS;
+						if(entrySlot) entrySlot--;
+						refresh=1;
+					break;								
 				}
 			}
 		}
@@ -386,15 +420,12 @@ void text(char* inStr, int x, int y) {
 
 void menu() {
 	drawRect(2,120,236,58,0);
-	int i=0;
 	int optCount=0;
 	static int optSel=0;
 
-	while(menuText[i]) { //Counts the number of lines in the menu text.
-		if (menuText[i]==10) optCount++;
-		i++;
-	}
+	for(int i=0;menuText[i];) if(menuText[i++]==10) optCount++; //Counts the number of lines in the menu text.
 
+	if(optSel>optCount)optSel=0;
 	text(menuText,11,102); //Displays menu text.
 	static int keyPress=1;
 	static int zPress=1;
@@ -476,26 +507,6 @@ int intersect(unsigned int x, unsigned int y) {
 	}
 	return -1;
 }
-
-int32_t getrandom() {
-	union signedOut {
-		uint32_t in;
-		int32_t out;
-	} signedOut;
-	signedOut.in=lfsr(SDL_GetTicks()) >> 1;
-	return signedOut.out;
-}
-
-/*void setCollision(view* in, int iX, int iY, char stat) { //Leaves a 1 pixel border to allow for slight sprite overlap.
-	if(iX>SW-1) return;
-	if(iY>SH-1) return;
-	for (int x=0; x<TS-1; x++) {
-		for (int y=0; y<TS-1; y++) {
-			if(y==0 || x==0 || x==TS-1 || y==TS-1) in->layers[(iX*TS)+x][(iY*TS)+y]=0;
-			else in->layers[(iX*TS)+x][(iY*TS)+y] = stat; 
-		}
-	}
-}*/
 
 void scaleCollision(collisionWrap* out, view* in) { //Leaves a 1 pixel border to allow for slight sprite overlap.
 	for(int x=0;x<SW;x++) {
@@ -627,7 +638,7 @@ char collisionCheck(int x, int y) { //Collision detection between map layer and 
 	int wrapperY=(y+TS*SH)/(TS*SH);
 	int microX=(x+TS*SW)%(TS*SW);
 	int microY=(y+TS*SH)%(TS*SH);
-	return 0;
+	//return 0;
 	if(wrapperX>2 || wrapperY>2) return 1;
 	//assert(wrapperX<3);
 	if(microX==0 && microY==0 ) return 0;
@@ -690,18 +701,24 @@ void snapToGrid(entity* movEnt) {
 	else (*movEnt).y = ((*movEnt).y/TS)*TS;
 }
 
-void loop() {
-	if (scroll) scrollMap();
-	if (refresh || collisionReset) {
+void collisionScaler() {
+	memset(&cwrapper,0,sizeof cwrapper);
+	if (collisionReset) {
 		for (int x=0; x<3; x++) {
 			for (int y=0; y<3; y++) {
 				scaleCollision(&cwrapper[x][y],&tilewrapper[x][y]);
 			}
 		}
-	}
+	}	
+}
+
+void loop() {
+	if (scroll) scrollMap();
+	if (collisionReset) collisionScaler();
 
 	if (refresh) {		
-		assert(!entSet[0].alignment);
+		for(int i=1;i<ELIMIT;i++) memset(&entSet[i],0,sizeof entSet[i]);
+		memset(&tilewrapper,0,sizeof tilewrapper);
 		for (int x=0; x<3; x++) {
 			for (int y=0; y<3; y++) {
 				worldgen(&tilewrapper[x][y],(sX-1)+x,(sY-1)+y);
@@ -710,6 +727,7 @@ void loop() {
 				bgTex[x][y]=SDL_CreateTextureFromSurface(r, bgLayer);
 			}
 		}
+		collisionScaler();
 		refresh=0;
 	}
 	if (!mode) {
@@ -742,7 +760,6 @@ void loop() {
 	if(animationG<30) animationG+=2;
 	else animationG=0;
 	
-	if(!frameTotal%200) facFrag();
 	frameTotal++;
 }
 
@@ -756,7 +773,7 @@ int main () {
 	s = SDL_GetWindowSurface(w);
 	rng.ui32=4; //SEEDS THE MAIN RNG
 	generateTunnels();
-	initialiseFactions();
+	//initialiseFactions();
 	tunnels[0].m=1;
 	tunnels[0].c=0;
 	memset(&tilewrapper, 0, sizeof tilewrapper);
@@ -796,31 +813,13 @@ int main () {
 	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
 	entityInitialise(); //Loads the player
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
-	
-	
-	/*Corner Room definition.*/
-	memset(&cornerRoom.screen, 22, sizeof cornerRoom.screen);
-	cornerRoom.screen[0][0]=15;
-	cornerRoom.screen[0][9]=15;
-	cornerRoom.screen[14][0]=15;
-	cornerRoom.screen[14][9]=15;
-	for (int x=0; x<SW; x++) {
-		for(int y=0; y<SH; y++) {
-			//setCollision(&cornerRoom,x,y,1);
-		}
-	}
-	//setCollision(&cornerRoom,0,0,0);
-	//setCollision(&cornerRoom,0,9,0);
-	//setCollision(&cornerRoom,14,0,0);
-	//setCollision(&cornerRoom,14,9,0);	
-	/*End of Corner Room definition.*/
 	memset(&tilewrapper,0,sizeof tilewrapper);
 	entityInitialise();
 	
 	
 	#ifndef WEB
 	while(1) { //The timing loop leaves a little to be desired.
-		if (SDL_GetTicks()-timer < 1000/FRAMERATE) SDL_Delay(1000/FRAMERATE);
+		if (SDL_GetTicks()-timer < 1000/FRAMERATE && !keyboard[SDL_SCANCODE_P]) SDL_Delay(1000/FRAMERATE);
 		else printf("Frames dropped: %u\n", (SDL_GetTicks()-timer)/(1000/FRAMERATE)+1);
 		timer = SDL_GetTicks();
 		SDL_PollEvent(&keyIn);

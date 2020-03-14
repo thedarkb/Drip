@@ -1,6 +1,6 @@
 void playerBehaviour(int i) {
 	if(swordOut) entSet[i].animation=8;
-	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	if(!refresh) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 	char pmotion=0;
 	static int zTimeout=0;
 	if(entSet[i].freezeFrames) {
@@ -8,7 +8,7 @@ void playerBehaviour(int i) {
 		return;
 	}
 
-	for (int j=0; j<128; j++) { //number of pixels to move per frame.
+	for (int j=0; j<TS/8; j++) { //number of pixels to move per frame.
 		if (entSet[i].status[3]==0 && !swordOut && !dialogueOut) {	
 			if (keyboard[SDL_SCANCODE_RIGHT]) {
 				moveX(&entSet[i], 1);
@@ -89,7 +89,6 @@ void playerBehaviour(int i) {
 			pInv.items[pInv.selection].type=0;
 		}
 		if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
-		if (keyboard[SDL_SCANCODE_P]) facFrag();
 
 		if (keyboard[SDL_SCANCODE_L]) {
 			pushMsg("Test\0");
@@ -104,7 +103,7 @@ void playerBehaviour(int i) {
 		}
 		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
 		if (keyboard[SDL_SCANCODE_F1]) printf("Entity 0 at %d,%d\n",entSet[i].x,entSet[i].y);
-		if(keyboard[SDL_SCANCODE_F2]) printf("Alignment: %d\n", entSet[i].alignment);
+		if(keyboard[SDL_SCANCODE_F3]) printf("Screen: %u,%u\n",sX,sY);
 		
 		if (entSet[i].y < 0) scroll = 1;
 		if (entSet[i].y > TS*SH) scroll=2;
@@ -303,7 +302,9 @@ void behav_item(int i) {
 	entSet[i].collisionClass=130;
 }
 
-void behav_npcSpawn(int i) {
+void behav_npcSpawn(int i){entSet[i].behaviour=behav_npc;}
+
+/*void behav_npcSpawn(int i) {
 	entSet[i].status[0]=0;
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
 	drawClothes(&entSet[i]);
@@ -316,7 +317,7 @@ void behav_npcSpawn(int i) {
 			return;
 		}
 	}	
-}
+}*/
 
 void behav_npc(int i) {
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE lives in main.h
