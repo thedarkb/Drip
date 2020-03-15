@@ -55,7 +55,6 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	uint32_t screenHash=PAIR(xPos,yPos);
 	screenHash = lfsr(screenHash);
 
-
 	switch(PAIR(xPos,yPos)) {
 		case PAIR(300,300):
 			memset(&in->screen,1,sizeof in->screen);
@@ -80,12 +79,14 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	}
 
 	//printf("Difference: %d\n", diff);
-	if(DIST(xPos,yPos,400,400)<40000 && yPos>250) {
+	if(DIST(xPos,yPos,400,400)<40000 && yPos>250 && xPos<267) {
 		*in=map_grasslandBase(xPos,yPos);
 	} else if( DIST(xPos,yPos,400,400)<40000 && yPos<250){
 		*in=map_snowlandBase(xPos,yPos);
 	} else if(DIST(xPos,yPos,400,400)<40000 && yPos==250) {
 		*in=map_snowgrass(xPos,yPos);
+	} else if((DIST(xPos,yPos,400,400)<40000 && yPos>250 && xPos>267)) {
+		*in=map_burren(xPos,yPos);
 	} else if (DIST(xPos,yPos,400,400)<40804){
 		*in=map_beach(xPos,yPos);
 	} else if(xPos<605&&yPos<605){

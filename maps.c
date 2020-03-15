@@ -255,44 +255,28 @@ view map_beach(unsigned int xPos, unsigned int yPos) {
 	return me;
 }
 
-view map_ridge() {
-	view me={
-		{
-			{11,11,0,0,0,0,0,0,0,0},
-			{11,155,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,157,0,0,0,0,0,0,0,0},
-			{11,11,0,0,0,0,0,0,0,0},
-			{11,155,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,156,0,0,0,0,0,0,0,0},
-			{11,157,0,0,0,0,0,0,0,0},
-			{11,11,10,0,0,0,0,0,0,0}
-		},
-		{
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,1,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0}
+view map_ridge(uint32_t hash, char in) {
+	view me;
+	view blend;
+	memset(&me,0,sizeof me);
+	in*=8;
+	me.screen[0][0]=155+in;
+	me.layers[0][0]=1;
+	int x=1;
+	for(;;x++) {
+		hash=lfsr(hash);
+		if(x>SW-3||hash&BIT(7) && x>3){
+			me.screen[x][0]=157+in;
+			me.layers[x][0]=1;
+			break;
+		} else {
+			me.screen[x][0]=156+in;
+			me.layers[x][0]=1;
 		}
-	};
-	return me;
+	}
+	memset(&blend,0,sizeof blend);
+	blend=offsetBlendMap(blend,me,SW-2-x,0);
+	return blend;
 }
 
 view map_ruinedhouse() {
@@ -375,14 +359,17 @@ view map_snowlandBase(uint16_t xIn, uint16_t yIn) {
 	if(screenHash & BIT(2) && screenHash & BIT(1) && screenHash & BIT(3)) {
 		screenHash=lfsr(screenHash);
 		me=offsetBlendMap(me,map_ruinedhouse(),screenHash%3,screenHash%3);
+	} else if(screenHash&BIT(0)){
+		screenHash=lfsr(screenHash);
+		me=offsetBlendMap(me,map_ridge(screenHash,1),0,screenHash%9);
 	}
 	for(int x=0;x<SW;x++) {
 		for(int y=0;y<SH;y++) {
+			screenHash=lfsr(screenHash);
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[x][y]==85) {
 				entitySpawn(ent_wall(134),eX+(TS*x),eY+(TS*y));
 				me.layers[x][y]=1;
 			}
-			screenHash=lfsr(screenHash);
 		}
 	}
 	me.spawnFunc=NULL;
@@ -409,7 +396,7 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	}
 	if(screenHash & BIT(0)) {
 		screenHash=lfsr(screenHash);
-		me=offsetBlendMap(me,map_ridge(),0,screenHash%SH);
+		me=offsetBlendMap(me,map_ridge(screenHash,0),0,screenHash%SH);
 	} else if(screenHash & BIT(2) && screenHash & BIT(1) && screenHash & BIT(3)) {
 		screenHash=lfsr(screenHash);
 		me=offsetBlendMap(me,map_ruinedhouse(),screenHash%3,screenHash%3);
@@ -425,4 +412,24 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	}
 	me.spawnFunc=NULL;
 	return me;
+}
+
+view map_burren(uint16_t xIn, uint16_t yIn) {
+	/*view me;
+	memset(&me.screen,15,sizeof me.screen);
+	memset(&me.layers,0,sizeof me.layers);
+	uint32_t screenHash=0;
+	screenHash |= xIn<<16;
+	screenHash |= yIn;
+	screenHash=lfsr(screenHash);
+	for(int x=0;x<SW;x++){
+		for(int y=0;y<SH;y++){
+			screenHash=lfsr(screenHash);
+			if(screenHash&BIT(0)){
+				me.screen[x][y]=
+			}
+		}
+	}
+	return me;*/
+	return map_grasslandBase(xIn,yIn);
 }

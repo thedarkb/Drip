@@ -765,10 +765,18 @@ void loop() {
 
 int main () {
 	SDL_Init(SDL_INIT_VIDEO);
+	#ifdef WEB
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*2, (SH*TS+HUDHEIGHT)*2, SDL_WINDOW_OPENGL);
+	#else
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
+	#endif
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
+	#ifdef WEB
+	SDL_RenderSetScale(r,2,2);
+	#else
 	SDL_RenderSetScale(r,4,4);
+	#endif
 	SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_BLEND);
 	s = SDL_GetWindowSurface(w);
 	rng.ui32=4; //SEEDS THE MAIN RNG
