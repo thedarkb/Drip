@@ -1,3 +1,100 @@
+view map_box(unsigned int tile, unsigned char layer, unsigned int xIn, unsigned int yIn, unsigned int w, unsigned int h) {
+	view me;
+	memset(&me,0,sizeof me);
+	for(int x=xIn;x<xIn+w;x++) {
+		for(int y=yIn;y<yIn+h;y++) {
+			if(y<SH && x<SW) {
+				me.screen[x][y]=tile;
+				me.layers[x][y]=layer;
+			}
+		}
+	}
+	return me;
+}
+
+view map_vHall(unsigned int floor, unsigned int sWall) {
+	view me;
+	memset(&me,0,sizeof me);
+	me=blendMap(me,map_box(floor,0,1,0,3,SH));
+	me=blendMap(me,map_box(sWall,1,0,0,1,SH));
+	me=blendMap(me,map_box(sWall,1,4,0,1,SH));
+
+	return me;
+}
+
+view map_hHall(unsigned int floor, unsigned int sWall) {
+	view me;
+	memset(&me,0,sizeof me);
+	me=blendMap(me,map_box(floor,0,0,1,SW,3));
+	me=blendMap(me,map_box(sWall,1,0,0,SW,1));
+	me=blendMap(me,map_box(232,1,0,4,SW,1));
+
+	return me;
+}
+
+view map_d1entrance() {
+	view me;
+	memset(&me,0,sizeof me);
+	me=blendMap(me,map_box(16,0,5,3,4,4));
+	me=blendMap(me,map_box(232,0,6,4,2,2));
+
+	me=blendMap(me,map_box(5,1,4,2,1,6));
+	me=blendMap(me,map_box(5,1,9,2,1,6));
+	me=blendMap(me,map_box(6,1,5,2,4,1));
+	me=blendMap(me,map_box(6,1,5,7,4,1));
+	return me;
+}
+
+view map_d1topRightHall1f() {
+	view me;
+	memset(&me,0,sizeof me);
+	me=blendMap(me,map_hHall(33,6));
+	return me;
+}
+
+view map_d1topRightCorner1f() {
+	view me;
+	memset(&me,0,sizeof me);
+	me=offsetBlendMap(me,map_hHall(33,6),-6,0);
+	me=offsetBlendMap(me,map_vHall(33,232),5,4);
+	me=blendMap(me,map_box(232,1,9,1,1,3));
+	return me;
+}
+
+view map_d1bottomRightCorner1f() {
+	view me;
+	memset(&me,0,sizeof me);
+	me=offsetBlendMap(me,map_hHall(33,6),-6,5);
+	me=offsetBlendMap(me,map_vHall(33,232),5,-5);
+	me=blendMap(me,map_box(33,0,6,5,3,1));
+	me=blendMap(me,map_box(232,1,9,5,1,5));
+	return me;
+}
+
+view map_d1bottomRightHall1f() {
+	view me;
+	memset(&me,0,sizeof me);
+	me=offsetBlendMap(me,map_hHall(33,6),0,5);
+	return me;
+}
+
+view map_d1rightCorridor1f() {
+	view me;
+	memset(&me,0,sizeof me);
+	me=offsetBlendMap(me,map_vHall(33,232),5,0);
+
+	me=blendMap(me,map_box(5,1,9,3,1,2));
+	me=blendMap(me,map_box(5,1,9,6,1,1));
+	me=blendMap(me,map_box(232,1,9,7,4,1));
+	me=blendMap(me,map_box(6,1,10,3,3,1));
+	me=blendMap(me,map_box(5,1,13,3,1,4));
+	me=blendMap(me,map_box(33,0,10,4,3,3));
+	me.screen[9][5]=33;
+	me.layers[9][5]=0;
+
+	return me;
+}
+
 view map_interior() {
 	printf("Creating interior...");
 	view me={
@@ -36,7 +133,7 @@ view map_interior() {
 			{1,1,1,1,1,1,1,1,1,1}
 		}
 	};
-	return me;
+	return map_d1entrance();
 }
 
 view map_beachbottom() {
@@ -317,6 +414,10 @@ view map_ruinedhouse() {
 		}
 	};
 	return me;
+}
+
+view map_dungeonVertical(unsigned int floor, unsigned int wall) {
+	
 }
 
 view map_snowgrass(uint16_t xIn, uint16_t yIn) {

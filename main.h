@@ -4,7 +4,7 @@
 #define WW 10
 #define WH 10
 
-#define ELIMIT 256 //Entity limit must not exceed 256
+#define ELIMIT 512 //Entity limit must not exceed 256
 #define MAPELIMIT 8
 #define FLIMIT 32
 #define ENTVARIETY 1
@@ -13,7 +13,7 @@
 #define SPRITELAYERS 3
 #define INVLIMIT 8
 #define ENTFRAMES 32
-#define TILECOUNT 214 //Set this to the actual number of sprites for best performance.
+#define TILECOUNT 239 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 30
 #define HUDHEIGHT 20
 #define MSGDEPTH 32
@@ -107,7 +107,7 @@ typedef struct inventory {
 
 typedef struct view {
 	unsigned char screen[SW][SH]; //Tile data.
-	unsigned char layers[SW][SH]; //Bitmap containing collision data.
+	unsigned char layers[SW][SH]; //Collision data.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 	void(*spawnFunc)(unsigned int xIn, unsigned int yIn);
@@ -117,33 +117,12 @@ typedef struct collisionWrap {
 	unsigned char layers[SW*TS][SH*TS];	
 } collisionWrap;
 
-typedef struct axiom {
-	int x1;
-	int x2;
-	int y1;
-	int y2;
-	view(*loader)(unsigned int xIn, unsigned int yIn);
-} axiom;
-
 typedef struct location {
 	uint16_t sX;
 	uint16_t sY;
 	int x;
 	int y;
 } location;
-
-/*typedef struct faction { //Faction areas are circular.
-	unsigned int centreX;
-	unsigned int centreY;
-	unsigned int radius;
-	int baseAlignment; //The standard alignment for an entity spawning as part of a faction.
-	unsigned int alignmentFuzz; //Alignment variance
-	unsigned int aggroThreshold; //The threshold of alignment difference that provokes one of its members.
-	int minAg; //The minimum recorded aggression in an extant entity.
-	int maxAg; //The maximum.
-	entity entPlates[ENTVARIETY]; //Its entity templates.
-	faction* next; //Next faction on the linked list.
-} faction;*/
 
 typedef struct tunnel {
 	int m; //Slope
@@ -166,7 +145,8 @@ unsigned char speaker; //Holds entity number which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
 collisionWrap cwrapper[3][3]; //Holds the corresponding collision data
-axiom axioms[16];
+void(*mapLoader[705][610])(view* in, unsigned int xPos, unsigned int yPos);
+
 uint16_t flags=0;
 
 unsigned char lastSlot=0;
@@ -213,7 +193,7 @@ int cameraY=0;
 
 int frameTotal=0;
 
-view offsetBlendMap(view blayer, view tlayer, unsigned int xOff, unsigned int yOff);
+view offsetBlendMap(view blayer, view tlayer, int xOff, int yOff);
 view blendMap(view blayer, view tlayer);
 void pathfind(entity* in, int x, int y, int speed);
 void drawClothes(entity* in);
@@ -230,7 +210,7 @@ void nentitySpawn(entity in);
 //void factionSpawn(faction* theboys,int x,int y);
 void deadEntityKiller();
 void corpseDisposal();
-void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
+//void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
 void menu();
 void pushMsg(char* inStr);

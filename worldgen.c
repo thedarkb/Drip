@@ -7,35 +7,8 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 	int yMult=(yIn-1)*(SH*TS);
 	int xOffset=(xIn-1);
 	int yOffset=(yIn-1);	
-	
-	if(screenNum==0) {
-	//	entitySpawn(ent_aitest(),xMult+80,yMult+120);
-	//	entitySpawn(ent_techNpc(),xMult,yMult);
-	//	entitySpawn(ent_agNpc(),xMult+70,yMult+70);
-	}
 	tilewrapper[xIn][yIn].flag=0;
-	//return ent_empty();
 }
-
-/*void factionFetch(unsigned int xIn, unsigned int yIn) {
-	int x = sX+(xIn-1);
-	int y = sY+(yIn-1);
-
-	int xMult=(xIn-1)*(SW*TS);
-	int yMult=(yIn-1)*(SH*TS);
-
-	faction* position=rootFaction;
-	int counter=0;
-	if(intersect(x,y)) return;
-
-	while(position) {
-		if(get_diff(position->centreX, x) < position->radius && get_diff(position->centreY,y) < position->radius) {
-			printf("Spawning entities belonging to faction in position %d\n",counter++);
-			factionSpawn(position, xMult+120, yMult+80);
-		}
-		position=position->next;
-	}
-}*/
 
 void loadSpawn() {
 	for(int x=0; x<3; x++) {
@@ -55,27 +28,9 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	uint32_t screenHash=PAIR(xPos,yPos);
 	screenHash = lfsr(screenHash);
 
-	switch(PAIR(xPos,yPos)) {
-		case PAIR(300,300):
-			memset(&in->screen,1,sizeof in->screen);
-			mapEntitySpawn(ent_door(48,301,300,16,32),xPos,yPos,16,16);
-			mapEntitySpawn(ent_door(48,595,380,16,32),xPos,yPos,64,64);
-			mapEntitySpawn(ent_door(48,607,305,48,64),xPos,yPos,64,128);
-			in->flag=1;
-			return;
-		break;
-		case PAIR(301,300):
-			memset(&in->screen,1,sizeof in->screen);
-			mapEntitySpawn(ent_door(48,300,300,16,32),xPos,yPos,16,16);
-			in->flag=1;
-		break;
-		case PAIR(607,305):
-			memset(&in->screen,1,sizeof in->screen);
-			*in=map_interior();
-			mapEntitySpawn(ent_door(48,300,300,64,144),xPos,yPos,48,80);
-			mapEntitySpawn(ent_npc(),xPos,yPos,48,32);
-			return;
-		break;
+	if(mapLoader[xPos][yPos]) {
+		mapLoader[xPos][yPos](in,xPos,yPos);
+		return;
 	}
 
 	//printf("Difference: %d\n", diff);
@@ -346,4 +301,60 @@ void generateTunnels() {
 		//Goes back to the top of the for loop if a duplicate line is detected.
 		printf("Tunnel %d, m=%d; c=%d\n", i, tunnels[i].m, tunnels[i].c);
 	}
+}
+
+void ax_d1entrance(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1entrance();
+	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,6*TS,4*TS);
+	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,7*TS,4*TS);
+	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,6*TS,5*TS);
+	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,7*TS,5*TS);
+}
+
+void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){
+	memset(&in->screen,1,sizeof in->screen);
+	mapEntitySpawn(ent_door(48,301,300,16,32),xPos,yPos,16,16);
+	mapEntitySpawn(ent_door(48,595,380,16,32),xPos,yPos,64,64);
+	mapEntitySpawn(ent_door(48,607,305,48,64),xPos,yPos,64,128);
+	mapEntitySpawn(ent_door(48,608,310,80,64),xPos,yPos,80,128);
+	in->flag=1;
+}
+
+void ax_testhouse(view* in, unsigned int xPos, unsigned int yPos) {
+	memset(&in->screen,1,sizeof in->screen);
+	*in=map_interior();
+	mapEntitySpawn(ent_door(48,300,300,64,144),xPos,yPos,48,80);
+	mapEntitySpawn(ent_npc(),xPos,yPos,48,32);
+}
+
+void ax_d1rightCorridor1f(view *in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1rightCorridor1f();
+}
+
+void ax_d1topRightCorner1f(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1topRightCorner1f();
+}
+
+void ax_d1bottomRightCorner1f(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1bottomRightCorner1f();
+}
+
+void ax_d1topRightHall1f(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1topRightHall1f();	
+}
+
+void ax_d1bottomRightHall1f(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1bottomRightHall1f();
+}
+
+void axiomLoad(){
+	memset(&mapLoader,0,sizeof mapLoader);
+	mapLoader[300][300]=ax_startPad;
+	mapLoader[607][305]=ax_testhouse;
+	mapLoader[608][310]=ax_d1entrance;
+	mapLoader[608][320]=ax_d1rightCorridor1f;
+	mapLoader[608][319]=ax_d1topRightCorner1f;
+	mapLoader[608][321]=ax_d1bottomRightCorner1f;
+	mapLoader[607][319]=ax_d1topRightHall1f;
+	mapLoader[607][321]=ax_d1bottomRightHall1f;
 }

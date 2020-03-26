@@ -17,14 +17,14 @@
 #include "worldgen.c"
 #include "entityLogic.c"
 
-view offsetBlendMap(view blayer, view tlayer, unsigned int xOff, unsigned int yOff) {
+view offsetBlendMap(view blayer, view tlayer, int xOff, int yOff) {
 	view me;
 	me=blayer;
 	for(int x=0;x<SW;x++){
 		for(int y=0;y<SH;y++) {
-			if(tlayer.screen[x][y] && x+xOff < SW-1 && y+yOff < SH-1) {
+			if(tlayer.screen[x][y] && x+xOff < SW && y+yOff < SH && x+xOff >= 0 && y+yOff >= 0) {
 				me.screen[x+xOff][y+yOff]=tlayer.screen[x][y];
-				me.layers[x+xOff][y+yOff]|=tlayer.layers[x][y];
+				me.layers[x+xOff][y+yOff]=tlayer.layers[x][y];
 			}
 		}
 	}
@@ -101,56 +101,6 @@ void drawClothes(entity* in) {
 	tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,0xFFFFFF);
 }
 
-/*faction* attachFac(faction newFac) { //Adds a new faction to the linked list.
-	faction* position=rootFaction;
-	printf("Attaching faction\n");
-	while(position->next){
-		printf("Counting factions...\n");
-		position=position->next;
-	}
-	position->next=malloc(sizeof newFac);
-	position=position->next;
-	*position=newFac;
-	(*position).next=NULL;
-	return position;
-}
-
-void destroyFac(faction* whigs) {
-	faction* position=rootFaction;
-	while(position) {
-		if(position->next==whigs) {
-			position->next=position->next->next;
-			free(whigs);
-			for(int i=0; i<ELIMIT;i++){
-				if(entSet[i].faction==whigs) entSet[i].faction=NULL;
-			}
-			return;
-		}
-		position=position->next;
-	}	
-}
-
-void facFrag() {
-	printf("Fragging factions...\n");
-	faction* position=rootFaction;
-	while(position){
-		if(get_diff(position->maxAg, position->minAg)>position->aggroThreshold) {
-			printf("A faction is dividing.\n");
-			faction* d1=attachFac(fac_fragment(*position, position->minAg));
-			faction* d2=attachFac(fac_fragment(*position, position->maxAg));
-			for(int i=0; i<ELIMIT; i++) {
-				if(entSet[i].faction=position) {
-					if(entSet[i].alignment<(position->minAg+position->maxAg)/2) entSet[i].faction=d1;
-					else entSet[i].faction=d2;
-				}
-			}
-			faction* parent=position;
-			position=position->next;
-			destroyFac(parent);
-		} else position=position->next;
-	}
-}*/
-
 void entityInitialise() { //Clears entity array, spawns player.
 	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
@@ -199,16 +149,6 @@ void entitySpawn(entity in, int x, int y) {
 		}
 	}
 }
-
-/*void factionSpawn(faction* position,int x,int y) {
-	entitySpawn(position->entPlates[0],x,y);
-	reroll();
-	entSet[lastSlot].faction=position;
-	entSet[lastSlot].alignment=position->baseAlignment+(rng.i32%position->alignmentFuzz); //Sets the entity's alignment to the faction's, accounting for fuzz.
-	entSet[lastSlot].aggroThreshold=position->aggroThreshold;
-	if(entSet[lastSlot].alignment<=position->minAg) entSet[lastSlot].faction->minAg=entSet[lastSlot].alignment;
-	else if(entSet[lastSlot].alignment>position->maxAg) entSet[lastSlot].faction->maxAg=entSet[lastSlot].alignment;
-}*/
 
 void deadEntityKiller() {
 	for (int i=0; i<ELIMIT; i++) {
@@ -820,6 +760,7 @@ int main () {
 	unsigned int timer=0;
 	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
 	entityInitialise(); //Loads the player
+	axiomLoad();//Loads the map function pointer matrix.
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
 	memset(&tilewrapper,0,sizeof tilewrapper);
 	entityInitialise();
