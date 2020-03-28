@@ -95,6 +95,17 @@ view map_d1rightCorridor1f() {
 	return me;
 }
 
+view map_d1atrium() {
+	view me;
+	memset(&me,0,sizeof me);
+	me=blendMap(me,map_box(33,0,0,0,SW,SH));
+	me=blendMap(me,map_box(6,1,0,0,SW,1));
+	me=blendMap(me,map_box(232,1,14,0,1,5));
+	me.screen[14][5]=6;
+	me.layers[14][5]=1;
+	return me;
+}
+
 view map_interior() {
 	printf("Creating interior...");
 	view me={

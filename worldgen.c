@@ -49,6 +49,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		memset(&in->layers,1,sizeof in->layers);
 	} else {
 		memset(in,0,sizeof *in);
+		memset(in->layers,1,sizeof *in);
 	}
 	in->spawnFunc=NULL;
 	in->flag=1;
@@ -347,6 +348,10 @@ void ax_d1bottomRightHall1f(view* in, unsigned int xPos, unsigned int yPos){
 	*in=map_d1bottomRightHall1f();
 }
 
+void ax_d1atrium(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1atrium();
+}
+
 void axiomLoad(){
 	memset(&mapLoader,0,sizeof mapLoader);
 	mapLoader[300][300]=ax_startPad;
@@ -357,4 +362,5 @@ void axiomLoad(){
 	mapLoader[608][321]=ax_d1bottomRightCorner1f;
 	mapLoader[607][319]=ax_d1topRightHall1f;
 	mapLoader[607][321]=ax_d1bottomRightHall1f;
+	mapLoader[606][321]=ax_d1atrium;
 }
