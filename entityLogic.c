@@ -96,11 +96,23 @@ void playerBehaviour(int i) {
 			pushMsg("Stacking\0");
 		}
 		if (keyboard[SDL_SCANCODE_N]) entitySpawn(ent_aitest(), 0,0);
-		if (keyboard[SDL_SCANCODE_J]) {
-			for (int k=0; k<ELIMIT; k++) {
-				printf("%u\n", entSet[k].behaviour);
-			}
+		#ifdef DEV
+		if(keyboard[SDL_SCANCODE_SPACE]) {
+			tilewrapper[1][1].screen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
 		}
+		if(keyboard[SDL_SCANCODE_COMMA]) {
+			tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=1;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		if(keyboard[SDL_SCANCODE_PERIOD]) {
+			tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=1;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		#endif
 		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
 		if (keyboard[SDL_SCANCODE_F1]) printf("Entity 0 at %d,%d\n",entSet[i].x,entSet[i].y);
 		if(keyboard[SDL_SCANCODE_F3]) printf("Screen: %u,%u\n",sX,sY);

@@ -8,6 +8,9 @@
 #include "main.h"
 #include "entities.h"
 #include "entityLogic.h"
+#ifdef DEV
+#include "mapeditor.c"
+#endif
 #include "items.c"
 #include "dialogue.c"
 #include "clothes.c"
@@ -22,9 +25,9 @@ view offsetBlendMap(view blayer, view tlayer, int xOff, int yOff) {
 	me=blayer;
 	for(int x=0;x<SW;x++){
 		for(int y=0;y<SH;y++) {
-			if(tlayer.screen[x][y] && x+xOff < SW && y+yOff < SH && x+xOff >= 0 && y+yOff >= 0) {
-				me.screen[x+xOff][y+yOff]=tlayer.screen[x][y];
-				me.layers[x+xOff][y+yOff]=tlayer.layers[x][y];
+			if(tlayer.screen[y][x] && x+xOff < SW && y+yOff < SH && x+xOff >= 0 && y+yOff >= 0) {
+				me.screen[y+yOff][x+xOff]=tlayer.screen[y][x];
+				me.layers[y+yOff][x+xOff]=tlayer.layers[y][x];
 			}
 		}
 	}
@@ -36,9 +39,9 @@ view blendMap(view blayer, view tlayer) {
 	me=blayer;
 	for(int x=0;x<SW;x++){
 		for(int y=0;y<SH;y++) {
-			if(tlayer.screen[x][y]) {
-				me.screen[x][y]=tlayer.screen[x][y];
-				me.layers[x][y]=tlayer.layers[x][y];
+			if(tlayer.screen[y][x]) {
+				me.screen[y][x]=tlayer.screen[y][x];
+				me.layers[y][x]=tlayer.layers[y][x];
 			}
 		}
 	}
@@ -448,18 +451,6 @@ int intersect(unsigned int x, unsigned int y) {
 	return -1;
 }
 
-void scaleCollision(collisionWrap* out, view* in) { //Leaves a 1 pixel border to allow for slight sprite overlap.
-	for(int x=0;x<SW;x++) {
-		for(int y=0;y<SH;y++) {
-			for(int c=1;c<TS-1;c++) {
-				for(int r=1;r<TS-1;r++) {
-					out->layers[x*TS+c][y*TS+r]=in->layers[x][y];
-				}
-			}
-		}
-	}
-}
-
 void image(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
 	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h}; //Accounts for HUD and camera.
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
@@ -503,7 +494,7 @@ void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) { //For drawing to t
 void bgDraw (view* in) { //Takes a tileset and blits it to the background layer.
 	for (int x=0; x<SW; x++) {
 		for (int y=0; y<SH; y++) {
-			bgBlit(swtileset[in->screen[x][y]],x*TS,y*TS,TS,TS);
+			bgBlit(swtileset[in->screen[y][x]],x*TS,y*TS,TS,TS);
 		}
 	}
 }
@@ -527,6 +518,17 @@ void drawRectAlpha(unsigned int x, unsigned int y, unsigned int w, unsigned int 
 	htmlDecode.htmlCode=colour;
 	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], alpha);
 	SDL_Rect scaler={x,y,w,h};
+	SDL_RenderFillRect(r, &scaler);
+}
+
+void drawRectAlphaTrack(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour, uint8_t alpha) { //Draws filled rectangle
+	union htmlDecode {
+		uint32_t htmlCode;
+		unsigned char rgb[3];
+	} htmlDecode;
+	htmlDecode.htmlCode=colour;
+	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], alpha);
+	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h};
 	SDL_RenderFillRect(r, &scaler);
 }
 
@@ -574,6 +576,10 @@ void flip() { //Updates screen.
 }
 
 char collisionCheck(int x, int y) { //Collision detection between map layer and entity.
+	#ifdef DEV
+	return 0;
+	#endif
+	
 	int wrapperX=(x+TS*SW)/(TS*SW);
 	int wrapperY=(y+TS*SH)/(TS*SH);
 	int microX=(x+TS*SW)%(TS*SW);
@@ -582,7 +588,7 @@ char collisionCheck(int x, int y) { //Collision detection between map layer and 
 	if(wrapperX>2 || wrapperY>2) return 1;
 	//assert(wrapperX<3);
 	if(microX==0 && microY==0 ) return 0;
-	return cwrapper[wrapperX][wrapperY].layers[microX][microY];
+	return tilewrapper[wrapperX][wrapperY].layers[microY/TS][microX/TS];
 	return 0;
 }
 
@@ -641,20 +647,9 @@ void snapToGrid(entity* movEnt) {
 	else (*movEnt).y = ((*movEnt).y/TS)*TS;
 }
 
-void collisionScaler() {
-	memset(&cwrapper,0,sizeof cwrapper);
-	if (collisionReset) {
-		for (int x=0; x<3; x++) {
-			for (int y=0; y<3; y++) {
-				scaleCollision(&cwrapper[x][y],&tilewrapper[x][y]);
-			}
-		}
-	}	
-}
 
 void loop() {
 	if (scroll) scrollMap();
-	if (collisionReset) collisionScaler();
 
 	if (refresh) {		
 		for(int i=1;i<ELIMIT;i++) memset(&entSet[i],0,sizeof entSet[i]);
@@ -662,12 +657,10 @@ void loop() {
 		for (int x=0; x<3; x++) {
 			for (int y=0; y<3; y++) {
 				worldgen(&tilewrapper[x][y],(sX-1)+x,(sY-1)+y);
-				scaleCollision(&cwrapper[x][y],&tilewrapper[x][y]);
 				bgDraw(&tilewrapper[x][y]);
 				bgTex[x][y]=SDL_CreateTextureFromSurface(r, bgLayer);
 			}
 		}
-		collisionScaler();
 		refresh=0;
 	}
 	if (!mode) {
@@ -692,11 +685,18 @@ void loop() {
 
 	//light();
 
+	#ifndef DEV
+	hudRefresh();
+	#endif
+
+	#ifdef DEV
+	drawEditorOverlay();
+	#endif
+
+	flip();
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
 
-	hudRefresh();
-	flip();
 	if(animationG<30) animationG+=2;
 	else animationG=0;
 	
@@ -726,7 +726,6 @@ int main () {
 	tunnels[0].c=0;
 	memset(&tilewrapper, 0, sizeof tilewrapper);
 	memset(&bgTex, 0, sizeof bgTex);
-	memset(&cwrapper,0,sizeof cwrapper);
 	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	lOverlay=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	SDL_SetSurfaceBlendMode(lOverlay,SDL_BLENDMODE_NONE);
@@ -735,6 +734,10 @@ int main () {
 	keyboard = SDL_GetKeyboardState(NULL);
 
 	loader = IMG_Load("sheet.png"); //tilesheet
+
+	#ifdef DEV
+	initMapEditor();
+	#endif
 
 
 	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the

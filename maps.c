@@ -4,8 +4,8 @@ view map_box(unsigned int tile, unsigned char layer, unsigned int xIn, unsigned 
 	for(int x=xIn;x<xIn+w;x++) {
 		for(int y=yIn;y<yIn+h;y++) {
 			if(y<SH && x<SW) {
-				me.screen[x][y]=tile;
-				me.layers[x][y]=layer;
+				me.screen[y][x]=tile;
+				me.layers[y][x]=layer;
 			}
 		}
 	}
@@ -356,7 +356,7 @@ view map_beach(unsigned int xPos, unsigned int yPos) {
 		for(int x=1;x<SW-1;x++) {
 			for(int y=1;y<SH-1;y++) {
 				screenHash=lfsr(screenHash);
-				if(screenHash&BIT(1)&&screenHash&BIT(2)) me.screen[x][y]=11;
+				if(screenHash&BIT(1)&&screenHash&BIT(2)) me.screen[y][x]=11;
 			}
 		}
 	}
@@ -374,12 +374,12 @@ view map_ridge(uint32_t hash, char in) {
 	for(;;x++) {
 		hash=lfsr(hash);
 		if(x>SW-3||hash&BIT(7) && x>3){
-			me.screen[x][0]=157+in;
-			me.layers[x][0]=1;
+			me.screen[0][x]=157+in;
+			me.layers[0][x]=1;
 			break;
 		} else {
-			me.screen[x][0]=156+in;
-			me.layers[x][0]=1;
+			me.screen[0][x]=156+in;
+			me.layers[0][x]=1;
 		}
 	}
 	memset(&blend,0,sizeof blend);
@@ -424,6 +424,7 @@ view map_ruinedhouse() {
 			{0,0,0,0,0,0,0,0,0,0}
 		}
 	};
+	memset(&me,0,sizeof me);
 	return me;
 }
 
@@ -450,7 +451,7 @@ view map_snowgrass(uint16_t xIn, uint16_t yIn) {
 			else me.screen[x][y]=85;
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5)){
 				mapEntitySpawn(ent_wall(134),xIn,yIn,TS*x,TS*y);
-				me.layers[x][y]=1;
+				me.layers[y][x]=1;
 			}
 		}
 	}
@@ -478,9 +479,9 @@ view map_snowlandBase(uint16_t xIn, uint16_t yIn) {
 	for(int x=0;x<SW;x++) {
 		for(int y=0;y<SH;y++) {
 			screenHash=lfsr(screenHash);
-			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[x][y]==85) {
+			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[y][x]==85) {
 				entitySpawn(ent_wall(134),eX+(TS*x),eY+(TS*y));
-				me.layers[x][y]=1;
+				me.layers[y][x]=1;
 			}
 		}
 	}
@@ -498,11 +499,11 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	screenHash=lfsr(screenHash);
 	int eX=(xIn-sX)*(SW*TS);
 	int eY=(yIn-sY)*(SH*TS);
-	printf("Wrapper: %d,%d\n",eX,eY);
+	//printf("Wrapper: %d,%d\n",eX,eY);
 
 	for(int x=0;x<SW;x++){
 		for(int y=0;y<SH;y++) {
-			if(screenHash & BIT(0) && screenHash & BIT(1)) me.screen[x][y]=12;
+			if(screenHash & BIT(0) && screenHash & BIT(1)) me.screen[y][x]=12;
 			screenHash=lfsr(screenHash);
 		}
 	}
@@ -517,7 +518,7 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 		for(int y=0;y<SH;y++) {
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[x][y]==11) {
 				entitySpawn(ent_wall(30),eX+(TS*x),eY+(TS*y));
-				me.layers[x][y]=1;
+				me.layers[y][x]=1;
 			}
 			screenHash=lfsr(screenHash);
 		}

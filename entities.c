@@ -27,6 +27,9 @@ entity ent_playerM() { //Male
 	me.frame[9]=125; //down step2
 	me.frame[10]=133; //left step2
 	me.frame[11]=141; //right step2
+	#ifdef DEV
+	for(int i=0;i<12;i++) me.frame[i]=83;
+	#endif
 	return me;
 }
 

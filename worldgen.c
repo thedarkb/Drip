@@ -27,6 +27,14 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	loadSpawn();
 	uint32_t screenHash=PAIR(xPos,yPos);
 	screenHash = lfsr(screenHash);
+	memset(in,0,sizeof tilewrapper[1][1]);
+
+	#ifdef DEV
+	if(editorArray[xPos][yPos]) {
+		*in=*editorArray[xPos][yPos];
+		return;
+	}
+	#endif
 
 	if(mapLoader[xPos][yPos]) {
 		mapLoader[xPos][yPos](in,xPos,yPos);
@@ -82,14 +90,6 @@ void scrollMap() {
 			tilewrapper[0][1]=tilewrapper[0][0];
 			tilewrapper[1][1]=tilewrapper[1][0];
 			tilewrapper[2][1]=tilewrapper[2][0];
-
-			cwrapper[0][2]=cwrapper[0][1];
-			cwrapper[1][2]=cwrapper[1][1];
-			cwrapper[2][2]=cwrapper[2][1];
-			
-			cwrapper[0][1]=cwrapper[0][0];
-			cwrapper[1][1]=cwrapper[1][0];
-			cwrapper[2][1]=cwrapper[2][0];
 			
 			
 			SDL_DestroyTexture(bgTex[0][2]);
@@ -137,15 +137,6 @@ void scrollMap() {
 			tilewrapper[0][1]=tilewrapper[0][2];
 			tilewrapper[1][1]=tilewrapper[1][2];
 			tilewrapper[2][1]=tilewrapper[2][2];
-
-			cwrapper[0][0]=cwrapper[0][1];
-			cwrapper[1][0]=cwrapper[1][1];
-			cwrapper[2][0]=cwrapper[2][1];
-			
-			cwrapper[0][1]=cwrapper[0][2];
-			cwrapper[1][1]=cwrapper[1][2];
-			cwrapper[2][1]=cwrapper[2][2];
-				
 			
 			SDL_DestroyTexture(bgTex[0][0]);
 			SDL_DestroyTexture(bgTex[1][0]);
@@ -191,13 +182,6 @@ void scrollMap() {
 			tilewrapper[1][1]=tilewrapper[0][1];
 			tilewrapper[1][2]=tilewrapper[0][2];
 
-			cwrapper[2][0]=cwrapper[1][0];
-			cwrapper[2][1]=cwrapper[1][1];
-			cwrapper[2][2]=cwrapper[1][2];
-			
-			cwrapper[1][0]=cwrapper[0][0];
-			cwrapper[1][1]=cwrapper[0][1];
-			cwrapper[1][2]=cwrapper[0][2];
 			
 			
 			SDL_DestroyTexture(bgTex[2][0]);
@@ -243,13 +227,6 @@ void scrollMap() {
 			tilewrapper[1][1]=tilewrapper[2][1];
 			tilewrapper[1][2]=tilewrapper[2][2];
 
-			cwrapper[0][0]=cwrapper[1][0];
-			cwrapper[0][1]=cwrapper[1][1];
-			cwrapper[0][2]=cwrapper[1][2];
-			
-			cwrapper[1][0]=cwrapper[2][0];
-			cwrapper[1][1]=cwrapper[2][1];
-			cwrapper[1][2]=cwrapper[2][2];
 			
 			
 			SDL_DestroyTexture(bgTex[0][0]);

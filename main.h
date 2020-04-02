@@ -106,16 +106,12 @@ typedef struct inventory {
 } inventory;
 
 typedef struct view {
-	unsigned char screen[SW][SH]; //Tile data.
-	unsigned char layers[SW][SH]; //Collision data.
+	unsigned char screen[SH][SW]; //Tile data.
+	unsigned char layers[SH][SW]; //Collision data.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 	void(*spawnFunc)(unsigned int xIn, unsigned int yIn);
 } view;
-
-typedef struct collisionWrap {
-	unsigned char layers[SW*TS][SH*TS];	
-} collisionWrap;
 
 typedef struct location {
 	uint16_t sX;
@@ -144,7 +140,6 @@ view cornerRoom;
 unsigned char speaker; //Holds entity number which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
-collisionWrap cwrapper[3][3]; //Holds the corresponding collision data
 void(*mapLoader[705][610])(view* in, unsigned int xPos, unsigned int yPos);
 
 uint16_t flags=0;
@@ -221,7 +216,6 @@ int intersect(unsigned int x, unsigned int y);
 void generateTunnels();
 int32_t getrandom();
 void setCollision(view* in, int iX, int iY, char stat);
-void scaleCollision(collisionWrap* out, view* in);
 void worldgen(view* in, uint16_t xPos, uint16_t yPos);
 void scrollMap();
 void image(SDL_Texture* imgIn, int x, int y, int w, int h);
@@ -231,6 +225,7 @@ void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
 void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
 void drawRectAlpha(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour, uint8_t alpha);
+void drawRectAlphaTrack(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour, uint8_t alpha);
 void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
 void hudRefresh();
 void flip();
