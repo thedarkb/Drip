@@ -208,6 +208,7 @@ void deadEntityKiller();
 void corpseDisposal();
 //void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
+void text(char* inStr, int x, int y);
 void menu();
 void pushMsg(char* inStr);
 unsigned int get_diff (int val1, int val2);
