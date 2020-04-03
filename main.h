@@ -51,9 +51,6 @@ SDL_Surface* swtileset[TILECOUNT];
 SDL_Texture* hwtileset[TILECOUNT];
 SDL_Surface* font[128];
 SDL_Texture* hwfont[128];
-SDL_Surface* bgLayer=NULL;
-SDL_Texture* bgTex[3][3];
-SDL_Surface* scrollLayer = NULL;
 
 //typedef struct faction faction;
 
@@ -108,6 +105,8 @@ typedef struct inventory {
 typedef struct view {
 	unsigned char screen[SH][SW]; //Tile data.
 	unsigned char layers[SH][SW]; //Collision data.
+	unsigned char tScreen[SH][SW];
+	unsigned char top;
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 } view;

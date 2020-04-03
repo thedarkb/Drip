@@ -451,6 +451,11 @@ int intersect(unsigned int x, unsigned int y) {
 	return -1;
 }
 
+void imageNoTrack(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
+	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h}; //Accounts for HUD but NOT the camera.
+	SDL_RenderCopy(r, imgIn, NULL, &scaler);
+}
+
 void image(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
 	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h}; //Accounts for HUD and camera.
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
@@ -488,7 +493,7 @@ void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h) { //For drawing to 
 
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) { //For drawing to the background layer.
 	SDL_Rect scaler = {x,y,w,h};
-	SDL_BlitSurface(imgIn, NULL, bgLayer, &scaler);
+	//SDL_BlitSurface(imgIn, NULL, bgLayer, &scaler);
 }
 
 void bgDraw (view* in) { //Takes a tileset and blits it to the background layer.
@@ -600,13 +605,14 @@ void moveX(entity* movEnt, short amount) { //Pretty self explanatory
 	if (movEnt->animation > 8) movEnt->animation=8;
 
 	unsigned int check = (*movEnt).x + amount;
+	unsigned int checkY=movEnt->y+TS/2-movEnt->ySub;
 	//if (check >TS*SW-TS) return;
-	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return; //Checks all the corners, plus a bit in the middle.
-	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+TS/2)) return;
-	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+(*movEnt).ySub)) return;
-	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+TS/2)) return;
-	if (collisionCheck(check+TS-(*movEnt).xSub, (*movEnt).y+TS-(*movEnt).ySub)) return;
-	if (collisionCheck(check+(*movEnt).xSub, (*movEnt).y+TS-(*movEnt).ySub)) return;
+	if (collisionCheck(check+(*movEnt).xSub, checkY+TS/8)) return; //Checks all the corners, plus a bit in the middle.
+	if (collisionCheck(check+(*movEnt).xSub, checkY+TS/2)) return;
+	if (collisionCheck(check+TS-(*movEnt).xSub, checkY+TS/8)) return;
+	if (collisionCheck(check+TS-(*movEnt).xSub, checkY+TS/2)) return;
+	if (collisionCheck(check+TS-(*movEnt).xSub, checkY+TS/2-(*movEnt).ySub)) return;
+	if (collisionCheck(check+(*movEnt).xSub, checkY+TS/2-(*movEnt).ySub)) return;
 	(*movEnt).x = check;
 }
 
@@ -617,15 +623,16 @@ void moveY(entity* movEnt, short amount) {
 	movEnt->animation = ((animationG/15)*4)+4;
 	if (movEnt->animation > 8) movEnt->animation=8;
 
-	unsigned int check = (*movEnt).y + amount;
+	unsigned int check = (*movEnt).y+amount+TS/2;
+	unsigned int checkY=movEnt->y+TS/2;
 
 	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+(*movEnt).ySub)) return;
 	if (collisionCheck((*movEnt).x+TS/2, check+(*movEnt).ySub)) return;
-	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+TS-(*movEnt).ySub)) return;
-	if (collisionCheck((*movEnt).x+TS/2, check+TS-(*movEnt).ySub)) return;	
-	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+TS-(*movEnt).ySub)) return;	
-	(*movEnt).y = check;
+	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+TS/2-(*movEnt).ySub)) return;
+	if (collisionCheck((*movEnt).x+TS/2, check+TS/2-(*movEnt).ySub)) return;	
+	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+TS/2-(*movEnt).ySub)) return;	
+	(*movEnt).y = check-TS/2;
 }
 
 void fastMoveX(entity* movEnt, short direction, short speed) { //Use these for high speed movement to prevent clipping.
@@ -658,27 +665,47 @@ void loop() {
 			for (int y=0; y<3; y++) {
 				worldgen(&tilewrapper[x][y],(sX-1)+x,(sY-1)+y);
 				bgDraw(&tilewrapper[x][y]);
-				bgTex[x][y]=SDL_CreateTextureFromSurface(r, bgLayer);
 			}
 		}
 		refresh=0;
 	}
+
 	if (!mode) {
-		image(bgTex[0][0],-SW*TS,-SH*TS,SW*TS,SH*TS);
-		image(bgTex[1][0],0,-SH*TS,SW*TS,SH*TS);
-		image(bgTex[2][0],SW*TS,-SH*TS,SW*TS,SH*TS);
-
-		image(bgTex[0][1],-SW*TS,0,SW*TS,SH*TS);
-		image(bgTex[1][1],0,0,SW*TS,SH*TS);
-		image(bgTex[2][1],SW*TS,0,SW*TS,SH*TS);
-
-		image(bgTex[0][2],-SW*TS,SH*TS,SW*TS,SH*TS);
-		image(bgTex[1][2],0,SH*TS,SW*TS,SH*TS);
-		image(bgTex[2][2],SW*TS,SH*TS,SW*TS,SH*TS);
+		int offsetX=(TS*SW)/2-cameraX;
+		int offsetY=(TS*SH)/2-cameraY;
+		for(int wx=0;wx<3;wx++){
+			int worldX=(wx*SW*TS-SW*TS);
+			for(int wy=0;wy<3;wy++) {
+				int worldY=(wy*SH*TS-SH*TS);
+				for(int x=0;x<SW;x++) {
+					for(int y=0;y<SH;y++) {
+						int writeX=(x*TS)+worldX+offsetX;
+						int writeY=(y*TS)+worldY+offsetY;
+						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS)
+							imageNoTrack(hwtileset[tilewrapper[wx][wy].screen[y][x]],writeX,writeY,TS,TS);
+					}
+				}
+			}
+		}
 
 		deadEntityKiller();
 		spriteCollisions();
 		entityLogic();
+
+		for(int wx=0;wx<3;wx++){
+			int worldX=(wx*SW*TS-SW*TS);
+			for(int wy=0;wy<3;wy++) {
+				int worldY=(wy*SH*TS-SH*TS);
+				for(int x=0;x<SW;x++) {
+					for(int y=0;y<SH;y++) {
+						int writeX=(x*TS)+worldX+offsetX;
+						int writeY=(y*TS)+worldY+offsetY;
+						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS && tilewrapper[wx][wy].tScreen[y][x])
+							imageNoTrack(hwtileset[tilewrapper[wx][wy].tScreen[y][x]],writeX,writeY,TS,TS);
+					}
+				}
+			}
+		}
 	} else if (mode==1) popMsg();
 	else if (menuFlag) menu();
 	else mode=0;
@@ -701,6 +728,7 @@ void loop() {
 	else animationG=0;
 	
 	frameTotal++;
+	//assert(frameTotal<3000);
 }
 
 int main () {
@@ -721,16 +749,12 @@ int main () {
 	SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_BLEND);
 	s = SDL_GetWindowSurface(w);
 	rng.ui32=4; //SEEDS THE MAIN RNG
-	generateTunnels();
 	//initialiseFactions();
 	tunnels[0].m=1;
 	tunnels[0].c=0;
 	memset(&tilewrapper, 0, sizeof tilewrapper);
-	memset(&bgTex, 0, sizeof bgTex);
-	bgLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	lOverlay=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 	SDL_SetSurfaceBlendMode(lOverlay,SDL_BLENDMODE_NONE);
-	scrollLayer=SDL_CreateRGBSurface(0,SW*TS,SH*TS,32,0,0,0,0);
 
 	keyboard = SDL_GetKeyboardState(NULL);
 

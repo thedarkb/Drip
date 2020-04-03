@@ -125,6 +125,8 @@ view map_beach(unsigned int xPos, unsigned int yPos) {
 	memset(&me,0,sizeof me);
 	memset(&me.screen,10,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xPos<<16;
 	screenHash |= yPos;
@@ -219,6 +221,7 @@ view map_ruinedhouse() {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 		}
 	};
+	memset(&me.tScreen,0,sizeof me.tScreen);
 	return me;
 }
 
@@ -230,6 +233,8 @@ view map_snowgrass(uint16_t xIn, uint16_t yIn) {
 	view me;
 	memset(&me.screen,85,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xIn<<16;
 	screenHash |= yIn;
@@ -256,6 +261,8 @@ view map_snowlandBase(uint16_t xIn, uint16_t yIn) {
 	view me;
 	memset(&me.screen,85,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xIn<<16;
 	screenHash |= yIn;
@@ -286,6 +293,8 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	view me;
 	memset(&me.screen,11,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xIn<<16;
 	screenHash |= yIn;
@@ -320,21 +329,5 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 }
 
 view map_burren(uint16_t xIn, uint16_t yIn) {
-	/*view me;
-	memset(&me.screen,15,sizeof me.screen);
-	memset(&me.layers,0,sizeof me.layers);
-	uint32_t screenHash=0;
-	screenHash |= xIn<<16;
-	screenHash |= yIn;
-	screenHash=lfsr(screenHash);
-	for(int x=0;x<SW;x++){
-		for(int y=0;y<SH;y++){
-			screenHash=lfsr(screenHash);
-			if(screenHash&BIT(0)){
-				me.screen[x][y]=
-			}
-		}
-	}
-	return me;*/
 	return map_grasslandBase(xIn,yIn);
 }

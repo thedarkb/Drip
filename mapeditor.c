@@ -22,7 +22,7 @@ void editorMapExport() {
 	sprintf(filename,"%s.c",structName);
 	fileOut=fopen(filename, "w");
 
-	fprintf(fileOut, "view %s={\n", structName);
+	fprintf(fileOut, "const view %s={\n", structName);
 	fprintf(fileOut,"	{\n");
 	for(int y=0;y<SH;y++){
 		fprintf(fileOut,"		{");
@@ -43,8 +43,18 @@ void editorMapExport() {
 		if(y!=SH-1) fprintf(fileOut,"},\n");
 		else fprintf(fileOut,"}\n");
 	}
+	fprintf(fileOut,"	},\n	{\n");
+	for(int y=0;y<SH;y++){
+		fprintf(fileOut,"		{");
+		for(int x=0;x<SW;x++){
+			if(x!=SW-1)fprintf(fileOut,"%u,",(*editorArray[sX][sY]).tScreen[y][x]);
+			else fprintf(fileOut,"%u",(*editorArray[sX][sY]).tScreen[y][x]);
+		}
+		if(y!=SH-1) fprintf(fileOut,"},\n");
+		else fprintf(fileOut,"}\n");
+	}
 	fprintf(fileOut,"	}\n");	
-	fprintf(fileOut,"}");
+	fprintf(fileOut,"};");
 	fclose(fileOut);
 }
 
@@ -81,6 +91,9 @@ void drawEditorOverlay(){
 	}
 
 	drawRect(0,0,SW*TS,TS*2,0);
+	cameraX=entSet[0].x;
+	cameraY=entSet[0].y;
+	emptyRect(entSet[0].x+(TS*SW)/2-cameraX,entSet[0].y+4+TS+(TS*SH)/2-cameraY,TS,TS,0xFF0000);
 
 	char editorText[255];
 	sprintf(editorText,"Tile ID: %u\nGrid Position: %u,%u\n",mapEditorTile,sX,sY);
