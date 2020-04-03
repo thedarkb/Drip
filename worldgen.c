@@ -59,7 +59,6 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		memset(in,0,sizeof *in);
 		memset(in->layers,1,sizeof *in);
 	}
-	in->spawnFunc=NULL;
 	in->flag=1;
 }
 

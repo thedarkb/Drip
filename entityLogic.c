@@ -108,7 +108,12 @@ void playerBehaviour(int i) {
 			refresh=1;
 		}
 		if(keyboard[SDL_SCANCODE_PERIOD]) {
-			tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=1;
+			tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=0;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		if(keyboard[SDL_SCANCODE_F10]) {
+			memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
 			mapEditorShim(&tilewrapper[1][1],sX,sY);
 			refresh=1;
 		}

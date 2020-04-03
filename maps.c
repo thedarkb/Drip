@@ -485,7 +485,6 @@ view map_snowlandBase(uint16_t xIn, uint16_t yIn) {
 			}
 		}
 	}
-	me.spawnFunc=NULL;
 	return me;
 }
 
@@ -523,7 +522,6 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 			screenHash=lfsr(screenHash);
 		}
 	}
-	me.spawnFunc=NULL;
 	return me;
 }
 

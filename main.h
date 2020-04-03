@@ -110,7 +110,6 @@ typedef struct view {
 	unsigned char layers[SH][SW]; //Collision data.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
-	void(*spawnFunc)(unsigned int xIn, unsigned int yIn);
 } view;
 
 typedef struct location {
