@@ -280,14 +280,6 @@ void generateTunnels() {
 	}
 }
 
-void ax_d1entrance(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1entrance();
-	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,6*TS,4*TS);
-	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,7*TS,4*TS);
-	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,6*TS,5*TS);
-	mapEntitySpawn(ent_door(18,608,320,120,80),xPos,yPos,7*TS,5*TS);
-}
-
 void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){
 	memset(&in->screen,1,sizeof in->screen);
 	mapEntitySpawn(ent_door(48,301,300,16,32),xPos,yPos,16,16);
@@ -304,39 +296,8 @@ void ax_testhouse(view* in, unsigned int xPos, unsigned int yPos) {
 	mapEntitySpawn(ent_npc(),xPos,yPos,48,32);
 }
 
-void ax_d1rightCorridor1f(view *in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1rightCorridor1f();
-}
-
-void ax_d1topRightCorner1f(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1topRightCorner1f();
-}
-
-void ax_d1bottomRightCorner1f(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1bottomRightCorner1f();
-}
-
-void ax_d1topRightHall1f(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1topRightHall1f();	
-}
-
-void ax_d1bottomRightHall1f(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1bottomRightHall1f();
-}
-
-void ax_d1atrium(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1atrium();
-}
-
 void axiomLoad(){
 	memset(&mapLoader,0,sizeof mapLoader);
 	mapLoader[300][300]=ax_startPad;
 	mapLoader[607][305]=ax_testhouse;
-	mapLoader[608][310]=ax_d1entrance;
-	mapLoader[608][320]=ax_d1rightCorridor1f;
-	mapLoader[608][319]=ax_d1topRightCorner1f;
-	mapLoader[608][321]=ax_d1bottomRightCorner1f;
-	mapLoader[607][319]=ax_d1topRightHall1f;
-	mapLoader[607][321]=ax_d1bottomRightHall1f;
-	mapLoader[606][321]=ax_d1atrium;
 }

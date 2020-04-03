@@ -12,100 +12,6 @@ view map_box(unsigned int tile, unsigned char layer, unsigned int xIn, unsigned 
 	return me;
 }
 
-view map_vHall(unsigned int floor, unsigned int sWall) {
-	view me;
-	memset(&me,0,sizeof me);
-	me=blendMap(me,map_box(floor,0,1,0,3,SH));
-	me=blendMap(me,map_box(sWall,1,0,0,1,SH));
-	me=blendMap(me,map_box(sWall,1,4,0,1,SH));
-
-	return me;
-}
-
-view map_hHall(unsigned int floor, unsigned int sWall) {
-	view me;
-	memset(&me,0,sizeof me);
-	me=blendMap(me,map_box(floor,0,0,1,SW,3));
-	me=blendMap(me,map_box(sWall,1,0,0,SW,1));
-	me=blendMap(me,map_box(232,1,0,4,SW,1));
-
-	return me;
-}
-
-view map_d1entrance() {
-	view me;
-	memset(&me,0,sizeof me);
-	me=blendMap(me,map_box(16,0,5,3,4,4));
-	me=blendMap(me,map_box(232,0,6,4,2,2));
-
-	me=blendMap(me,map_box(5,1,4,2,1,6));
-	me=blendMap(me,map_box(5,1,9,2,1,6));
-	me=blendMap(me,map_box(6,1,5,2,4,1));
-	me=blendMap(me,map_box(6,1,5,7,4,1));
-	return me;
-}
-
-view map_d1topRightHall1f() {
-	view me;
-	memset(&me,0,sizeof me);
-	me=blendMap(me,map_hHall(33,6));
-	return me;
-}
-
-view map_d1topRightCorner1f() {
-	view me;
-	memset(&me,0,sizeof me);
-	me=offsetBlendMap(me,map_hHall(33,6),-6,0);
-	me=offsetBlendMap(me,map_vHall(33,232),5,4);
-	me=blendMap(me,map_box(232,1,9,1,1,3));
-	return me;
-}
-
-view map_d1bottomRightCorner1f() {
-	view me;
-	memset(&me,0,sizeof me);
-	me=offsetBlendMap(me,map_hHall(33,6),-6,5);
-	me=offsetBlendMap(me,map_vHall(33,232),5,-5);
-	me=blendMap(me,map_box(33,0,6,5,3,1));
-	me=blendMap(me,map_box(232,1,9,5,1,5));
-	return me;
-}
-
-view map_d1bottomRightHall1f() {
-	view me;
-	memset(&me,0,sizeof me);
-	me=offsetBlendMap(me,map_hHall(33,6),0,5);
-	return me;
-}
-
-view map_d1rightCorridor1f() {
-	view me;
-	memset(&me,0,sizeof me);
-	me=offsetBlendMap(me,map_vHall(33,232),5,0);
-
-	me=blendMap(me,map_box(5,1,9,3,1,2));
-	me=blendMap(me,map_box(5,1,9,6,1,1));
-	me=blendMap(me,map_box(232,1,9,7,4,1));
-	me=blendMap(me,map_box(6,1,10,3,3,1));
-	me=blendMap(me,map_box(5,1,13,3,1,4));
-	me=blendMap(me,map_box(33,0,10,4,3,3));
-	me.screen[9][5]=33;
-	me.layers[9][5]=0;
-
-	return me;
-}
-
-view map_d1atrium() {
-	view me;
-	memset(&me,0,sizeof me);
-	me=blendMap(me,map_box(33,0,0,0,SW,SH));
-	me=blendMap(me,map_box(6,1,0,0,SW,1));
-	me=blendMap(me,map_box(232,1,14,0,1,5));
-	me.screen[14][5]=6;
-	me.layers[14][5]=1;
-	return me;
-}
-
 view map_interior() {
 	printf("Creating interior...");
 	view me={
@@ -144,7 +50,7 @@ view map_interior() {
 			{1,1,1,1,1,1,1,1,1,1}
 		}
 	};
-	return map_d1entrance();
+	return me;
 }
 
 view map_beachbottom() {
@@ -390,41 +296,30 @@ view map_ridge(uint32_t hash, char in) {
 view map_ruinedhouse() {
 	view me={
 		{
-			{62,62,62,2,0,0,0,0,0,0},
-			{2,44,43,2,0,0,0,0,0,0},
-			{2,43,43,2,0,0,0,0,0,0},
-			{2,0,0,0,0,0,0,0,0,0},
-			{2,43,0,62,0,0,0,0,0,0},
-			{2,0,0,62,0,0,0,0,0,0},
-			{2,62,62,62,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0}
+			{5,6,6,62,62,6,7,0,0,0,0,0,0,0,0},
+			{5,15,0,0,15,0,62,0,0,0,0,0,0,0,0},
+			{5,0,0,15,0,0,62,0,0,0,0,0,0,0,0},
+			{6,6,6,8,6,62,62,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 		},
 		{
-			{0,0,0,1,0,0,0,0,0,0},
-			{1,0,0,1,0,0,0,0,0,0},
-			{1,0,0,1,0,0,0,0,0,0},
-			{1,0,0,0,0,0,0,0,0,0},
-			{1,0,0,0,0,0,0,0,0,0},
-			{1,0,0,0,0,0,0,0,0,0},
-			{1,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0}
+			{1,1,1,0,0,1,1,0,0,0,0,0,0,0,0},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{1,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{1,1,1,0,1,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 		}
 	};
-	memset(&me,0,sizeof me);
 	return me;
 }
 

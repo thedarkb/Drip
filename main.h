@@ -220,6 +220,7 @@ void scrollMap();
 void image(SDL_Texture* imgIn, int x, int y, int w, int h);
 void tintedImage(SDL_Texture* imgIn, int x, int y, int w, int h, uint32_t colour);
 void simage(SDL_Surface* imgIn, int x, int y, int w, int h);
+void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h);
 void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h);
 void bgDraw ();
 void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour);
