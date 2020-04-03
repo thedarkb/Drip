@@ -51,9 +51,6 @@ SDL_Surface* swtileset[TILECOUNT];
 SDL_Texture* hwtileset[TILECOUNT];
 SDL_Surface* font[128];
 SDL_Texture* hwfont[128];
-SDL_Surface* bgLayer=NULL;
-SDL_Texture* bgTex[3][3];
-SDL_Surface* scrollLayer = NULL;
 
 //typedef struct faction faction;
 
@@ -108,6 +105,8 @@ typedef struct inventory {
 typedef struct view {
 	unsigned char screen[SH][SW]; //Tile data.
 	unsigned char layers[SH][SW]; //Collision data.
+	unsigned char tScreen[SH][SW];
+	unsigned char top;
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 } view;
@@ -213,6 +212,7 @@ void deadEntityKiller();
 void corpseDisposal();
 //void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
+void text(char* inStr, int x, int y);
 void menu();
 void pushMsg(char* inStr);
 unsigned int get_diff (int val1, int val2);

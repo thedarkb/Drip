@@ -12,72 +12,121 @@ view map_box(unsigned int tile, unsigned char layer, unsigned int xIn, unsigned 
 	return me;
 }
 
-view map_interior() {
-	printf("Creating interior...");
-	view me={
-		{
-			{5,5,5,5,5,6,0,0,0,0},
-			{6,16,16,16,16,6,0,0,0,0},
-			{6,16,16,16,16,6,0,0,0,0},
-			{6,16,16,16,16,16,0,0,0,0},
-			{6,16,16,16,16,6,0,0,0,0},
-			{6,16,16,16,16,6,0,0,0,0},
-			{5,5,5,5,5,6,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0}
-		},
-		{
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,0,0,0,0,1,1,1,1,1},
-			{1,0,0,0,0,1,1,1,1,1},
-			{1,0,0,0,0,0,1,1,1,1},
-			{1,0,0,0,0,1,1,1,1,1},
-			{1,0,0,0,0,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1},
-			{1,1,1,1,1,1,1,1,1,1}
-		}
-	};
-	return me;
-}
+const view map_beachbottom={
+	{
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{29,29,29,29,29,29,29,29,29,29,29,29,29,29,29}
+	},
+	{
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	}
+};
 
-view map_beachbottom() {
-	view me=emptyView;
-	return me;
-}
+const view map_beachtop={
+	{
+		{37,37,37,37,37,37,37,37,37,37,37,37,37,37,37},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	},
+	{
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	}
+};
 
-view map_beachtop() {
-	view me=emptyView;
-	return me;
-}
+const view map_beachleft={
+	{
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{71,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	},
+	{
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	}
+};
 
-view map_beachleft() {
-	view me=emptyView;
-	return me;
-}
-
-view map_beachright() {
-	view me=emptyView;
-	return me;
-}
+const view map_beachright={
+	{
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,110}
+	},
+	{
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+		{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
+	}
+};
 
 view map_beach(unsigned int xPos, unsigned int yPos) {
 	view me;
 	memset(&me,0,sizeof me);
 	memset(&me.screen,10,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xPos<<16;
 	screenHash |= yPos;
@@ -86,19 +135,19 @@ view map_beach(unsigned int xPos, unsigned int yPos) {
 	char left=0;
 	char right=0;
 	if(DIST(xPos,yPos-1,400,400)>40804){
-		me=blendMap(me,map_beachbottom());
+		me=blendMap(me,map_beachbottom);
 		down=1;
 	}
 	if(DIST(xPos,yPos+1,400,400)>40804) {
-		me=blendMap(me,map_beachtop());
+		me=blendMap(me,map_beachtop);
 		up=1;
 	}
 	if(DIST(xPos-1,yPos,400,400)>40804) {
-		me=blendMap(me,map_beachright());
+		me=blendMap(me,map_beachright);
 		right=1;
 	}
 	if(DIST(xPos+1,yPos,400,400)>40804) {
-		me=blendMap(me,map_beachleft());
+		me=blendMap(me,map_beachleft);
 		left=1;
 	}
 	if(up||left||down||right) {
@@ -172,6 +221,7 @@ view map_ruinedhouse() {
 			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
 		}
 	};
+	memset(&me.tScreen,0,sizeof me.tScreen);
 	return me;
 }
 
@@ -183,6 +233,8 @@ view map_snowgrass(uint16_t xIn, uint16_t yIn) {
 	view me;
 	memset(&me.screen,85,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xIn<<16;
 	screenHash |= yIn;
@@ -193,9 +245,9 @@ view map_snowgrass(uint16_t xIn, uint16_t yIn) {
 	for(int x=0;x<SW;x++) {
 		for(int y=0;y<SH;y++) {
 			screenHash=lfsr(screenHash);
-			if(screenHash&BIT(0)) me.screen[x][y]=11;
-			else if(screenHash&BIT(1)) me.screen[x][y]=82;
-			else me.screen[x][y]=85;
+			if(screenHash&BIT(0)) me.screen[y][x]=11;
+			else if(screenHash&BIT(1)) me.screen[y][x]=82;
+			else me.screen[y][x]=85;
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5)){
 				mapEntitySpawn(ent_wall(134),xIn,yIn,TS*x,TS*y);
 				me.layers[y][x]=1;
@@ -209,6 +261,8 @@ view map_snowlandBase(uint16_t xIn, uint16_t yIn) {
 	view me;
 	memset(&me.screen,85,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xIn<<16;
 	screenHash |= yIn;
@@ -239,6 +293,8 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	view me;
 	memset(&me.screen,11,sizeof me.screen);
 	memset(&me.layers,0,sizeof me.layers);
+	memset(&me.tScreen,0,sizeof me.tScreen);
+
 	uint32_t screenHash=0;
 	screenHash |= xIn<<16;
 	screenHash |= yIn;
@@ -262,7 +318,7 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	}
 	for(int x=0;x<SW;x++) {
 		for(int y=0;y<SH;y++) {
-			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[x][y]==11) {
+			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[y][x]==11) {
 				entitySpawn(ent_wall(30),eX+(TS*x),eY+(TS*y));
 				me.layers[y][x]=1;
 			}
@@ -273,21 +329,5 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 }
 
 view map_burren(uint16_t xIn, uint16_t yIn) {
-	/*view me;
-	memset(&me.screen,15,sizeof me.screen);
-	memset(&me.layers,0,sizeof me.layers);
-	uint32_t screenHash=0;
-	screenHash |= xIn<<16;
-	screenHash |= yIn;
-	screenHash=lfsr(screenHash);
-	for(int x=0;x<SW;x++){
-		for(int y=0;y<SH;y++){
-			screenHash=lfsr(screenHash);
-			if(screenHash&BIT(0)){
-				me.screen[x][y]=
-			}
-		}
-	}
-	return me;*/
 	return map_grasslandBase(xIn,yIn);
 }

@@ -96,9 +96,15 @@ void playerBehaviour(int i) {
 			pushMsg("Stacking\0");
 		}
 		if (keyboard[SDL_SCANCODE_N]) entitySpawn(ent_aitest(), 0,0);
+
 		#ifdef DEV
 		if(keyboard[SDL_SCANCODE_SPACE]) {
 			tilewrapper[1][1].screen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		if(keyboard[SDL_SCANCODE_RETURN]) {
+			tilewrapper[1][1].tScreen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
 			mapEditorShim(&tilewrapper[1][1],sX,sY);
 			refresh=1;
 		}
@@ -118,6 +124,7 @@ void playerBehaviour(int i) {
 			refresh=1;
 		}
 		#endif
+
 		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
 		if (keyboard[SDL_SCANCODE_F1]) printf("Entity 0 at %d,%d\n",entSet[i].x,entSet[i].y);
 		if(keyboard[SDL_SCANCODE_F3]) printf("Screen: %u,%u\n",sX,sY);
