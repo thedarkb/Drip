@@ -704,6 +704,7 @@ void loop() {
 }
 
 int main () {
+	memset(&emptyView,0,sizeof emptyView);
 	SDL_Init(SDL_INIT_VIDEO);
 	#ifdef WEB
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*2, (SH*TS+HUDHEIGHT)*2, SDL_WINDOW_OPENGL);

@@ -141,6 +141,8 @@ unsigned char speaker; //Holds entity number which started conversation.
 view tilewrapper[3][3]; //Holds all of the visible view structs
 void(*mapLoader[705][610])(view* in, unsigned int xPos, unsigned int yPos);
 
+view emptyView;
+
 uint16_t flags=0;
 
 unsigned char lastSlot=0;
