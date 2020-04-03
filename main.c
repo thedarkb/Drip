@@ -577,7 +577,7 @@ void flip() { //Updates screen.
 
 char collisionCheck(int x, int y) { //Collision detection between map layer and entity.
 	#ifdef DEV
-	return 0;
+	if(mapEditorEnable)return 0;
 	#endif
 	
 	int wrapperX=(x+TS*SW)/(TS*SW);
@@ -690,7 +690,8 @@ void loop() {
 	#endif
 
 	#ifdef DEV
-	drawEditorOverlay();
+	if(mapEditorEnable)drawEditorOverlay();
+	else hudRefresh();
 	#endif
 
 	flip();

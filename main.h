@@ -167,6 +167,11 @@ unsigned int msgTimeout=0;
 
 unsigned char refresh=1;
 
+#ifdef DEV
+char mapEditorEnable=0;
+#endif
+
+
 char* menuText;
 char mode=0;
 char menuFlag=0;
