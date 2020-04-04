@@ -76,7 +76,7 @@ typedef struct entity {
 	unsigned char collisionClass; //Collision classes above 128 are not themselves susceptible to collisions.
 	unsigned char layer; //Where they are in the sprite stack.
 	unsigned char attack; //RPG style attack stat.
-	unsigned int status[4]; //General purpose entity specific variables.
+	int status[4]; //General purpose entity specific variables.
 	uint16_t health;
 	unsigned int frame[FLIMIT]; //Array of animation frames.
 	unsigned char setframe; //Current frame
@@ -146,8 +146,8 @@ uint16_t flags=0;
 
 unsigned char lastSlot=0;
 
-uint16_t sX = 300; //View struct currently occupied by the player.
-uint16_t sY = 300; //^
+unsigned int sX = 300; //View struct currently occupied by the player.
+unsigned int sY = 300; //^
 unsigned char scroll = 0; //Triggers a screen transition on the next frame.
 
 unsigned char pMaxHealth=100;

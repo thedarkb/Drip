@@ -27,9 +27,6 @@ entity ent_playerM() { //Male
 	me.frame[9]=125; //down step2
 	me.frame[10]=133; //left step2
 	me.frame[11]=141; //right step2
-	#ifdef DEV
-	for(int i=0;i<12;i++) me.frame[i]=83;
-	#endif
 	return me;
 }
 
@@ -427,11 +424,12 @@ entity ent_npc() {
 	return me;
 }
 
-entity ent_door(unsigned char tile, uint16_t destSx, uint16_t destSy, int destX, int destY) {
+entity ent_door(unsigned char tile, unsigned int destSx, unsigned int destSy, int destX, int destY) {
 	entity me;
 	memset(&me,0,sizeof me);
 	me.collisionClass=132;
 	me.health=255;
+	printf("Creating door with tile %u, destination sX %u, destination sY %u, destX %d, destY %d\n",tile,destSx,destSy,destX,destY);
 	me.frame[0]=tile;
 	me.status[0]=destSx;
 	me.status[1]=destSy;
@@ -439,7 +437,7 @@ entity ent_door(unsigned char tile, uint16_t destSx, uint16_t destSy, int destX,
 	me.status[3]=destY;
 	me.xSub=10;
 	me.ySub=10;
-	me.behaviour=behav_wall;
+	me.behaviour=behav_door;
 	return me;
 }
 

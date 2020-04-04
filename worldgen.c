@@ -154,12 +154,44 @@ void scrollMap() {
 	}
 }
 
+void ax_d1rcorridor(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1rcorridor;
+}
+
+void ax_d1lcorridor(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1leftcorridor;
+}
+
+void ax_d1puzzleroom(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1puzzleroom;
+}
+
+void ax_d1blc(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1blc;
+}
+
+void ax_d1brc(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1brc;
+}
+
+void ax_d1tlc(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1tlc;
+}
+
+void ax_d1trc(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1trc;
+}
+
+void ax_d1topcorridor(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1topcorridor;
+}
+
 void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){
 	memset(&in->screen,1,sizeof in->screen);
 	mapEntitySpawn(ent_door(48,301,300,16,32),xPos,yPos,16,16);
 	mapEntitySpawn(ent_door(48,595,380,16,32),xPos,yPos,64,64);
 	mapEntitySpawn(ent_door(48,607,305,48,64),xPos,yPos,64,128);
-	mapEntitySpawn(ent_door(48,608,310,80,64),xPos,yPos,80,128);
+	mapEntitySpawn(ent_door(48,614,313,TS,TS),xPos,yPos,96,128);
 	in->flag=1;
 }
 
@@ -208,8 +240,27 @@ void ax_testhouse(view* in, unsigned int xPos, unsigned int yPos) {
 	mapEntitySpawn(ent_npc(),xPos,yPos,48,32);
 }
 
+void ax_entryroom(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_entryroom;
+	mapEntitySpawn(ent_door(0,614,310,200,80),xPos,yPos,TS*2,TS*2);
+}
+
 void axiomLoad(){
 	memset(&mapLoader,0,sizeof mapLoader);
 	mapLoader[300][300]=ax_startPad;
 	mapLoader[607][305]=ax_testhouse;
+	mapLoader[614][313]=ax_entryroom;
+
+	//Dungeon 1
+	mapLoader[612][311]=ax_d1blc;
+	mapLoader[613][311]=ax_d1puzzleroom;
+	mapLoader[614][311]=ax_d1brc;
+
+	mapLoader[612][310]=ax_d1lcorridor;
+	mapLoader[614][310]=ax_d1rcorridor;
+
+	mapLoader[612][309]=ax_d1tlc;
+	mapLoader[613][309]=ax_d1topcorridor;
+	mapLoader[614][309]=ax_d1trc;
+	//End of Dungeon 1
 }

@@ -6,5 +6,5 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y);
 entity ent_wall(unsigned char tile);
 entity ent_nonsolid(unsigned char x, unsigned char y, unsigned char tile);
 entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned char status);
-entity ent_door(unsigned char tile, uint16_t destSx, uint16_t destSy, int destX, int destY);
+entity ent_door(unsigned char tile, unsigned int destSx, unsigned int destSy, int destX, int destY);
 entity ent_empty();

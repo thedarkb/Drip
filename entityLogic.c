@@ -1,6 +1,15 @@
+#define ME entSet[i]
+
 void playerBehaviour(int i) {
 	if(swordOut) entSet[i].animation=8;
+	#ifndef DEV
 	if(!refresh) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	#endif
+	#ifdef DEV
+	if(mapEditorEnable) image(hwtileset[83], entSet[i].x, entSet[i].y, TS, TS);
+	else if(!refresh) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
+	#endif
+
 	char pmotion=0;
 	static int zTimeout=0;
 	if(entSet[i].freezeFrames) {
@@ -89,45 +98,49 @@ void playerBehaviour(int i) {
 			pInv.items[pInv.selection].type=0;
 		}
 		if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
-
-		if (keyboard[SDL_SCANCODE_L]) {
-			pushMsg("Test\0");
-			pushMsg("Message\0");
-			pushMsg("Stacking\0");
-		}
 		if (keyboard[SDL_SCANCODE_N]) entitySpawn(ent_aitest(), 0,0);
 
 		#ifdef DEV
-		if(keyboard[SDL_SCANCODE_SPACE]) {
-			tilewrapper[1][1].screen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
-			mapEditorShim(&tilewrapper[1][1],sX,sY);
-			refresh=1;
+		static int toggleTab=0;
+		if(!toggleTab && keyboard[SDL_SCANCODE_TAB]) {
+			toggleTab=1;
+			if(mapEditorEnable) mapEditorEnable=0;
+			else mapEditorEnable=1;
 		}
-		if(keyboard[SDL_SCANCODE_RETURN]) {
-			tilewrapper[1][1].tScreen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
-			mapEditorShim(&tilewrapper[1][1],sX,sY);
-			refresh=1;
-		}
-		if(keyboard[SDL_SCANCODE_COMMA]) {
-			tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=1;
-			mapEditorShim(&tilewrapper[1][1],sX,sY);
-			refresh=1;
-		}
-		if(keyboard[SDL_SCANCODE_PERIOD]) {
-			tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=0;
-			mapEditorShim(&tilewrapper[1][1],sX,sY);
-			refresh=1;
-		}
-		if(keyboard[SDL_SCANCODE_F10]) {
-			memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
-			mapEditorShim(&tilewrapper[1][1],sX,sY);
-			refresh=1;
+		if(!keyboard[SDL_SCANCODE_TAB]) toggleTab=0;
+		if(mapEditorEnable) {
+			if(keyboard[SDL_SCANCODE_SPACE]) {
+				tilewrapper[1][1].screen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
+				mapEditorShim(&tilewrapper[1][1],sX,sY);
+				refresh=1;
+			}
+			if(keyboard[SDL_SCANCODE_RETURN]) {
+				tilewrapper[1][1].tScreen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
+				mapEditorShim(&tilewrapper[1][1],sX,sY);
+				refresh=1;
+			}
+			if(keyboard[SDL_SCANCODE_COMMA]) {
+				tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=1;
+				mapEditorShim(&tilewrapper[1][1],sX,sY);
+				refresh=1;
+			}
+			if(keyboard[SDL_SCANCODE_PERIOD]) {
+				tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=0;
+				mapEditorShim(&tilewrapper[1][1],sX,sY);
+				refresh=1;
+			}
+			if(keyboard[SDL_SCANCODE_F10]) {
+				memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
+				mapEditorShim(&tilewrapper[1][1],sX,sY);
+				refresh=1;
+			}
 		}
 		#endif
 
 		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
 		if (keyboard[SDL_SCANCODE_F1]) printf("Entity 0 at %d,%d\n",entSet[i].x,entSet[i].y);
 		if(keyboard[SDL_SCANCODE_F3]) printf("Screen: %u,%u\n",sX,sY);
+		if(keyboard[SDL_SCANCODE_F2]) printf("Camera at %d,%d\n",cameraX,cameraY);
 		
 		if (entSet[i].y < 0) scroll = 1;
 		if (entSet[i].y > TS*SH) scroll=2;
@@ -355,6 +368,11 @@ void behav_npc(int i) {
 
 void behav_wall(int i) {
 	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y,TS,TS);
+}
+
+void behav_door(int i) {
+	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y,TS,TS);
+	//if(ME.health) printf("I AM A DOOR: %d,%d,%d,%d\n",entSet[i].status[0],entSet[i].status[1],entSet[i].status[2],entSet[i].status[3]);		
 }
 
 void entityLogic() {

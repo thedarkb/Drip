@@ -671,18 +671,39 @@ void loop() {
 	}
 
 	if (!mode) {
+		char xStart=0;
+		char yStart=0;
+		char xEnd=3;
+		char yEnd=3;
+
+		if(cameraX<(TS*SW)/2) xEnd=2;
+		else xStart=1;
+
+		if(cameraY<(TS*SH)/2) yEnd=2;
+		else yStart=1;
+
+		if(cameraX==(TS*SW)/2) {
+			xStart=1;
+			xEnd=2;
+		}
+		if(cameraY==(TS*SH)/2) {
+			yStart=1;
+			yEnd=2;
+		}
+
 		int offsetX=(TS*SW)/2-cameraX;
 		int offsetY=(TS*SH)/2-cameraY;
-		for(int wx=0;wx<3;wx++){
+		for(int wx=xStart;wx<xEnd;wx++){
 			int worldX=(wx*SW*TS-SW*TS);
-			for(int wy=0;wy<3;wy++) {
+			for(int wy=yStart;wy<yEnd;wy++) {
 				int worldY=(wy*SH*TS-SH*TS);
 				for(int x=0;x<SW;x++) {
 					for(int y=0;y<SH;y++) {
 						int writeX=(x*TS)+worldX+offsetX;
 						int writeY=(y*TS)+worldY+offsetY;
-						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS)
+						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS) {
 							imageNoTrack(hwtileset[tilewrapper[wx][wy].screen[y][x]],writeX,writeY,TS,TS);
+						}
 					}
 				}
 			}
@@ -692,16 +713,20 @@ void loop() {
 		spriteCollisions();
 		entityLogic();
 
-		for(int wx=0;wx<3;wx++){
+		for(int wx=xStart;wx<xEnd;wx++){
 			int worldX=(wx*SW*TS-SW*TS);
-			for(int wy=0;wy<3;wy++) {
+			for(int wy=yStart;wy<yEnd;wy++) {
 				int worldY=(wy*SH*TS-SH*TS);
 				for(int x=0;x<SW;x++) {
 					for(int y=0;y<SH;y++) {
+						#ifdef DEV
+						if(mapEditorEnable && keyboard[SDL_SCANCODE_V]) continue;
+						#endif
 						int writeX=(x*TS)+worldX+offsetX;
 						int writeY=(y*TS)+worldY+offsetY;
-						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS && tilewrapper[wx][wy].tScreen[y][x])
+						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS && tilewrapper[wx][wy].tScreen[y][x]){
 							imageNoTrack(hwtileset[tilewrapper[wx][wy].tScreen[y][x]],writeX,writeY,TS,TS);
+						}
 					}
 				}
 			}
@@ -740,7 +765,7 @@ int main () {
 	#else
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
 	#endif
-	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED || SDL_RENDERER_PRESENTVSYNC);
+	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
 	#ifdef WEB
 	SDL_RenderSetScale(r,2,2);
