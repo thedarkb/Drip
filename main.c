@@ -172,7 +172,7 @@ void deadEntityKiller() {
 	}
 }
 
-int overlap(unsigned char i, unsigned char j){
+int overlap(unsigned int i, unsigned int j){
 	if (!entSet[j].collisionClass) return 0;
 	if (!entSet[i].collisionClass) return 0;
 	if (i==j) return 0;
@@ -290,40 +290,14 @@ void spriteCollisions() {
 						entSet[i].collisionClass=0;
 					break;
 					case 132: //Door
-						printf("Collision detected with door.\n");
+						printf("Entity %u collided with door with destination: %d,%d,%d,%d\n",j,entSet[i].status[0],entSet[i].status[1],entSet[i].status[2],entSet[i].status[3]);
+						printf("Entity 256.behaviour=%p\n",entSet[256].behaviour);
 						sX=entSet[i].status[0];
 						sY=entSet[i].status[1];
 						entSet[j].x=entSet[i].status[2];
 						entSet[j].y=entSet[i].status[3];
 						refresh=1;
-					break;
-					case 133: //Door that caches previous position
-						printf("Collision detected with stackable door.\n");
-						entranceStack[entrySlot].sX=sX;
-						entranceStack[entrySlot].sY=sY;
-						entranceStack[entrySlot].x=entSet[j].x;
-						entranceStack[entrySlot].y=entSet[j].y;
-						entrySlot++;
-
-						sX=entSet[i].status[0];
-						sY=entSet[i].status[1];
-						entSet[j].x=entSet[i].status[2];
-						entSet[j].y=entSet[i].status[3];
-						refresh=1;
-					break;
-					case 134: //Door that caches previous position
-						printf("Collision detected with stackable door.\n");
-						if(!entrySlot) {
-							printf("An error in level design has left this door without a destination.\n");
-							break;
-						}
-						sX=entranceStack[entrySlot].sX;
-						sY=entranceStack[entrySlot].sY;
-						entSet[j].x=entranceStack[entrySlot].x;
-						entSet[j].y=entranceStack[entrySlot].y+TS;
-						if(entrySlot) entrySlot--;
-						refresh=1;
-					break;								
+					break;							
 				}
 			}
 		}

@@ -628,7 +628,7 @@ view map_snowlandBase(uint16_t xIn, uint16_t yIn) {
 		for(int y=0;y<SH;y++) {
 			screenHash=lfsr(screenHash);
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[y][x]==85) {
-				entitySpawn(ent_wall(134),eX+(TS*x),eY+(TS*y));
+				//entitySpawn(ent_wall(134),eX+(TS*x),eY+(TS*y));
 				me.layers[y][x]=1;
 			}
 		}
@@ -666,7 +666,7 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	for(int x=0;x<SW;x++) {
 		for(int y=0;y<SH;y++) {
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[y][x]==11) {
-				entitySpawn(ent_wall(30),eX+(TS*x),eY+(TS*y));
+				//entitySpawn(ent_wall(30),eX+(TS*x),eY+(TS*y));
 				me.layers[y][x]=1;
 			}
 			screenHash=lfsr(screenHash);
