@@ -108,23 +108,23 @@ void playerBehaviour(int i) {
 			else mapEditorEnable=1;
 		}
 		if(!keyboard[SDL_SCANCODE_TAB]) toggleTab=0;
-		if(mapEditorEnable) {
-			if(keyboard[SDL_SCANCODE_SPACE]) {
+		if(mapEditorEnable && ((entSet[i].x+TS/2)/TS<SW&&(entSet[i].y+TS/2)/TS<SH)) {
+			if(keyboard[SDL_SCANCODE_SPACE]) {	 
 				tilewrapper[1][1].screen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
 				mapEditorShim(&tilewrapper[1][1],sX,sY);
 				refresh=1;
 			}
-			if(keyboard[SDL_SCANCODE_RETURN]) {
+			if(keyboard[SDL_SCANCODE_RETURN] && ME.x+TS/2<SW*TS && ME.y+TS/2<SH*TS) {
 				tilewrapper[1][1].tScreen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
 				mapEditorShim(&tilewrapper[1][1],sX,sY);
 				refresh=1;
 			}
-			if(keyboard[SDL_SCANCODE_COMMA]) {
+			if(keyboard[SDL_SCANCODE_COMMA] && ME.x+TS/2<SW*TS && ME.y+TS/2<SH*TS) {
 				tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=1;
 				mapEditorShim(&tilewrapper[1][1],sX,sY);
 				refresh=1;
 			}
-			if(keyboard[SDL_SCANCODE_PERIOD]) {
+			if(keyboard[SDL_SCANCODE_PERIOD] && ME.x+TS/2<SW*TS && ME.y+TS/2<SH*TS) {
 				tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=0;
 				mapEditorShim(&tilewrapper[1][1],sX,sY);
 				refresh=1;
@@ -137,7 +137,7 @@ void playerBehaviour(int i) {
 		}
 		#endif
 
-		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
+		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);
 		if (keyboard[SDL_SCANCODE_F1]) printf("Entity 0 at %d,%d\n",entSet[i].x,entSet[i].y);
 		if(keyboard[SDL_SCANCODE_F3]) printf("Screen: %u,%u\n",sX,sY);
 		if(keyboard[SDL_SCANCODE_F2]) printf("Camera at %d,%d\n",cameraX,cameraY);
@@ -371,8 +371,14 @@ void behav_wall(int i) {
 }
 
 void behav_door(int i) {
+	if(euclideanDistance(i,0,10)) {
+		entSet[0].x=ME.destX;
+		entSet[0].y=ME.destY;
+		sX=ME.destSx;
+		sY=ME.destSy;
+		refresh=1;
+	}
 	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y,TS,TS);
-	//if(ME.health) printf("I AM A DOOR: %d,%d,%d,%d\n",entSet[i].status[0],entSet[i].status[1],entSet[i].status[2],entSet[i].status[3]);		
 }
 
 void entityLogic() {

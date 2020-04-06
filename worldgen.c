@@ -1,3 +1,101 @@
+void ax_d1rcorridor(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1rcorridor;
+	mapEntitySpawn(ent_door(57,614,307,192,128),614,310,16,64);
+}
+
+void ax_d1lcorridor(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1leftcorridor;
+	mapEntitySpawn(ent_door(57,612,307,16,128),612,310,224,64);
+}
+
+void ax_d1puzzleroom(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1puzzleroom;
+}
+
+void ax_d1blc(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1blc;
+}
+
+void ax_d1brc(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1brc;
+}
+
+void ax_d1tlc(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1tlc;
+}
+
+void ax_d1trc(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1trc;
+}
+
+void ax_d1topcorridor(view* in, unsigned int xPos, unsigned int yPos){
+	*in=map_d1topcorridor;
+}
+
+void ax_d1junction(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1junction;
+}
+
+void ax_d1leftb1f(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1leftb1f;
+}
+
+void ax_d1centreb1f(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1centreb1f;
+}
+
+void ax_d1rightb1f(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_d1rightb1f;
+}
+
+void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){
+	memset(&in->screen,1,sizeof in->screen);
+	mapEntitySpawn(ent_door(48,301,300,16,32),xPos,yPos,16,16);
+	mapEntitySpawn(ent_door(48,595,380,16,32),xPos,yPos,64,64);
+	mapEntitySpawn(ent_door(48,607,305,48,64),xPos,yPos,64,128);
+	mapEntitySpawn(ent_door(48,614,313,TS,TS),xPos,yPos,224,128);
+	in->flag=1;
+}
+
+void ax_testhouse(view* in, unsigned int xPos, unsigned int yPos) {
+	memset(&in->screen,1,sizeof in->screen);
+	*in=interior;
+	mapEntitySpawn(ent_door(48,300,300,64,144),xPos,yPos,48,80);
+	mapEntitySpawn(ent_npc(),xPos,yPos,48,32);
+}
+
+void ax_entryroom(view* in, unsigned int xPos, unsigned int yPos) {
+	*in=map_entryroom;
+	mapEntitySpawn(ent_door(0,614,310,200,80),xPos,yPos,TS*2,TS*2);
+}
+
+void axiomLoad(){
+	memset(&mapLoader,0,sizeof mapLoader);
+	mapLoader[300][300]=ax_startPad;
+	mapLoader[607][305]=ax_testhouse;
+	mapLoader[614][313]=ax_entryroom;
+
+	//Dungeon 1
+	mapLoader[612][311]=ax_d1blc;
+	mapLoader[613][311]=ax_d1puzzleroom;
+	mapLoader[613][310]=ax_d1junction;
+	mapLoader[614][311]=ax_d1brc;
+
+	mapLoader[612][310]=ax_d1lcorridor;
+	mapLoader[614][310]=ax_d1rcorridor;
+
+	mapLoader[612][309]=ax_d1tlc;
+	mapLoader[613][309]=ax_d1topcorridor;
+	mapLoader[614][309]=ax_d1trc;
+
+	mapLoader[612][307]=ax_d1leftb1f;
+	mapLoader[613][307]=ax_d1centreb1f;
+	mapLoader[614][307]=ax_d1rightb1f;
+
+
+	//End of Dungeon 1
+}
+
 void entFetch(unsigned int xIn, unsigned int yIn) {
 	uint32_t screenNum=0;
 	screenNum |= sX+(xIn-1);
@@ -35,6 +133,9 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		return;
 	}
 	#endif
+
+	//memset(in,0,sizeof *in);
+	//return;
 
 	if(mapLoader[xPos][yPos]) {
 		mapLoader[xPos][yPos](in,xPos,yPos);
@@ -154,113 +255,3 @@ void scrollMap() {
 	}
 }
 
-void ax_d1rcorridor(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1rcorridor;
-}
-
-void ax_d1lcorridor(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1leftcorridor;
-}
-
-void ax_d1puzzleroom(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1puzzleroom;
-}
-
-void ax_d1blc(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1blc;
-}
-
-void ax_d1brc(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1brc;
-}
-
-void ax_d1tlc(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1tlc;
-}
-
-void ax_d1trc(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1trc;
-}
-
-void ax_d1topcorridor(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1topcorridor;
-}
-
-void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){
-	memset(&in->screen,1,sizeof in->screen);
-	mapEntitySpawn(ent_door(48,301,300,16,32),xPos,yPos,16,16);
-	mapEntitySpawn(ent_door(48,595,380,16,32),xPos,yPos,64,64);
-	mapEntitySpawn(ent_door(48,607,305,48,64),xPos,yPos,64,128);
-	mapEntitySpawn(ent_door(48,614,313,TS,TS),xPos,yPos,96,128);
-	in->flag=1;
-}
-
-void ax_testhouse(view* in, unsigned int xPos, unsigned int yPos) {
-	memset(&in->screen,1,sizeof in->screen);
-	view interior={
-		{
-			{5,6,6,6,6,6,7,0,0,0,0,0,0,0,0},
-			{5,8,8,8,8,8,7,0,0,0,0,0,0,0,0},
-			{7,8,8,8,8,8,7,0,0,0,0,0,0,0,0},
-			{7,8,8,8,8,8,7,0,0,0,0,0,0,0,0},
-			{7,8,8,8,8,8,7,0,0,0,0,0,0,0,0},
-			{6,6,6,8,6,6,6,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-		},
-		{
-			{1,1,1,1,1,1,1,0,0,0,0,0,0,0,0},
-			{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0},
-			{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0},
-			{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0},
-			{1,0,0,0,0,0,1,0,0,0,0,0,0,0,0},
-			{1,1,1,0,1,1,1,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-		},
-		{
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,6,6,48,6,6,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
-			{0,0,0,0,0,0,0,0,0,0,0,0,0,0,0}
-		}
-	};
-	*in=interior;
-	mapEntitySpawn(ent_door(48,300,300,64,144),xPos,yPos,48,80);
-	mapEntitySpawn(ent_npc(),xPos,yPos,48,32);
-}
-
-void ax_entryroom(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_entryroom;
-	mapEntitySpawn(ent_door(0,614,310,200,80),xPos,yPos,TS*2,TS*2);
-}
-
-void axiomLoad(){
-	memset(&mapLoader,0,sizeof mapLoader);
-	mapLoader[300][300]=ax_startPad;
-	mapLoader[607][305]=ax_testhouse;
-	mapLoader[614][313]=ax_entryroom;
-
-	//Dungeon 1
-	mapLoader[612][311]=ax_d1blc;
-	mapLoader[613][311]=ax_d1puzzleroom;
-	mapLoader[614][311]=ax_d1brc;
-
-	mapLoader[612][310]=ax_d1lcorridor;
-	mapLoader[614][310]=ax_d1rcorridor;
-
-	mapLoader[612][309]=ax_d1tlc;
-	mapLoader[613][309]=ax_d1topcorridor;
-	mapLoader[614][309]=ax_d1trc;
-	//End of Dungeon 1
-}

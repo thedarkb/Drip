@@ -2,6 +2,35 @@
 #define menuCall menuFlag=1;menuFirstCall=1
 #define caller entSet[speaker]
 
+void diag_boy() {
+	entSet[0].frame[0]=148; //up
+	entSet[0].frame[1]=124; //down
+	entSet[0].frame[2]=132; //left
+	entSet[0].frame[3]=140; //right
+	entSet[0].frame[4]=147; //up step1
+	entSet[0].frame[5]=123; //down step1
+	entSet[0].frame[6]=131; //left step1
+	entSet[0].frame[7]=139; //right step1
+	entSet[0].frame[8]=149; //up step2
+	entSet[0].frame[9]=125; //down step2
+	entSet[0].frame[10]=133; //left step2
+	entSet[0].frame[11]=141; //right step2
+}
+
+void diag_girl() {
+	entSet[0].frame[0]=177;
+	entSet[0].frame[1]=153;
+	entSet[0].frame[2]=161;
+	entSet[0].frame[3]=169;
+	entSet[0].frame[4]=176;
+	entSet[0].frame[5]=152;
+	entSet[0].frame[6]=160;
+	entSet[0].frame[7]=168;
+	entSet[0].frame[8]=178;
+	entSet[0].frame[9]=154;
+	entSet[0].frame[10]=162;
+	entSet[0].frame[11]=170;
+}
 
 void diag_owl();
 //29 chars in 1 line

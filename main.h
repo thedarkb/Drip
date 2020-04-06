@@ -52,6 +52,13 @@ SDL_Texture* hwtileset[TILECOUNT];
 SDL_Surface* font[128];
 SDL_Texture* hwfont[128];
 
+enum direction {
+	UP,
+	DOWN,
+	LEFT,
+	RIGHT
+} direction;
+
 //typedef struct faction faction;
 
 typedef struct outfit {
@@ -77,6 +84,10 @@ typedef struct entity {
 	unsigned char layer; //Where they are in the sprite stack.
 	unsigned char attack; //RPG style attack stat.
 	int status[4]; //General purpose entity specific variables.
+	int destSx;//Used for the entity's pocket dimension or teleporter destination.
+	int destSy;
+	int destX;
+	int destY;
 	uint16_t health;
 	unsigned int frame[FLIMIT]; //Array of animation frames.
 	unsigned char setframe; //Current frame
@@ -135,7 +146,7 @@ void(*options[6])(); //Menu options.
 
 view cornerRoom;
 
-unsigned char speaker; //Holds entity number which started conversation.
+unsigned char speaker; //Holds index of the entity which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
 void(*mapLoader[705][610])(view* in, unsigned int xPos, unsigned int yPos);
@@ -172,7 +183,7 @@ char mapEditorEnable=0;
 
 
 char* menuText;
-char mode=0;
+char mode=4;
 char menuFlag=0;
 char menuFirstCall=0;
 char collisionReset=0;
@@ -209,6 +220,8 @@ void nentityReset();
 void nentitySpawn(entity in);
 //void factionSpawn(faction* theboys,int x,int y);
 void deadEntityKiller();
+int overlap(unsigned int i, unsigned int j);
+int euclideanDistance(unsigned int i, unsigned int j, unsigned int distance);
 void corpseDisposal();
 //void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);

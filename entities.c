@@ -1,5 +1,7 @@
 //Make sure everything is initialised so you don't get UB, that goes for you in particular, Merlin.
 
+const 
+
 entity ent_playerM() { //Male
 	entity me;
 	memset(&me, 0, sizeof me);
@@ -106,25 +108,25 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	entSet[creator].freezeFrames=5;
 	memset(&me, 0, sizeof me);
 	switch(direction){
-		case 0:
+		case UP:
 			me.y-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
 			me.hitY+=5;
 		break;
-		case 1:
+		case DOWN:
 			me.y+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
 			me.hitY-=5;			
 		break;
-		case 2:
+		case LEFT:
 			me.x-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
 			me.hitX+=5;
 		break;
-		case 3:
+		case RIGHT:
 			me.x+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
@@ -156,25 +158,25 @@ entity ent_axe(unsigned char direction, uint16_t x, uint16_t y, unsigned char cr
 	entSet[creator].freezeFrames=10;
 	memset(&me, 0, sizeof me);
 	switch(direction){
-		case 0:
+		case UP:
 			me.y-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
 			me.hitY+=7;
 		break;
-		case 1:
+		case DOWN:
 			me.y+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
 			me.hitY-=7;			
 		break;
-		case 2:
+		case LEFT:
 			me.x-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
 			me.hitX+=7;
 		break;
-		case 3:
+		case RIGHT:
 			me.x+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
@@ -331,7 +333,7 @@ entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned cha
 	me.ySub=10;
 	me.x=x;
 	me.y=y;
-	printf("Spawning item at %d,%d\n", x,y);
+	printf("Spawning item at %u,%u\n", x,y);
 	me.layer=0;
 	me.frame[0]=getItemSprite(type);
 	me.setframe=0;
@@ -429,12 +431,11 @@ entity ent_door(unsigned char tile, unsigned int destSx, unsigned int destSy, in
 	memset(&me,0,sizeof me);
 	me.collisionClass=132;
 	me.health=255;
-	printf("Creating door with tile %u, destination sX %u, destination sY %u, destX %d, destY %d\n",tile,destSx,destSy,destX,destY);
 	me.frame[0]=tile;
-	me.status[0]=destSx;
-	me.status[1]=destSy;
-	me.status[2]=destX;
-	me.status[3]=destY;
+	me.destSx=destSx;
+	me.destSy=destSy;
+	me.destX=destX;
+	me.destY=destY;
 	me.xSub=10;
 	me.ySub=10;
 	me.behaviour=behav_door;

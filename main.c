@@ -172,6 +172,11 @@ void deadEntityKiller() {
 	}
 }
 
+int euclideanDistance(unsigned int i, unsigned int j, unsigned int distance) {
+	if(DIST(entSet[i].x,entSet[i].y, entSet[j].x, entSet[j].y)<distance*distance) return 1;
+	return 0;
+}
+
 int overlap(unsigned int i, unsigned int j){
 	if (!entSet[j].collisionClass) return 0;
 	if (!entSet[i].collisionClass) return 0;
@@ -288,16 +293,7 @@ void spriteCollisions() {
 						entSet[i].health=0;
 						entSet[i].behaviour=NULL;
 						entSet[i].collisionClass=0;
-					break;
-					case 132: //Door
-						printf("Entity %u collided with door with destination: %d,%d,%d,%d\n",j,entSet[i].status[0],entSet[i].status[1],entSet[i].status[2],entSet[i].status[3]);
-						printf("Entity 256.behaviour=%p\n",entSet[256].behaviour);
-						sX=entSet[i].status[0];
-						sY=entSet[i].status[1];
-						entSet[j].x=entSet[i].status[2];
-						entSet[j].y=entSet[i].status[3];
-						refresh=1;
-					break;							
+					break;						
 				}
 			}
 		}
@@ -644,6 +640,14 @@ void loop() {
 		refresh=0;
 	}
 
+	if(!frameTotal) {
+		menuReset;
+		menuText="Boy\nGirl\0";
+		options[0]=diag_boy;
+		options[1]=diag_girl;
+		menuCall;
+	}
+
 	if (!mode) {
 		char xStart=0;
 		char yStart=0;
@@ -728,7 +732,6 @@ void loop() {
 	else animationG=0;
 	
 	frameTotal++;
-	//assert(frameTotal<3000);
 }
 
 int main () {
@@ -791,8 +794,7 @@ int main () {
 	axiomLoad();//Loads the map function pointer matrix.
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
 	memset(&tilewrapper,0,sizeof tilewrapper);
-	entityInitialise();
-	
+	entityInitialise();	
 	
 	#ifndef WEB
 	while(1) { //The timing loop leaves a little to be desired.
