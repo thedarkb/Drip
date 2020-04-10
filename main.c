@@ -14,6 +14,7 @@
 #include "items.c"
 #include "dialogue.c"
 #include "clothes.c"
+#include "collision.c"
 #include "entities.c"
 //#include "factions.c"
 #include "maps.c"
@@ -62,39 +63,10 @@ void light() {
 
 void pathfind(entity* in, int x, int y, int speed) {
 	for(int i=0; i<speed; i++) {
-		in->pathX=in->x;
-		in->pathY=in->y;
-
-		int correctedX=0;
-		int correctedY=0;
-
-		if(in->x>SW*TS) correctedX=in->x-(SW*TS);
-		else if(x<0) correctedX=in->x+(SW*TS);
-		else correctedX=in->x;
-
-		if(in->y>SW*TS) correctedY=in->y-(SH*TS);
-		else if(in->y<0) correctedY=in->y+(SH*TS);
-		else correctedY=in->y;
-
-
-		switch(in->pathType) {
-			case 0:
-			if(x > in->x) moveX(in, 1); //Chase target at x,y
-			if(x < in->x) moveX(in, -1);
-			if(y > in->y) moveY(in, 1);
-			if(y < in->y) moveY(in, -1);
-			break;
-
-			case 1:
-			if(correctedX<(SW*TS)/2) moveX(in,1); //Move toward clear area in room centre.
-			if(correctedX>(SW*TS)/2) moveX(in,-1);
-			if(correctedY<(SH*TS)/2) moveY(in,1);
-			if(correctedY>(SH*TS)/2) moveY(in,-1);
-			break;
-		}
-		if(in->x==in->pathX && in->y==in->pathY) in->pathType=1;//If no movement has occurred, return to clear area.
-		if(correctedX>TS*3 && correctedX<(SW*TS)-(TS*3) && correctedY>TS*3 && correctedY<(SH*TS)-(TS*3)) in->pathType=0; //If in clear area, chase target.
-
+		if(x > in->x) moveX(in, 1); //Chase target at x,y
+		if(x < in->x) moveX(in, -1);
+		if(y > in->y) moveY(in, 1);
+		if(y < in->y) moveY(in, -1);
 	}
 }
 
@@ -110,8 +82,9 @@ void entityInitialise() { //Clears entity array, spawns player.
 	}
 	entSet[0]=ent_playerM();
 	memset(&pInv, 0, sizeof pInv);
-	pInv.items[0].type=2;
-	pInv.items[1].type=3;
+	//pInv.items[0].type=2;
+	//pInv.items[1].type=3;
+	//pInv.items[2].type=4;
 }
 
 void entityScroll(int x, int y) { //Corrects entity positions when player moves to a new area.
@@ -165,7 +138,7 @@ void deadEntityKiller() {
 			entSet[i].layer=0;
 			if(entSet[i].drop[0] != 0) {
 				printf("Spawning drop...\n");
-				entitySpawn(ent_item(0, 0, entSet[i].drop[0], 255),entSet[i].x,entSet[i].y);
+				entitySpawn(ent_item(entSet[i].drop[0], 255),entSet[i].x,entSet[i].y);
 				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
 			}
 		}
@@ -182,9 +155,7 @@ int overlap(unsigned int i, unsigned int j){
 	if (!entSet[i].collisionClass) return 0;
 	if (i==j) return 0;
 	if (entSet[j].collisionClass>128) return 0;
-	if (get_diff(entSet[i].x+entSet[i].hitX+TS/2,entSet[j].x+entSet[j].hitX+TS/2) < entSet[i].xSub) {
-		if (get_diff(entSet[i].y+entSet[i].hitY+TS/2,entSet[j].y+entSet[j].hitY+TS/2) < entSet[i].ySub) return 1;
-	}
+	if (DIST(entSet[i].x,entSet[i].y,entSet[j].x,entSet[j].y)<entSet[i].radius*entSet[i].radius) return 1;
 	return 0;
 }
 
@@ -197,104 +168,9 @@ void spriteCollisions() {
 	for (int i=start; i<ELIMIT && i>=0; i+=direction) {
 		for (int j=start; j<ELIMIT && j>=0; j+=direction) {
 			if(overlap(i,j)){
-				//printf("Collision detected between %d and %d\n",i,j);
-				switch (entSet[i].collisionClass) {
-					case 2:
-					//if(get_diff(entSet[i].alignment, entSet[j].alignment) < entSet[i].aggroThreshold) continue;
-					//Stops NPCs of the same faction murdering eachother.
-					case 3: //Generic bouncy collisions.
-					if (entSet[j].health>20) entSet[j].health-=20;
-					else entSet[j].health=0;
-					if (entSet[j].y+TS/2 < entSet[i].y+TS/2) {
-						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
-							entSet[j].status[2]=entSet[j].collisionClass;
-							entSet[j].status[1]=10;
-							if(entSet[j].behaviour!=behav_upLeft) entSet[j].prevState=entSet[j].behaviour;
-							entSet[j].behaviour=behav_upLeft; //up left
-							entSet[j].collisionClass=0;
-						}
-						else {
-							entSet[j].status[2]=entSet[j].collisionClass;
-							entSet[j].status[1]=10;
-							if(entSet[j].behaviour!=behav_upRight) entSet[j].prevState=entSet[j].behaviour;
-							entSet[j].behaviour=behav_upRight; //up right
-							entSet[j].collisionClass=0;
-						}
-					}
-					else {
-						if(entSet[j].x+TS/2<entSet[i].x+TS/2) {
-							entSet[j].status[2]=entSet[j].collisionClass;
-							entSet[j].status[1]=10;
-							if(entSet[j].behaviour!=behav_downLeft) entSet[j].prevState=entSet[j].behaviour;
-							entSet[j].behaviour=behav_downLeft; //down left
-							entSet[j].collisionClass=0;
-						}
-						else {
-							entSet[j].status[2]=entSet[j].collisionClass;
-							entSet[j].status[1]=10;
-							if(entSet[j].behaviour!=behav_downRight) entSet[j].prevState=entSet[j].behaviour;
-							entSet[j].behaviour=behav_downRight; //down right
-							entSet[j].collisionClass=0;
-						}
-					}
-					break;
-					case 129: //Sword colliding with enemy.
-						//printf("Collision\n");
-						//printf("Direction: %u\n", entSet[i].direction);
-						switch(entSet[entSet[i].status[1]].direction) {
-							case 0:
-								entSet[j].status[2]=entSet[j].collisionClass;
-								entSet[j].status[1]=10;
-								entSet[j].prevState=entSet[j].behaviour;
-								entSet[j].behaviour=behav_up; //up
-								entSet[j].collisionClass=entSet[i].collisionClass;
-							break;
-							case 1:
-								entSet[j].status[2]=entSet[j].collisionClass;
-								entSet[j].status[1]=10;
-								entSet[j].prevState=entSet[j].behaviour;
-								entSet[j].behaviour=behav_down; //down
-								entSet[j].collisionClass=entSet[i].collisionClass;
-							break;
-							case 2:
-								entSet[j].status[2]=entSet[j].collisionClass;
-								entSet[j].status[1]=10;
-								entSet[j].prevState=entSet[j].behaviour;
-								entSet[j].behaviour=behav_left; //left
-								entSet[j].collisionClass=entSet[i].collisionClass;
-							break;
-							case 3:
-								entSet[j].status[2]=entSet[j].collisionClass;
-								entSet[j].status[1]=10;
-								entSet[j].prevState=entSet[j].behaviour;
-								entSet[j].behaviour=behav_right; //right
-								entSet[j].collisionClass=entSet[i].collisionClass;
-							break;
-							entSet[j].lastHit=i;
-						}
-						if (entSet[entSet[i].status[1]].attack < entSet[j].health) entSet[j].health-=entSet[entSet[i].status[1]].attack;
-						else entSet[j].health=0;
-					break;
-					case 130: //For when the player collides with an item.
-						if (j) break;
-						for (int k=0; k<INVLIMIT; k++) {
-							if (!pInv.items[k].type) {
-								pInv.items[k].type=entSet[i].status[0];
-								entSet[i].health=0;
-								break;
-							}
-						}
-					break;
-					case 131: //Entity dialogue.
-						speaker=j;
-						printf("dialogue collision detected.\n");
-						if(entSet[j].dialogue) entSet[j].dialogue();
-						else pushMsg("No dialogue found for entity.\n");
-						entSet[i].health=0;
-						entSet[i].behaviour=NULL;
-						entSet[i].collisionClass=0;
-					break;						
-				}
+				printf("OVERLAP\n");
+				if(entSet[i].collider && entSet[j].collisionClass<128) entSet[i].collider(i,j);
+				if(entSet[j].collider && entSet[i].collisionClass<128) entSet[j].collider(j,i);
 			}
 		}
 	}
@@ -332,14 +208,14 @@ void text(char* inStr, int x, int y) {
 }
 
 void menu() {
-	drawRect(2,120,236,58,0);
+	drawRect(2,74,236,58,0);
 	int optCount=0;
 	static int optSel=0;
 
 	for(int i=0;menuText[i];) if(menuText[i++]==10) optCount++; //Counts the number of lines in the menu text.
 
 	if(optSel>optCount)optSel=0;
-	text(menuText,11,102); //Displays menu text.
+	text(menuText,11,56); //Displays menu text.
 	static int keyPress=1;
 	static int zPress=1;
 	if(!keyboard[SDL_SCANCODE_UP] && !keyboard[SDL_SCANCODE_DOWN]) keyPress=0;
@@ -362,7 +238,7 @@ void menu() {
 		if(options[optSel]) options[optSel](); //Options are just function pointers.
 	}
 
-	text(">", 2, 102+(optSel*10));  //Draws the cursor.
+	text(">", 2, 56+(optSel*10));  //Draws the cursor.
 }
 
 void pushMsg(char* inStr) { //Adds a message to the stack.
@@ -427,7 +303,7 @@ void imageNoTrack(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an 
 }
 
 void image(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
-	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h}; //Accounts for HUD and camera.
+	SDL_Rect scaler = {x+CX,y+CY,w,h}; //Accounts for HUD and camera.
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }
 
@@ -438,7 +314,7 @@ void tintedImage(SDL_Texture* imgIn, int x, int y, int w, int h, uint32_t colour
 	} htmlDecode;
 	htmlDecode.htmlCode=colour;
 	if(SDL_SetTextureColorMod(imgIn, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0])) printf("Colour Mod not supported.\n");
-	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h}; //Accounts for HUD and camera.
+	SDL_Rect scaler = {x+CX,y+CY,w,h}; //Accounts for HUD and camera.
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 	SDL_SetTextureColorMod(imgIn, 255, 255, 255);
 }
@@ -503,7 +379,7 @@ void drawRectAlphaTrack(unsigned int x, unsigned int y, unsigned int w, unsigned
 	} htmlDecode;
 	htmlDecode.htmlCode=colour;
 	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], alpha);
-	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h};
+	SDL_Rect scaler = {x+CX,y+CY,w,h};
 	SDL_RenderFillRect(r, &scaler);
 }
 
@@ -514,7 +390,7 @@ void drawRectTrack(unsigned int x, unsigned int y, unsigned int w, unsigned int 
 	} htmlDecode;
 	htmlDecode.htmlCode=colour;
 	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
-	SDL_Rect scaler = {x+(TS*SW)/2-cameraX,y+(TS*SH)/2+HUDHEIGHT-cameraY,w,h};
+	SDL_Rect scaler = {x+CX,y+CY,w,h};
 	SDL_RenderFillRect(r, &scaler);
 }
 
@@ -552,7 +428,7 @@ void flip() { //Updates screen.
 
 char collisionCheck(int x, int y) { //Collision detection between map layer and entity.
 	#ifdef DEV
-	if(mapEditorEnable)return 0;
+	if(mapEditorEnable) return 0;
 	#endif
 	
 	int wrapperX=(x+TS*SW)/(TS*SW);
@@ -626,6 +502,8 @@ void snapToGrid(entity* movEnt) {
 
 
 void loop() {
+	SDL_SetRenderDrawColor(r,0,0,0,255);
+	SDL_RenderClear(r);
 	if (scroll) scrollMap();
 
 	if (refresh) {		
@@ -648,68 +526,67 @@ void loop() {
 		menuCall;
 	}
 
-	if (!mode) {
-		char xStart=0;
-		char yStart=0;
-		char xEnd=3;
-		char yEnd=3;
+	char xStart=0;
+	char yStart=0;
+	char xEnd=3;
+	char yEnd=3;
 
-		if(cameraX<(TS*SW)/2) xEnd=2;
-		else xStart=1;
+	if(cameraX<(TS*SW)/2) xEnd=2;
+	else xStart=1;
 
-		if(cameraY<(TS*SH)/2) yEnd=2;
-		else yStart=1;
+	if(cameraY<(TS*SH)/2) yEnd=2;
+	else yStart=1;
 
-		if(cameraX==(TS*SW)/2) {
-			xStart=1;
-			xEnd=2;
-		}
-		if(cameraY==(TS*SH)/2) {
-			yStart=1;
-			yEnd=2;
-		}
+	if(cameraX==(TS*SW)/2) {
+		xStart=1;
+		xEnd=2;
+	}
+	if(cameraY==(TS*SH)/2) {
+		yStart=1;
+		yEnd=2;
+	}
 
-		int offsetX=(TS*SW)/2-cameraX;
-		int offsetY=(TS*SH)/2-cameraY;
-		for(int wx=xStart;wx<xEnd;wx++){
-			int worldX=(wx*SW*TS-SW*TS);
-			for(int wy=yStart;wy<yEnd;wy++) {
-				int worldY=(wy*SH*TS-SH*TS);
-				for(int x=0;x<SW;x++) {
-					for(int y=0;y<SH;y++) {
-						int writeX=(x*TS)+worldX+offsetX;
-						int writeY=(y*TS)+worldY+offsetY;
-						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS) {
-							imageNoTrack(hwtileset[tilewrapper[wx][wy].screen[y][x]],writeX,writeY,TS,TS);
-						}
+	int offsetX=(RESX)/2-cameraX-TS/2;
+	int offsetY=(RESY)/2-cameraY-TS/2;
+	for(int wx=xStart;wx<xEnd;wx++){
+		int worldX=(wx*SW*TS-SW*TS);
+		for(int wy=yStart;wy<yEnd;wy++) {
+			int worldY=(wy*SH*TS-SH*TS);
+			for(int x=0;x<SW;x++) {
+				for(int y=0;y<SH;y++) {
+					int writeX=(x*TS)+worldX+offsetX;
+					int writeY=(y*TS)+worldY+offsetY;
+					if(writeX>0-TS && writeX<RESX && writeY>0-TS && writeY<RESY) {
+						imageNoTrack(hwtileset[tilewrapper[wx][wy].screen[y][x]],writeX,writeY,TS,TS);
 					}
 				}
 			}
 		}
+	}
+	deadEntityKiller();
+	spriteCollisions();
+	entityLogic();
 
-		deadEntityKiller();
-		spriteCollisions();
-		entityLogic();
-
-		for(int wx=xStart;wx<xEnd;wx++){
-			int worldX=(wx*SW*TS-SW*TS);
-			for(int wy=yStart;wy<yEnd;wy++) {
-				int worldY=(wy*SH*TS-SH*TS);
-				for(int x=0;x<SW;x++) {
-					for(int y=0;y<SH;y++) {
-						#ifdef DEV
-						if(mapEditorEnable && keyboard[SDL_SCANCODE_V]) continue;
-						#endif
-						int writeX=(x*TS)+worldX+offsetX;
-						int writeY=(y*TS)+worldY+offsetY;
-						if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS && tilewrapper[wx][wy].tScreen[y][x]){
-							imageNoTrack(hwtileset[tilewrapper[wx][wy].tScreen[y][x]],writeX,writeY,TS,TS);
-						}
+	for(int wx=xStart;wx<xEnd;wx++){
+		int worldX=(wx*SW*TS-SW*TS);
+		for(int wy=yStart;wy<yEnd;wy++) {
+			int worldY=(wy*SH*TS-SH*TS);
+			for(int x=0;x<SW;x++) {
+				for(int y=0;y<SH;y++) {
+					#ifdef DEV
+					if(mapEditorEnable && keyboard[SDL_SCANCODE_V]) continue;
+					#endif
+					int writeX=(x*TS)+worldX+offsetX;
+					int writeY=(y*TS)+worldY+offsetY;
+					if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS && tilewrapper[wx][wy].tScreen[y][x]){
+						imageNoTrack(hwtileset[tilewrapper[wx][wy].tScreen[y][x]],writeX,writeY,TS,TS);
 					}
 				}
 			}
 		}
-	} else if (mode==1) popMsg();
+	}
+
+	if (mode==1) popMsg();
 	else if (menuFlag) menu();
 	else mode=0;
 
@@ -732,15 +609,17 @@ void loop() {
 	else animationG=0;
 	
 	frameTotal++;
+	//assert(frameTotal<300);
 }
 
 int main () {
 	memset(&emptyView,0,sizeof emptyView);
+	memset(&flagArray,0,sizeof flagArray);
 	SDL_Init(SDL_INIT_VIDEO);
 	#ifdef WEB
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*2, (SH*TS+HUDHEIGHT)*2, SDL_WINDOW_OPENGL);
 	#else
-	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*4, (SH*TS+HUDHEIGHT)*4, SDL_WINDOW_OPENGL);
+	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*3, (SH*TS+HUDHEIGHT)*3, SDL_WINDOW_OPENGL);
 	#endif
 	r = SDL_CreateRenderer(w,-1,SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 	SDL_RenderSetLogicalSize(r, TS*SW,TS*SH+HUDHEIGHT);
@@ -749,6 +628,7 @@ int main () {
 	#else
 	SDL_RenderSetScale(r,4,4);
 	#endif
+	SDL_RenderSetClipRect(r,&clipRect);
 	SDL_SetRenderDrawBlendMode(r,SDL_BLENDMODE_BLEND);
 	s = SDL_GetWindowSurface(w);
 	rng.ui32=4; //SEEDS THE MAIN RNG

@@ -19,3 +19,4 @@ void behav_npcSpawn(int i);
 void behav_npc(int i);
 void behav_wall(int i);
 void behav_door(int i);
+void behav_lockedDoor(int i);

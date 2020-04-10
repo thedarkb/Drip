@@ -93,10 +93,10 @@ void drawEditorOverlay(){
 	drawRect(0,0,SW*TS,TS*2,0);
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
-	emptyRect(entSet[0].x+(TS*SW)/2-cameraX,entSet[0].y+4+TS+(TS*SH)/2-cameraY,TS,TS,0xFF0000);
+	emptyRect(entSet[0].x+CX,entSet[0].y+CY,TS,TS,0xFF0000);
 
 	char editorText[255];
-	sprintf(editorText,"Tile ID: %u\nGrid Position: %u,%u\n",mapEditorTile,sX,sY);
+	sprintf(editorText,"Tile ID: %u\nGrid Pos: %u,%u\n",mapEditorTile,sX,sY);
 	text(editorText,TS+2,-TS);
 
 	hudDraw(hwtileset[mapEditorTile],0,0,TS,TS);

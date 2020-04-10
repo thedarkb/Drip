@@ -30,22 +30,37 @@ void ax_d1trc(view* in, unsigned int xPos, unsigned int yPos) {
 
 void ax_d1topcorridor(view* in, unsigned int xPos, unsigned int yPos){
 	*in=map_d1topcorridor;
+	if(!flagArray[D1_SWORDDOOR]){
+		mapEntitySpawn(ent_doorLocked(49,D1_SWORDDOOR),xPos,yPos,112,48);
+		in->layers[46/TS][112/TS]=1;
+	}
 }
 
 void ax_d1junction(view* in, unsigned int xPos, unsigned int yPos) {
 	*in=map_d1junction;
+	mapEntitySpawn(ent_doorLocked(49,D1_2FDOOR),xPos,yPos,144,64);
+	if(!flagArray[D1_2FDOOR]){
+		mapEntitySpawn(ent_doorLocked(49,D1_2FDOOR),xPos,yPos,144,64);
+		in->layers[64/TS][144/TS]=1;
+	}
+	mapEntitySpawn(ent_blobby(),xPos,yPos,128,64);
 }
 
 void ax_d1leftb1f(view* in, unsigned int xPos, unsigned int yPos) {
 	*in=map_d1leftb1f;
+	mapEntitySpawn(ent_door(56,613,310,0,64),xPos,yPos,32,128);
 }
 
 void ax_d1centreb1f(view* in, unsigned int xPos, unsigned int yPos) {
 	*in=map_d1centreb1f;
+	mapEntitySpawn(ent_item(4,D1_KEY1),xPos,yPos,96,16);
+	mapEntitySpawn(ent_item(4,D1_KEY2),xPos,yPos,144,16);
+	mapEntitySpawn(ent_item(2,D1_SWORD),xPos,yPos,144,32);	
 }
 
 void ax_d1rightb1f(view* in, unsigned int xPos, unsigned int yPos) {
 	*in=map_d1rightb1f;
+	mapEntitySpawn(ent_door(56,614,310,0,64),xPos,yPos,208,128);
 }
 
 void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){

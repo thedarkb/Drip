@@ -10,20 +10,16 @@ unsigned char getItemSprite(unsigned char type) {
 	sprite[1]=69;
 	sprite[2]=84;
 	sprite[3]=96;
+	sprite[4]=99;
 
 	return sprite[type];
 }
 
-void itemEffects(unsigned char type) {
+void itemEffects(unsigned char type, unsigned char slot) {
 	printf("Item type: %u\n", type);
 	switch (type) {
 		case 0:
 			printf("I am a potato.\n");
-		break;
-		case 1:
-			printf("My name is Steve, I'm a bunch of coloured rocks and I like the exit function.\n");
-			SDL_Delay(5000);
-			exit(0);
 		break;
 		case 2:
 			;
@@ -34,5 +30,14 @@ void itemEffects(unsigned char type) {
 		case 3:
 			entitySpawn(ent_axe(entSet[0].direction, 0, 0, 0),0,0);
 			swordOut=1;
+		case 4:
+			for(int i=0;i<ELIMIT;i++) {
+				if(entSet[i].behaviour==behav_lockedDoor && euclideanDistance(i,0,32)) {
+					flagArray[entSet[i].status[0]]=1;
+					pInv.items[slot].type=0;
+					break;
+				}
+			}
+		break;
 	}
 }

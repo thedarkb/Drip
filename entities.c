@@ -1,7 +1,5 @@
 //Make sure everything is initialised so you don't get UB, that goes for you in particular, Merlin.
 
-const 
-
 entity ent_playerM() { //Male
 	entity me;
 	memset(&me, 0, sizeof me);
@@ -32,35 +30,6 @@ entity ent_playerM() { //Male
 	return me;
 }
 
-entity ent_playerF() { //Female
-	entity me;
-	memset(&me, 0, sizeof me);
-	me.behaviour=playerBehaviour;
-	me.x=0;
-	me.y=0;
-	me.layer=2;
-	me.health=pMaxHealth;
-	me.attack=5;
-	me.xSub=TS/5;
-	me.ySub=1;
-	me.direction=1;
-	me.visible=1;
-	me.collisionClass=1;
-	me.frame[0]=177;
-	me.frame[1]=153;
-	me.frame[2]=161;
-	me.frame[3]=169;
-	me.frame[4]=176;
-	me.frame[5]=152;
-	me.frame[6]=160;
-	me.frame[7]=168;
-	me.frame[8]=178;
-	me.frame[9]=154;
-	me.frame[10]=162;
-	me.frame[11]=170;
-	return me;
-}
-
 entity ent_light(unsigned char brightness) {
 	entity me;
 	memset(&me,0,sizeof me);
@@ -68,38 +37,6 @@ entity ent_light(unsigned char brightness) {
 	me.health=255;
 	me.behaviour=behav_potato;
 	printf("Spawning light, apparently.\n");
-	return me;
-}
-
-entity ent_aitest() {
-	entity me;
-	memset(&me, 0, sizeof me);
-	me.behaviour=behav_wait;
-	printf("SPAWNING WITH BEHAVIOUR %p\n", me.behaviour);
-	me.xSub=2;
-	me.ySub=10;
-	me.direction=1;
-	me.layer=1;
-	me.attack=2;
-	me.deathframe=206;
-	me.visible=1;
-	me.health=30;
-	me.dialogue=diag_menuTest;
-	me.collisionClass=2;
-	me.frame[0]=177;
-	me.frame[1]=153;
-	me.frame[2]=161;
-	me.frame[3]=169;
-	me.frame[4]=176;
-	me.frame[5]=152;
-	me.frame[6]=160;
-	me.frame[7]=168;
-	me.frame[8]=178;
-	me.frame[9]=154;
-	me.frame[10]=162;
-	me.frame[11]=170;
-	me.drop[0]=1;
-	snapToGrid(&me);
 	return me;
 }
 
@@ -112,27 +49,28 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 			me.y-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY+=5;
+			//me.hitY+=5;
 		break;
 		case DOWN:
 			me.y+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY-=5;			
+			//me.hitY-=5;			
 		break;
 		case LEFT:
 			me.x-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX+=5;
+			//me.hitX+=5;
 		break;
 		case RIGHT:
 			me.x+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX-=5;
+			//me.hitX-=5;
 		break;
 	}
+	me.radius=5;
 	me.frame[0]=92;
 	me.frame[1]=101;
 	me.frame[2]=90;
@@ -143,6 +81,7 @@ entity ent_sword(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	me.frame[7]=88;
 	me.health=255;
 	me.lastHit=255;
+	me.collider=col_weapon;
 	me.layer=2;
 	me.visible=0;
 	me.status[0]=10;
@@ -162,27 +101,28 @@ entity ent_axe(unsigned char direction, uint16_t x, uint16_t y, unsigned char cr
 			me.y-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY+=7;
+			//me.hitY+=7;
 		break;
 		case DOWN:
 			me.y+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY-=7;			
+			//me.hitY-=7;			
 		break;
 		case LEFT:
 			me.x-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX+=7;
+			//me.hitX+=7;
 		break;
 		case RIGHT:
 			me.x+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX-=7;
+			//me.hitX-=7;
 		break;
 	}
+	me.radius=5;
 	me.frame[0]=108;
 	me.frame[1]=117;
 	me.frame[2]=106;
@@ -193,6 +133,7 @@ entity ent_axe(unsigned char direction, uint16_t x, uint16_t y, unsigned char cr
 	me.frame[7]=104;
 	me.health=255;
 	me.lastHit=255;
+	me.collider=col_weapon;
 	me.layer=2;
 	me.visible=0;
 	me.status[0]=10;
@@ -212,27 +153,28 @@ entity ent_staff(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 			me.y-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY+=7;
+			//me.hitY+=7;
 		break;
 		case 1:
 			me.y+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY-=7;			
+			//me.hitY-=7;			
 		break;
 		case 2:
 			me.x-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX+=7;
+			//me.hitX+=7;
 		break;
 		case 3:
 			me.x+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX-=7;
+			//me.hitX-=7;
 		break;
 	}
+	me.radius=5;
 	me.frame[0]=108;
 	me.frame[1]=117;
 	me.frame[2]=106;
@@ -243,6 +185,7 @@ entity ent_staff(unsigned char direction, uint16_t x, uint16_t y, unsigned char 
 	me.frame[7]=104;
 	me.health=255;
 	me.lastHit=255;
+	me.collider=col_weapon;
 	me.layer=2;
 	me.visible=0;
 	me.status[0]=10;
@@ -261,27 +204,28 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 			me.y-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY+=5;
+			//me.hitY+=5;
 		break;
 		case 1:
 			me.y+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitY-=5;			
+			//me.hitY-=5;			
 		break;
 		case 2:
 			me.x-=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX+=5;
+			//me.hitX+=5;
 		break;
 		case 3:
 			me.x+=TS;
 			me.xSub=TS/2;
 			me.ySub=TS/2;
-			me.hitX-=5;
+			//me.hitX-=5;
 		break;
 	}
+	me.radius=5;
 	me.frame[0]=67;
 	me.frame[1]=67;
 	me.frame[2]=67;
@@ -292,6 +236,7 @@ entity ent_dialogue(unsigned char direction, uint16_t x, uint16_t y) {
 	me.status[0]=10;
 	me.status[1]=0;
 	me.behaviour=behav_dialogue;
+	me.collider=col_dialogue;
 	me.setframe=direction;
 	me.visible=0;
 	me.collisionClass=131;
@@ -324,22 +269,50 @@ entity ent_nonsolid(unsigned char x, unsigned char y, unsigned char tile) {
 	return me;
 }
 
-entity ent_item(unsigned int x, unsigned int y, unsigned char type, unsigned char status) {
+entity ent_item(unsigned char type, unsigned char status) {
 	entity me;
 	memset(&me, 0, sizeof me);
+	if(flagArray[status]) return me;
+	me.radius=TS;
 	me.health=10;
 	me.behaviour=behav_item;
 	me.xSub=10;
 	me.ySub=10;
-	me.x=x;
-	me.y=y;
-	printf("Spawning item at %u,%u\n", x,y);
 	me.layer=0;
 	me.frame[0]=getItemSprite(type);
 	me.setframe=0;
 	me.status[0]=type;
+	me.status[1]=status;
 	me.visible=0;
 	me.collisionClass=0;
+	me.collider=col_item;
+	return me;
+}
+
+entity ent_blobby() {
+	entity me;
+	memset(&me,0,sizeof me);
+	me.collisionClass=2;
+	me.radius=TS/2;
+	me.xSub=2;
+	me.ySub=1;
+	me.visible=1;
+	me.frame[UP]=212;
+	me.frame[DOWN]=188;
+	me.frame[LEFT]=196;
+	me.frame[RIGHT]=204;
+	me.frame[4+UP]=211;
+	me.frame[4+DOWN]=187;
+	me.frame[4+LEFT]=195;
+	me.frame[4+RIGHT]=203;
+	me.frame[8+UP]=213;
+	me.frame[8+DOWN]=189;
+	me.frame[8+LEFT]=197;
+	me.frame[8+RIGHT]=205;
+	me.health=20;
+	me.layer=1;
+	me.collider=col_bouncy;
+	me.behaviour=behav_npcSpawn;
 	return me;
 }
 
@@ -423,10 +396,11 @@ entity ent_npc() {
 	me.collisionClass=2;
 	me.behaviour=behav_wall;
 	me.dialogue=diag_menuTest;
+	me.collider=col_bouncy;
 	return me;
 }
 
-entity ent_door(unsigned char tile, unsigned int destSx, unsigned int destSy, int destX, int destY) {
+entity ent_door(unsigned int tile, unsigned int destSx, unsigned int destSy, int destX, int destY) {
 	entity me;
 	memset(&me,0,sizeof me);
 	me.collisionClass=132;
@@ -442,31 +416,13 @@ entity ent_door(unsigned char tile, unsigned int destSx, unsigned int destSy, in
 	return me;
 }
 
-entity ent_doorStacking(unsigned char tile, uint16_t destSx, uint16_t destSy, int destX, int destY) {
+entity ent_doorLocked(unsigned int tile, unsigned int flag){
 	entity me;
 	memset(&me,0,sizeof me);
-	me.collisionClass=133;
-	me.health=255;
 	me.frame[0]=tile;
-	me.status[0]=destSx;
-	me.status[1]=destSy;
-	me.status[2]=destX;
-	me.status[3]=destY;
-	me.xSub=10;
-	me.ySub=10;
-	me.behaviour=behav_wall;
-	return me;
-}
-
-entity ent_doorReturn(unsigned char tile) {
-	entity me;
-	memset(&me,0,sizeof me);
-	me.collisionClass=133;
+	me.behaviour=behav_lockedDoor;
+	me.status[0]=flag;
 	me.health=255;
-	me.frame[0]=tile;
-	me.xSub=10;
-	me.ySub=10;
-	me.behaviour=behav_wall;
 	return me;
 }
 

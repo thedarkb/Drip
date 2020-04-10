@@ -4,6 +4,9 @@
 #define WW 10
 #define WH 10
 
+#define RESX 180
+#define RESY 120
+
 #define ELIMIT 512 //Entity limit must not exceed 256
 #define MAPELIMIT 8
 #define FLIMIT 32
@@ -14,7 +17,7 @@
 #define INVLIMIT 8
 #define ENTFRAMES 32
 #define TILECOUNT 239 //Set this to the actual number of sprites for best performance.
-#define FRAMERATE 30
+#define FRAMERATE 60
 #define HUDHEIGHT 20
 #define MSGDEPTH 32
 #define MSGTIME 30
@@ -27,12 +30,10 @@
 #define ANIMPARSE entSet[i].frame[entSet[i].direction+entSet[i].animation]
 #define THIS entSet[i]
 							
-#define LOADVIEW(p, x) \
-							_V=x;\
-							p=malloc(sizeof _V);\
-							*p=_V
 #define DIST(x1,y1,x2,y2) ((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))
 #define PAIR(x,y) (((x)<<16)|(y)) //This is very dirty and only designed for use with uint16_t sX/sY pairs.
+#define CX RESX/2-cameraX-TS/2
+#define CY RESY/2+HUDHEIGHT-cameraY-TS/2
 #define TITLE "Drip"
 
 
@@ -42,9 +43,17 @@ SDL_Surface* lOverlay=NULL;
 SDL_Surface* loader = NULL;
 SDL_Renderer* r = NULL;
 SDL_Texture* t = NULL;
+SDL_Texture* screenBackup=NULL;
 SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
 const uint8_t* keyboard = NULL;
+
+const SDL_Rect clipRect={
+	0,
+	0,
+	RESX,
+	RESY+HUDHEIGHT
+};
 
 
 SDL_Surface* swtileset[TILECOUNT]; 
@@ -59,6 +68,15 @@ enum direction {
 	RIGHT
 } direction;
 
+enum flags {
+	D1_SWORDDOOR,
+	D1_2FDOOR,
+	D1_KEY1,
+	D1_KEY2,
+	D1_SWORD
+} flags;
+unsigned int flagArray[255];
+
 //typedef struct faction faction;
 
 typedef struct outfit {
@@ -66,13 +84,14 @@ typedef struct outfit {
 	unsigned char colourFrame[FLIMIT];
 } outfit;
 
+typedef struct entity entity;
+
 typedef struct entity {
 	int x; 
 	int y;
 	unsigned char xSub; //Defines hitbox
 	unsigned char ySub; //^
-	short hitX; //Determines the centre of the hitbox during sprite on sprite collision calculations.
-	short hitY; //^
+	int radius;
 	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
 	void(*prevState)(int); //Used to hold the main behaviour while a temporary behaviour is in use.
 	unsigned int freezeFrames; //Can be used by weapons to slow player, other uses may vary by entity.
@@ -81,6 +100,7 @@ typedef struct entity {
 	unsigned char direction; //Facing direction
 	unsigned char animation; //Animation frame
 	unsigned char collisionClass; //Collision classes above 128 are not themselves susceptible to collisions.
+	void(*collider)(int, int);
 	unsigned char layer; //Where they are in the sprite stack.
 	unsigned char attack; //RPG style attack stat.
 	int status[4]; //General purpose entity specific variables.
@@ -117,7 +137,6 @@ typedef struct view {
 	unsigned char screen[SH][SW]; //Tile data.
 	unsigned char layers[SH][SW]; //Collision data.
 	unsigned char tScreen[SH][SW];
-	unsigned char top;
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 } view;
@@ -153,8 +172,6 @@ void(*mapLoader[705][610])(view* in, unsigned int xPos, unsigned int yPos);
 
 view emptyView;
 
-uint16_t flags=0;
-
 unsigned char lastSlot=0;
 
 unsigned int sX = 300; //View struct currently occupied by the player.
@@ -167,7 +184,6 @@ unsigned char dialogueOut=0;
 
 unsigned char animationG=0;
 
-location entranceStack[10]; //Holds the last 10 warp locations for return from interior warps.
 unsigned char entrySlot=0;
 
 char* msgBuffer[MSGDEPTH];
@@ -250,6 +266,8 @@ void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, u
 void hudRefresh();
 void flip();
 char collisionCheck(int x, int y);
+void playerMoveX(entity* movEnt, short amount);
+void playerMoveY(entity* movEnt, short amount);
 void moveX(entity* movEnt, short amount);
 void moveY(entity* movEnt, short amount);
 void fastMoveX(entity* movEnt, short direction, short speed);

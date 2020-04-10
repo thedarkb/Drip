@@ -1,6 +1,7 @@
 #define ME entSet[i]
 
 void playerBehaviour(int i) {
+
 	if(swordOut) entSet[i].animation=8;
 	#ifndef DEV
 	if(!refresh) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -9,6 +10,8 @@ void playerBehaviour(int i) {
 	if(mapEditorEnable) image(hwtileset[83], entSet[i].x, entSet[i].y, TS, TS);
 	else if(!refresh) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
 	#endif
+
+	if(mode) return;
 
 	char pmotion=0;
 	static int zTimeout=0;
@@ -43,9 +46,9 @@ void playerBehaviour(int i) {
 				zTimeout=30;
 			}				
 			if (keyboard[SDL_SCANCODE_X] && !swordOut) {
-				itemEffects(pInv.items[pInv.weapon].type);		
+				itemEffects(pInv.items[pInv.weapon].type,pInv.weapon);		
 			}
-			if (keyboard[SDL_SCANCODE_C] && !swordOut) itemEffects(pInv.items[pInv.selection].type);
+			if (keyboard[SDL_SCANCODE_C] && !swordOut) itemEffects(pInv.items[pInv.selection].type,pInv.selection);
 		}
 
 		if(!keyboard[SDL_SCANCODE_X] && !keyboard[SDL_SCANCODE_C]) swordOut=0;
@@ -94,11 +97,10 @@ void playerBehaviour(int i) {
 		}
 	
 		if (keyboard[SDL_SCANCODE_D] && pInv.items[pInv.selection].type) {
-			entitySpawn(ent_item(0, 0, pInv.items[pInv.selection].type, 255),entSet[i].x,entSet[i].y);
+			entitySpawn(ent_item(pInv.items[pInv.selection].type, 255),entSet[i].x,entSet[i].y);
 			pInv.items[pInv.selection].type=0;
 		}
 		if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
-		if (keyboard[SDL_SCANCODE_N]) entitySpawn(ent_aitest(), 0,0);
 
 		#ifdef DEV
 		static int toggleTab=0;
@@ -137,7 +139,7 @@ void playerBehaviour(int i) {
 		}
 		#endif
 
-		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN);
+		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
 		if (keyboard[SDL_SCANCODE_F1]) printf("Entity 0 at %d,%d\n",entSet[i].x,entSet[i].y);
 		if(keyboard[SDL_SCANCODE_F3]) printf("Screen: %u,%u\n",sX,sY);
 		if(keyboard[SDL_SCANCODE_F2]) printf("Camera at %d,%d\n",cameraX,cameraY);
@@ -361,7 +363,10 @@ void behav_npc(int i) {
 	drawClothes(&entSet[i]);
 
 	reroll();
-	pathfind(&entSet[i], entSet[entSet[i].status[0]].x,entSet[entSet[i].status[0]].y,1); //Pointer to entity, target position, speed.
+	if(entSet[entSet[i].status[0]].x > entSet[i].x) moveX(&entSet[i], 1); //Chase target at x,y
+	if(entSet[entSet[i].status[0]].x < entSet[i].x) moveX(&entSet[i], -1);
+	if(entSet[entSet[i].status[0]].y > entSet[i].y) moveY(&entSet[i], 1);
+	if(entSet[entSet[i].status[0]].y < entSet[i].y) moveY(&entSet[i], -1); //Pointer to entity, target position, speed.
 
 	if(!entSet[entSet[i].status[0]].health || !entSet[entSet[i].status[0]].visible) entSet[i].behaviour=behav_npcSpawn;
 }
@@ -381,12 +386,29 @@ void behav_door(int i) {
 	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y,TS,TS);
 }
 
+void behav_lockedDoor(int i) {
+	if(entSet[i].x<0||entSet[i].x>SW*TS || entSet[i].y<0||entSet[i].y>SH*TS) goto drawOnly;
+	if(flagArray[entSet[i].status[0]]) {
+		tilewrapper[1][1].layers[entSet[i].y/TS][entSet[i].x/TS]=0;
+		return;
+	} else {
+		tilewrapper[1][1].layers[entSet[i].y/TS][entSet[i].x/TS]=1;
+	}
+
+	drawOnly:
+	if(flagArray[entSet[i].status[0]]) return;
+	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y,TS,TS);
+}
+
 void entityLogic() {
 	for(int l=0; l<SPRITELAYERS; l++) {
 		for (int i=0; i<ELIMIT; i++) {
 			if(entSet[i].behaviour && entSet[i].layer == l) {
 				entSet[i].behaviour(i);
 			}
+			#ifdef DEV
+			if(mapEditorEnable) break;
+			#endif
 		}
 	}
 }
