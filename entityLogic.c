@@ -41,7 +41,7 @@ void playerBehaviour(int i) {
 			if (!pmotion) entSet[i].animation=0;
 			
 			if(keyboard[SDL_SCANCODE_Z]) {
-				entitySpawn(ent_dialogue(entSet[i].direction, entSet[i].x, entSet[i].y),0,0);
+				entitySpawn(ent_dialogue(entSet[i].direction, entSet[i].x, entSet[i].y,0),0,0);
 				dialogueOut=1;
 				zTimeout=30;
 			}				
@@ -97,7 +97,7 @@ void playerBehaviour(int i) {
 		}
 	
 		if (keyboard[SDL_SCANCODE_D] && pInv.items[pInv.selection].type) {
-			entitySpawn(ent_item(pInv.items[pInv.selection].type, 255),entSet[i].x,entSet[i].y);
+			entitySpawn(ent_item(pInv.items[pInv.selection].type, 255,0,0),entSet[i].x,entSet[i].y);
 			pInv.items[pInv.selection].type=0;
 		}
 		if (keyboard[SDL_SCANCODE_K]) snapToGrid(&entSet[i]);
@@ -377,10 +377,10 @@ void behav_wall(int i) {
 
 void behav_door(int i) {
 	if(euclideanDistance(i,0,10)) {
-		entSet[0].x=ME.destX;
-		entSet[0].y=ME.destY;
-		sX=ME.destSx;
-		sY=ME.destSy;
+		entSet[0].x=ME.status[2];
+		entSet[0].y=ME.status[3];
+		sX=ME.status[0];
+		sY=ME.status[1];
 		refresh=1;
 	}
 	image(hwtileset[entSet[i].frame[0]], entSet[i].x, entSet[i].y,TS,TS);

@@ -100,15 +100,11 @@ typedef struct entity {
 	unsigned char direction; //Facing direction
 	unsigned char animation; //Animation frame
 	unsigned char collisionClass; //Collision classes above 128 are not themselves susceptible to collisions.
-	void(*collider)(int, int);
+	void(*collider)(int, int);//Collision handler.
 	unsigned char layer; //Where they are in the sprite stack.
 	unsigned char attack; //RPG style attack stat.
 	int status[4]; //General purpose entity specific variables.
-	int destSx;//Used for the entity's pocket dimension or teleporter destination.
-	int destSy;
-	int destX;
-	int destY;
-	uint16_t health;
+	uint16_t health; //Entity is at risk of being despawned if 0.
 	unsigned int frame[FLIMIT]; //Array of animation frames.
 	unsigned char setframe; //Current frame
 	unsigned char deathframe; //Death sprite
@@ -116,10 +112,6 @@ typedef struct entity {
 	unsigned char lastHit; //The last entity to strike them.
 	void(*dialogue)(); //Points to the dialogue, stored in dialogue.c; the domain of the man, the myth, the Merlin.
 	outfit clothes;
-	int pathX; //Used by the pathfinding function to check if the NPC is stuck.
-	int pathY;
-	unsigned char pathType; //Pathfinding mode.
-	unsigned char brightness;
 } entity;
 
 typedef struct item {
@@ -137,6 +129,7 @@ typedef struct view {
 	unsigned char screen[SH][SW]; //Tile data.
 	unsigned char layers[SH][SW]; //Collision data.
 	unsigned char tScreen[SH][SW];
+	entity preSpawns[10];
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 } view;

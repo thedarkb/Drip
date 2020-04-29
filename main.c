@@ -6,7 +6,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include "main.h"
-#include "entities.h"
+#include "rawents.h"
 #include "entityLogic.h"
 #ifdef DEV
 #include "mapeditor.c"
@@ -15,7 +15,7 @@
 #include "dialogue.c"
 #include "clothes.c"
 #include "collision.c"
-#include "entities.c"
+#include "rawents.c"
 //#include "factions.c"
 #include "maps.c"
 #include "worldgen.c"
@@ -50,7 +50,7 @@ view blendMap(view blayer, view tlayer) {
 }
 
 void light() {
-	unsigned char lightLevel=255;
+	/*unsigned char lightLevel=255;
 	for(int i=0; i<ELIMIT; i++) {
 		if(entSet[i].behaviour && lightLevel-entSet[i].brightness>0) lightLevel-=entSet[i].brightness;
 		else if(entSet[i].behaviour){
@@ -58,7 +58,7 @@ void light() {
 			break;
 		}
 	}
-	drawRectAlpha(0,HUDHEIGHT,SW*TS,SH*TS,0x282600,lightLevel);
+	drawRectAlpha(0,HUDHEIGHT,SW*TS,SH*TS,0x282600,lightLevel);*/
 }
 
 void pathfind(entity* in, int x, int y, int speed) {
@@ -138,7 +138,7 @@ void deadEntityKiller() {
 			entSet[i].layer=0;
 			if(entSet[i].drop[0] != 0) {
 				printf("Spawning drop...\n");
-				entitySpawn(ent_item(entSet[i].drop[0], 255),entSet[i].x,entSet[i].y);
+				entitySpawn(ent_item(entSet[i].drop[0], 255,0,0),entSet[i].x,entSet[i].y);
 				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
 			}
 		}

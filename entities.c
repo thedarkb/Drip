@@ -10,7 +10,6 @@ entity ent_playerM() { //Male
 	me.health=pMaxHealth;
 	me.attack=5;
 	me.xSub=TS/5;
-	me.brightness=100;
 	me.ySub=1;
 	me.direction=1;
 	me.visible=1;
@@ -27,16 +26,6 @@ entity ent_playerM() { //Male
 	me.frame[9]=125; //down step2
 	me.frame[10]=133; //left step2
 	me.frame[11]=141; //right step2
-	return me;
-}
-
-entity ent_light(unsigned char brightness) {
-	entity me;
-	memset(&me,0,sizeof me);
-	//me.brightness=brightness;
-	me.health=255;
-	me.behaviour=behav_potato;
-	printf("Spawning light, apparently.\n");
 	return me;
 }
 
@@ -319,7 +308,6 @@ entity ent_blobby() {
 entity ent_techNpc() {
 	entity me;
 	printf("Spawning tech NPC\n");
-	me.brightness=50;
 	memset(&me, 0, sizeof me);
 	me.collisionClass=2;
 	me.xSub=2;
@@ -352,7 +340,6 @@ entity ent_agNpc() {
 	me.xSub=2;
 	me.ySub=10;
 	me.visible=1;
-	me.brightness=50;
 	me.frame[0]=145;
 	me.frame[1]=121;
 	me.frame[2]=129;
@@ -406,10 +393,10 @@ entity ent_door(unsigned int tile, unsigned int destSx, unsigned int destSy, int
 	me.collisionClass=132;
 	me.health=255;
 	me.frame[0]=tile;
-	me.destSx=destSx;
-	me.destSy=destSy;
-	me.destX=destX;
-	me.destY=destY;
+	me.status[0]=destSx;
+	me.status[1]=destSy;
+	me.status[2]=destX;
+	me.status[3]=destY;
 	me.xSub=10;
 	me.ySub=10;
 	me.behaviour=behav_door;
