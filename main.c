@@ -8,6 +8,7 @@
 #include "main.h"
 #include "rawents.h"
 #include "entityLogic.h"
+#include "entities.h"
 #ifdef DEV
 #include "mapeditor.c"
 #endif
@@ -16,6 +17,7 @@
 #include "clothes.c"
 #include "collision.c"
 #include "rawents.c"
+#include "entities.c"
 //#include "factions.c"
 #include "maps.c"
 #include "worldgen.c"

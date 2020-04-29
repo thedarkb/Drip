@@ -1,10 +1,7 @@
 unsigned char getItemSprite(unsigned char type) {
 	unsigned char sprite[255];
 
-	if (type==0) {
-		printf("Invalid drop.");
-		return 0;
-	}
+	if(!type) return 0;
 	
 	sprite[0]=83;
 	sprite[1]=69;

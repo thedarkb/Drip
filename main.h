@@ -129,7 +129,7 @@ typedef struct view {
 	unsigned char screen[SH][SW]; //Tile data.
 	unsigned char layers[SH][SW]; //Collision data.
 	unsigned char tScreen[SH][SW];
-	entity preSpawns[10];
+	unsigned char preSpawns[10];
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 } view;

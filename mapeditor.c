@@ -60,6 +60,8 @@ void editorMapExport() {
 
 void drawEditorOverlay(){
 	static int lastTap=0;
+	static int object=0;
+
 	if(!lastTap && keyboard[SDL_SCANCODE_PAGEDOWN] && mapEditorTile<TILECOUNT) mapEditorTile++;
 	else if (!lastTap && keyboard[SDL_SCANCODE_PAGEUP] && mapEditorTile>0) mapEditorTile--;
 	else if(!lastTap&&keyboard[SDL_SCANCODE_T]) {
@@ -71,8 +73,11 @@ void drawEditorOverlay(){
 	}
 
 	if(!lastTap && keyboard[SDL_SCANCODE_M]) editorMapExport();
+	if(!lastTap && keyboard[SDL_SCANCODE_SEMICOLON] && object) object=0;
+	else if(!lastTap && keyboard[SDL_SCANCODE_SEMICOLON] && !object) object=1;	
 
-	if(keyboard[SDL_SCANCODE_PAGEUP] || keyboard[SDL_SCANCODE_PAGEDOWN] || keyboard[SDL_SCANCODE_M]) lastTap=1;
+
+	if(keyboard[SDL_SCANCODE_PAGEUP] || keyboard[SDL_SCANCODE_PAGEDOWN] || keyboard[SDL_SCANCODE_M] || keyboard[SDL_SCANCODE_SEMICOLON]) lastTap=1;
 	else lastTap=0;
 
 	if(keyboard[SDL_SCANCODE_RIGHTBRACKET]&&mapEditorTile<TILECOUNT-1)mapEditorTile+=2;
@@ -96,8 +101,18 @@ void drawEditorOverlay(){
 	emptyRect(entSet[0].x+CX,entSet[0].y+CY,TS,TS,0xFF0000);
 
 	char editorText[255];
-	sprintf(editorText,"Tile ID: %u\nGrid Pos: %u,%u\n",mapEditorTile,sX,sY);
+	if(object) {
+		if(mapEditorTile < FLAVOURCOUNT-1) strcpy(editorText,editorEntityFlavour[mapEditorTile]);
+		else {
+			strcpy(editorText,"Scroll back up!");
+			text(editorText,TS+2,-TS);
+			return;
+		}
+	} else {
+		sprintf(editorText,"Tile ID: %u\nGrid Pos: %u,%u\n",mapEditorTile,sX,sY);
+	}
 	text(editorText,TS+2,-TS);
 
-	hudDraw(hwtileset[mapEditorTile],0,0,TS,TS);
+	if(object && topLevelEntities[mapEditorTile]) hudDraw(hwtileset[topLevelEntities[mapEditorTile](0,0,0,0).frame[1]],0,0,TS,TS);
+	else hudDraw(hwtileset[mapEditorTile],0,0,TS,TS);
 }
