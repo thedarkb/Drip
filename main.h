@@ -8,7 +8,7 @@
 #define RESY 120
 
 #define ELIMIT 512 //Entity limit must not exceed 256
-#define MAPELIMIT 8
+#define MAPELIMIT 16
 #define FLIMIT 32
 #define ENTVARIETY 1
 #define FACTIONLIMIT 2
@@ -91,7 +91,7 @@ typedef struct entity {
 	int y;
 	unsigned char xSub; //Defines hitbox
 	unsigned char ySub; //^
-	int radius;
+	int radius;//Can't be bothered getting proper sprite collisions working so I just work off of distance from centre.
 	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
 	void(*prevState)(int); //Used to hold the main behaviour while a temporary behaviour is in use.
 	unsigned int freezeFrames; //Can be used by weapons to slow player, other uses may vary by entity.
@@ -114,6 +114,16 @@ typedef struct entity {
 	outfit clothes;
 } entity;
 
+typedef struct entitySpawners {//Spawnpoints in map cells are stored as an array of these.
+	unsigned int id;//Check out entities.h for these.
+	int x;//X spawn position
+	int y;//Y spawn position
+	int a1;//First argument.
+	int a2;//Second argument.
+	int a3;//Third argument.
+	int a4;//Fourth argument.
+} entitySpawners;
+
 typedef struct item {
 	unsigned char type;
 	unsigned char status;
@@ -126,10 +136,11 @@ typedef struct inventory {
 } inventory;
 
 typedef struct view {
-	unsigned char screen[SH][SW]; //Tile data.
+	unsigned char screen[SH][SW]; //Bottom layer tile data.
 	unsigned char layers[SH][SW]; //Collision data.
-	unsigned char tScreen[SH][SW];
-	unsigned char preSpawns[10];
+	unsigned char tScreen[SH][SW];//Top layer tile data.
+	entitySpawners preSpawns[MAPELIMIT];//Entities to be spawned on map load.
+	unsigned char type;//If 1, makes use of prespawns.
 	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
 	unsigned char room; //Tells loadspawn to reset data.
 } view;

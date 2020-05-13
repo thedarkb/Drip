@@ -106,8 +106,13 @@ void playerBehaviour(int i) {
 		static int toggleTab=0;
 		if(!toggleTab && keyboard[SDL_SCANCODE_TAB]) {
 			toggleTab=1;
-			if(mapEditorEnable) mapEditorEnable=0;
-			else mapEditorEnable=1;
+			if(mapEditorEnable) {
+				mapEditorEnable=0;
+				entSet[i].collisionClass=1;
+			} else {
+				mapEditorEnable=1;
+				entSet[i].collisionClass=0;
+			}
 		}
 		if(!keyboard[SDL_SCANCODE_TAB]) toggleTab=0;
 		if(mapEditorEnable && ((entSet[i].x+TS/2)/TS<SW&&(entSet[i].y+TS/2)/TS<SH)) {
@@ -407,7 +412,7 @@ void entityLogic() {
 				entSet[i].behaviour(i);
 			}
 			#ifdef DEV
-			if(mapEditorEnable) break;
+			//if(mapEditorEnable) break;
 			#endif
 		}
 	}

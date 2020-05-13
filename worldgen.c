@@ -69,7 +69,7 @@ void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){
 	mapEntitySpawn(ent_door(48,595,380,16,32),xPos,yPos,64,64);
 	mapEntitySpawn(ent_door(48,607,305,48,64),xPos,yPos,64,128);
 	mapEntitySpawn(ent_door(48,614,313,TS,TS),xPos,yPos,224,128);
-	in->flag=1;
+	in->flag=0;
 }
 
 void ax_testhouse(view* in, unsigned int xPos, unsigned int yPos) {
@@ -119,7 +119,24 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 	int xMult=(xIn-1)*(SW*TS);
 	int yMult=(yIn-1)*(SH*TS);
 	int xOffset=(xIn-1);
-	int yOffset=(yIn-1);	
+	int yOffset=(yIn-1);
+
+	printf("EntFetch entered...\n");
+
+	for(int i=0;i<MAPELIMIT;i++) {
+		if(!tilewrapper[xIn][yIn].preSpawns[i].id || tilewrapper[xIn][yIn].preSpawns[i].id>4) continue;
+		printf("Parsing pre-spawns...\n");
+		mapEntitySpawn(topLevelEntities[tilewrapper[xIn][yIn].preSpawns[i].id](
+			tilewrapper[xIn][yIn].preSpawns[i].a1,
+			tilewrapper[xIn][yIn].preSpawns[i].a2,
+			tilewrapper[xIn][yIn].preSpawns[i].a3,
+			tilewrapper[xIn][yIn].preSpawns[i].a4),
+			xIn,
+			yIn,
+			tilewrapper[xIn][yIn].preSpawns[i].x,
+			tilewrapper[xIn][yIn].preSpawns[i].y);
+	}
+
 	tilewrapper[xIn][yIn].flag=0;
 }
 
@@ -174,7 +191,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	} else {
 		memset(in,0,sizeof tilewrapper[1][1]);
 	}
-	in->flag=1;
+	in->flag=0;
 }
 
 void scrollMap() {

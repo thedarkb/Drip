@@ -53,7 +53,19 @@ void editorMapExport() {
 		if(y!=SH-1) fprintf(fileOut,"},\n");
 		else fprintf(fileOut,"}\n");
 	}
-	fprintf(fileOut,"	}\n");	
+	fprintf(fileOut,"	},\n");
+	fprintf(fileOut,"	{\n");
+	for(int i=0;i<MAPELIMIT;i++) {
+		fprintf(fileOut,"		{%u,",(*editorArray[sX][sY]).preSpawns[i].id);
+		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].x);
+		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].y);
+		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].a1);
+		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].a2);
+		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].a3);
+		if(i<MAPELIMIT-1) fprintf(fileOut,"%u},\n",(*editorArray[sX][sY]).preSpawns[i].a4);
+		else fprintf(fileOut,"%u}\n",(*editorArray[sX][sY]).preSpawns[i].a4);
+	}
+	fprintf(fileOut,"	}\n");
 	fprintf(fileOut,"};");
 	fclose(fileOut);
 }
@@ -61,10 +73,18 @@ void editorMapExport() {
 void drawEditorOverlay(){
 	static int lastTap=0;
 	static int object=0;
+	static int objectCounter=0;
+	static int entitySlot=0;
 
-	if(!lastTap && keyboard[SDL_SCANCODE_PAGEDOWN] && mapEditorTile<TILECOUNT) mapEditorTile++;
-	else if (!lastTap && keyboard[SDL_SCANCODE_PAGEUP] && mapEditorTile>0) mapEditorTile--;
-	else if(!lastTap&&keyboard[SDL_SCANCODE_T]) {
+	if(!object) {
+		if(!lastTap && keyboard[SDL_SCANCODE_PAGEDOWN] && mapEditorTile<TILECOUNT) mapEditorTile++;
+		else if (!lastTap && keyboard[SDL_SCANCODE_PAGEUP] && mapEditorTile>0) mapEditorTile--;
+	} else {
+		if(!lastTap && keyboard[SDL_SCANCODE_PAGEDOWN] && objectCounter<ENTCOUNT-1) objectCounter++;
+		else if (!lastTap && keyboard[SDL_SCANCODE_PAGEUP] && objectCounter>0) objectCounter--;
+	}
+
+	if(!lastTap&&keyboard[SDL_SCANCODE_T]) {
 		printf("Enter new sX: ");
 		scanf("%u", &sX);
 		printf("Enter new sY: ");
@@ -77,7 +97,8 @@ void drawEditorOverlay(){
 	else if(!lastTap && keyboard[SDL_SCANCODE_SEMICOLON] && !object) object=1;	
 
 
-	if(keyboard[SDL_SCANCODE_PAGEUP] || keyboard[SDL_SCANCODE_PAGEDOWN] || keyboard[SDL_SCANCODE_M] || keyboard[SDL_SCANCODE_SEMICOLON]) lastTap=1;
+	if(keyboard[SDL_SCANCODE_PAGEUP] || keyboard[SDL_SCANCODE_PAGEDOWN] || keyboard[SDL_SCANCODE_M]
+	 || keyboard[SDL_SCANCODE_SEMICOLON]) lastTap=1;
 	else lastTap=0;
 
 	if(keyboard[SDL_SCANCODE_RIGHTBRACKET]&&mapEditorTile<TILECOUNT-1)mapEditorTile+=2;
@@ -102,7 +123,7 @@ void drawEditorOverlay(){
 
 	char editorText[255];
 	if(object) {
-		if(mapEditorTile < FLAVOURCOUNT-1) strcpy(editorText,editorEntityFlavour[mapEditorTile]);
+		if(objectCounter < ENTCOUNT-1) strcpy(editorText,editorEntityFlavour[objectCounter]);
 		else {
 			strcpy(editorText,"Scroll back up!");
 			text(editorText,TS+2,-TS);
@@ -113,6 +134,6 @@ void drawEditorOverlay(){
 	}
 	text(editorText,TS+2,-TS);
 
-	if(object && topLevelEntities[mapEditorTile]) hudDraw(hwtileset[topLevelEntities[mapEditorTile](0,0,0,0).frame[1]],0,0,TS,TS);
+	if(object && topLevelEntities[mapEditorTile]) hudDraw(hwtileset[topLevelEntities[objectCounter](0,0,0,0).frame[1]],0,0,TS,TS);
 	else hudDraw(hwtileset[mapEditorTile],0,0,TS,TS);
 }

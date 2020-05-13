@@ -1,13 +1,11 @@
 unsigned char getItemSprite(unsigned char type) {
-	unsigned char sprite[255];
-
-	if(!type) return 0;
-	
-	sprite[0]=83;
-	sprite[1]=69;
-	sprite[2]=84;
-	sprite[3]=96;
-	sprite[4]=99;
+	unsigned char sprite[255]={
+		0,
+		69,
+		84,
+		96,
+		99
+	};
 
 	return sprite[type];
 }
