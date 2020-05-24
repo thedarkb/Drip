@@ -115,13 +115,13 @@ typedef struct entity {
 } entity;
 
 typedef struct entitySpawners {//Spawnpoints in map cells are stored as an array of these.
-	unsigned int id;//Check out entities.h for these.
-	int x;//X spawn position
-	int y;//Y spawn position
-	int a1;//First argument.
-	int a2;//Second argument.
-	int a3;//Third argument.
-	int a4;//Fourth argument.
+	uint32_t id;//Check out entities.h for these.
+	int32_t x;//X spawn position
+	int32_t y;//Y spawn position
+	int32_t a1;//First argument.
+	int32_t a2;//Second argument.
+	int32_t a3;//Third argument.
+	int32_t a4;//Fourth argument.
 } entitySpawners;
 
 typedef struct item {
@@ -136,13 +136,13 @@ typedef struct inventory {
 } inventory;
 
 typedef struct view {
-	unsigned char screen[SH][SW]; //Bottom layer tile data.
-	unsigned char layers[SH][SW]; //Collision data.
-	unsigned char tScreen[SH][SW];//Top layer tile data.
+	uint8_t screen[SH][SW]; //Bottom layer tile data.
+	uint8_t layers[SH][SW]; //Collision data.
+	uint8_t tScreen[SH][SW];//Top layer tile data.
+	uint32_t sX;
+	uint32_t sY;
 	entitySpawners preSpawns[MAPELIMIT];//Entities to be spawned on map load.
-	unsigned char type;//If 1, makes use of prespawns.
-	unsigned char flag; //Tells worldgen that it must refresh the entities in a room.
-	unsigned char room; //Tells loadspawn to reset data.
+	uint8_t flag; //Tells worldgen that it must refresh the entities in a room.
 } view;
 
 typedef struct location {

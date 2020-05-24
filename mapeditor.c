@@ -8,7 +8,37 @@ void mapEditorShim(view* in, int x, int y){
 		editorArray[x][y]=malloc(sizeof tilewrapper[1][1]);
 	}
 	*editorArray[x][y]=*in;
+	editorArray[x][y]->sX=x;
+	editorArray[x][y]->sY=y;
 }
+
+void editorMapBinExport() {
+	if(!editorArray[sX][sY]) return;
+	view output=*editorArray[sX][sY];
+	FILE* fileOut=NULL;
+	view testRead;
+
+	printf("Output Filename: ");
+	char filename[64];
+	char structName[64];
+	memset(&filename,0,sizeof filename);
+	scanf("%s", structName);
+	sprintf(filename,"%s.map",structName);
+	fileOut=fopen(filename, "rb+");
+	while(fread(&testRead, sizeof(view), 1, fileOut)) {
+		if(testRead.sX==sX && testRead.sY==sY) {
+			printf("Overwriting pre-existing entry.\n");
+			fseek(fileOut, -1, SEEK_CUR);
+			fwrite(&output, sizeof(view), 1, fileOut);
+			fclose(fileOut);
+			return;
+		}
+	}
+	printf("Creating new entry.\n");
+	fwrite(&output, sizeof (view), 1, fileOut);
+	fclose(fileOut);
+}
+
 
 void editorMapExport() {
 	if(!editorArray[sX][sY]) return;
@@ -92,7 +122,7 @@ void drawEditorOverlay(){
 		refresh=1;
 	}
 
-	if(!lastTap && keyboard[SDL_SCANCODE_M]) editorMapExport();
+	if(!lastTap && keyboard[SDL_SCANCODE_M]) editorMapBinExport();
 	if(!lastTap && keyboard[SDL_SCANCODE_SEMICOLON] && object) object=0;
 	else if(!lastTap && keyboard[SDL_SCANCODE_SEMICOLON] && !object) object=1;	
 
