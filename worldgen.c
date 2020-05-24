@@ -85,30 +85,19 @@ void ax_entryroom(view* in, unsigned int xPos, unsigned int yPos) {
 }
 
 void axiomLoad(){
-	memset(&mapLoader,0,sizeof mapLoader);
-	mapLoader[300][300]=ax_startPad;
-	mapLoader[607][305]=ax_testhouse;
-	mapLoader[614][313]=ax_entryroom;
-
-	//Dungeon 1
-	mapLoader[612][311]=ax_d1blc;
-	mapLoader[613][311]=ax_d1puzzleroom;
-	mapLoader[613][310]=ax_d1junction;
-	mapLoader[614][311]=ax_d1brc;
-
-	mapLoader[612][310]=ax_d1lcorridor;
-	mapLoader[614][310]=ax_d1rcorridor;
-
-	mapLoader[612][309]=ax_d1tlc;
-	mapLoader[613][309]=ax_d1topcorridor;
-	mapLoader[614][309]=ax_d1trc;
-
-	mapLoader[612][307]=ax_d1leftb1f;
-	mapLoader[613][307]=ax_d1centreb1f;
-	mapLoader[614][307]=ax_d1rightb1f;
-
-
-	//End of Dungeon 1
+	memset(mapLoader,0,sizeof mapLoader);
+	view inMap;
+	FILE* inFile=NULL;
+	if(!(inFile=fopen(WORLDFILENAME, "rb"))) {
+		printf(WORLDFILENAME);
+		printf(" not found, exiting.\n");
+		exit(1);
+	}
+	while(fread(&inMap, sizeof inMap, 1, inFile)) {
+		printf("Map segment found with sX:%u and sY:%u.\n", inMap.sX, inMap.sY);
+		mapLoader[inMap.sX][inMap.sY]=malloc(sizeof inMap);
+		*mapLoader[inMap.sX][inMap.sY]=inMap;
+	}
 }
 
 void entFetch(unsigned int xIn, unsigned int yIn) {
@@ -124,7 +113,7 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 	printf("EntFetch entered...\n");
 
 	for(int i=0;i<MAPELIMIT;i++) {
-		if(!tilewrapper[xIn][yIn].preSpawns[i].id || tilewrapper[xIn][yIn].preSpawns[i].id>4) continue;
+		//if(!tilewrapper[xIn][yIn].preSpawns[i].id || tilewrapper[xIn][yIn].preSpawns[i].id>4) continue;
 		printf("Parsing pre-spawns...\n");
 		mapEntitySpawn(topLevelEntities[tilewrapper[xIn][yIn].preSpawns[i].id](
 			tilewrapper[xIn][yIn].preSpawns[i].a1,
@@ -170,7 +159,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	//return;
 
 	if(mapLoader[xPos][yPos]) {
-		mapLoader[xPos][yPos](in,xPos,yPos);
+		*in=*mapLoader[xPos][yPos];
 		return;
 	}
 

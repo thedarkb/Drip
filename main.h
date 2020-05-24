@@ -4,6 +4,8 @@
 #define WW 10
 #define WH 10
 
+#define WORLDFILENAME "world.map"
+
 #define RESX 180
 #define RESY 120
 
@@ -172,7 +174,7 @@ view cornerRoom;
 unsigned char speaker; //Holds index of the entity which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
-void(*mapLoader[705][610])(view* in, unsigned int xPos, unsigned int yPos);
+view* mapLoader[705][610];
 
 view emptyView;
 

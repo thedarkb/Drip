@@ -27,14 +27,14 @@ void editorMapBinExport() {
 	fileOut=fopen(filename, "rb+");
 	while(fread(&testRead, sizeof(view), 1, fileOut)) {
 		if(testRead.sX==sX && testRead.sY==sY) {
-			printf("Overwriting pre-existing entry.\n");
-			fseek(fileOut, -1, SEEK_CUR);
+			printf("Overwriting pre-existing entry at %u,%u.\n",output.sX,output.sY);
+			fseek(fileOut, -sizeof (view), SEEK_CUR);
 			fwrite(&output, sizeof(view), 1, fileOut);
 			fclose(fileOut);
 			return;
 		}
 	}
-	printf("Creating new entry.\n");
+	printf("Creating new entry at %u,%u.\n",output.sX,output.sY);
 	fwrite(&output, sizeof (view), 1, fileOut);
 	fclose(fileOut);
 }
