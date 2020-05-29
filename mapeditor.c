@@ -15,88 +15,25 @@ void mapEditorShim(view* in, int x, int y){
 void editorMapBinExport() {
 	if(!editorArray[sX][sY]) return;
 	view output=*editorArray[sX][sY];
+	output.flag=1;
 	FILE* fileOut=NULL;
 	view testRead;
 
-	printf("Output Filename: ");
 	char filename[64];
 	char structName[64];
 	memset(&filename,0,sizeof filename);
-	scanf("%s", structName);
-	sprintf(filename,"%s.map",structName);
-	fileOut=fopen(filename, "rb+");
-	while(fread(&testRead, sizeof(view), 1, fileOut)) {
+	fileOut=fopen(WORLDFILENAME, "rb+");
+	while(fread(&testRead, sizeof(view), 1, fileOut)) {//Hunts down a record for this area of the world.
 		if(testRead.sX==sX && testRead.sY==sY) {
 			printf("Overwriting pre-existing entry at %u,%u.\n",output.sX,output.sY);
-			fseek(fileOut, -sizeof (view), SEEK_CUR);
-			fwrite(&output, sizeof(view), 1, fileOut);
+			fseek(fileOut, -sizeof (view), SEEK_CUR);//If found, move the cursor back by one record.
+			fwrite(&output, sizeof(view), 1, fileOut);//Overwrites old record with new record.
 			fclose(fileOut);
 			return;
 		}
 	}
 	printf("Creating new entry at %u,%u.\n",output.sX,output.sY);
-	fwrite(&output, sizeof (view), 1, fileOut);
-	fclose(fileOut);
-}
-
-
-void editorMapExport() {
-	if(!editorArray[sX][sY]) return;
-	FILE* fileOut=NULL;
-
-	printf("Output Filename: ");
-	char filename[64];
-	char structName[64];
-	memset(&filename,0,sizeof filename);
-	scanf("%s", structName);
-	sprintf(filename,"%s.c",structName);
-	fileOut=fopen(filename, "w");
-
-	fprintf(fileOut, "const view %s={\n", structName);
-	fprintf(fileOut,"	{\n");
-	for(int y=0;y<SH;y++){
-		fprintf(fileOut,"		{");
-		for(int x=0;x<SW;x++){
-			if(x!=SW-1)fprintf(fileOut,"%u,",(*editorArray[sX][sY]).screen[y][x]);
-			else fprintf(fileOut,"%u",(*editorArray[sX][sY]).screen[y][x]);
-		}
-		if(y!=SH-1) fprintf(fileOut,"},\n");
-		else fprintf(fileOut,"}\n");
-	}
-	fprintf(fileOut,"	},\n	{\n");
-	for(int y=0;y<SH;y++){
-		fprintf(fileOut,"		{");
-		for(int x=0;x<SW;x++){
-			if(x!=SW-1)fprintf(fileOut,"%u,",(*editorArray[sX][sY]).layers[y][x]);
-			else fprintf(fileOut,"%u",(*editorArray[sX][sY]).layers[y][x]);
-		}
-		if(y!=SH-1) fprintf(fileOut,"},\n");
-		else fprintf(fileOut,"}\n");
-	}
-	fprintf(fileOut,"	},\n	{\n");
-	for(int y=0;y<SH;y++){
-		fprintf(fileOut,"		{");
-		for(int x=0;x<SW;x++){
-			if(x!=SW-1)fprintf(fileOut,"%u,",(*editorArray[sX][sY]).tScreen[y][x]);
-			else fprintf(fileOut,"%u",(*editorArray[sX][sY]).tScreen[y][x]);
-		}
-		if(y!=SH-1) fprintf(fileOut,"},\n");
-		else fprintf(fileOut,"}\n");
-	}
-	fprintf(fileOut,"	},\n");
-	fprintf(fileOut,"	{\n");
-	for(int i=0;i<MAPELIMIT;i++) {
-		fprintf(fileOut,"		{%u,",(*editorArray[sX][sY]).preSpawns[i].id);
-		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].x);
-		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].y);
-		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].a1);
-		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].a2);
-		fprintf(fileOut,"%u,",(*editorArray[sX][sY]).preSpawns[i].a3);
-		if(i<MAPELIMIT-1) fprintf(fileOut,"%u},\n",(*editorArray[sX][sY]).preSpawns[i].a4);
-		else fprintf(fileOut,"%u}\n",(*editorArray[sX][sY]).preSpawns[i].a4);
-	}
-	fprintf(fileOut,"	}\n");
-	fprintf(fileOut,"};");
+	fwrite(&output, sizeof (view), 1, fileOut);//If no record is found by the above loop, append a new one to the EOF
 	fclose(fileOut);
 }
 
@@ -105,6 +42,58 @@ void drawEditorOverlay(){
 	static int object=0;
 	static int objectCounter=0;
 	static int entitySlot=0;
+	char over[64]="";
+	int wEntSlot=0;
+
+	
+	if(mapEditorEnable && ((entSet[0].x+TS/2)/TS<SW&&(entSet[0].y+TS/2)/TS<SH)) {
+		if(keyboard[SDL_SCANCODE_SPACE] && !object) {	 
+			tilewrapper[1][1].screen[(entSet[0].y+TS/2)/TS][(entSet[0].x+TS/2)/TS]=mapEditorTile;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		} else if(keyboard[SDL_SCANCODE_SPACE] && object) {
+			for(int i=0;i<MAPELIMIT;i++){
+				if(!tilewrapper[1][1].preSpawns[i].id) {
+					tilewrapper[1][1].preSpawns[i].id=objectCounter;
+					tilewrapper[1][1].preSpawns[i].x=entSet[0].x;
+					tilewrapper[1][1].preSpawns[i].y=entSet[0].y;
+					printf("Enter the first spawn argument: ");
+					scanf("%d", &tilewrapper[1][1].preSpawns[i].a1);
+					printf("Enter the second spawn argument: ");
+					scanf("%d", &tilewrapper[1][1].preSpawns[i].a2);
+					printf("Enter the third spawn argument: ");
+					scanf("%d", &tilewrapper[1][1].preSpawns[i].a3);
+					printf("Enter the fourth spawn argument: ");
+					scanf("%d", &tilewrapper[1][1].preSpawns[i].a4);
+					goto fullBreak;
+				}
+			}
+			pushMsg("Entity array full!");
+			fullBreak:
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		if(keyboard[SDL_SCANCODE_RETURN] && entSet[0].x+TS/2<SW*TS && entSet[0].y+TS/2<SH*TS) {
+			tilewrapper[1][1].tScreen[(entSet[0].y+TS/2)/TS][(entSet[0].x+TS/2)/TS]=mapEditorTile;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		if(keyboard[SDL_SCANCODE_COMMA] && entSet[0].x+TS/2<SW*TS && entSet[0].y+TS/2<SH*TS) {
+			tilewrapper[1][1].layers[(entSet[0].y+TS/2)/TS][(entSet[0].x+TS/2)/TS]=1;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		if(keyboard[SDL_SCANCODE_PERIOD] && entSet[0].x+TS/2<SW*TS && entSet[0].y+TS/2<SH*TS) {
+			tilewrapper[1][1].layers[(entSet[0].y+TS/2)/TS][(entSet[0].x+TS/2)/TS]=0;
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+		if(keyboard[SDL_SCANCODE_F10]) {
+			memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
+			mapEditorShim(&tilewrapper[1][1],sX,sY);
+			refresh=1;
+		}
+	}
 
 	if(!object) {
 		if(!lastTap && keyboard[SDL_SCANCODE_PAGEDOWN] && mapEditorTile<TILECOUNT) mapEditorTile++;
@@ -123,12 +112,14 @@ void drawEditorOverlay(){
 	}
 
 	if(!lastTap && keyboard[SDL_SCANCODE_M]) editorMapBinExport();
+	if(!lastTap && keyboard[SDL_SCANCODE_F9]) for(int i=1;i<ELIMIT;i++) memset(&entSet[i],0,sizeof entSet[i]);
+	if(!lastTap && keyboard[SDL_SCANCODE_F8]) {refresh=1;tilewrapper[1][1].flag=1;}
 	if(!lastTap && keyboard[SDL_SCANCODE_SEMICOLON] && object) object=0;
 	else if(!lastTap && keyboard[SDL_SCANCODE_SEMICOLON] && !object) object=1;	
 
 
 	if(keyboard[SDL_SCANCODE_PAGEUP] || keyboard[SDL_SCANCODE_PAGEDOWN] || keyboard[SDL_SCANCODE_M]
-	 || keyboard[SDL_SCANCODE_SEMICOLON]) lastTap=1;
+	 || keyboard[SDL_SCANCODE_SEMICOLON] || keyboard[SDL_SCANCODE_F9] || keyboard[SDL_SCANCODE_F8]) lastTap=1;
 	else lastTap=0;
 
 	if(keyboard[SDL_SCANCODE_RIGHTBRACKET]&&mapEditorTile<TILECOUNT-1)mapEditorTile+=2;
@@ -145,25 +136,43 @@ void drawEditorOverlay(){
 			}
 		}
 	}
+	for(int i=0;i<MAPELIMIT;i++){
+		if(!object) break;
+		if(tilewrapper[1][1].preSpawns[i].id) {
+			drawRectAlphaTrack(tilewrapper[1][1].preSpawns[i].x,tilewrapper[1][1].preSpawns[i].y,TS,TS,0xFF0000,32);
+		}
+	}
 
 	drawRect(0,0,SW*TS,TS*2,0);
 	cameraX=entSet[0].x;
 	cameraY=entSet[0].y;
 	emptyRect(entSet[0].x+CX,entSet[0].y+CY,TS,TS,0xFF0000);
 
+	if(object){
+		for(int i=0;i<MAPELIMIT;i++){
+			if(get_diff(entSet[0].x,tilewrapper[1][1].preSpawns[i].x) < TS && get_diff(entSet[0].y,tilewrapper[1][1].preSpawns[i].y) < TS
+			 && tilewrapper[1][1].preSpawns[i].id) {
+				strcpy(over,editorEntityFlavour[tilewrapper[1][1].preSpawns[i].id]);
+				if(keyboard[SDL_SCANCODE_DELETE]) tilewrapper[1][1].preSpawns[i].id=0;
+				mapEditorShim(&tilewrapper[1][1],sX,sY);
+			}
+		}
+	}
+	
+
 	char editorText[255];
 	if(object) {
-		if(objectCounter < ENTCOUNT-1) strcpy(editorText,editorEntityFlavour[objectCounter]);
+		if(objectCounter < ENTCOUNT) sprintf(editorText,"%s\nOVER: %s",editorEntityFlavour[objectCounter],over);
 		else {
 			strcpy(editorText,"Scroll back up!");
-			text(editorText,TS+2,-TS);
-			return;
 		}
 	} else {
 		sprintf(editorText,"Tile ID: %u\nGrid Pos: %u,%u\n",mapEditorTile,sX,sY);
 	}
 	text(editorText,TS+2,-TS);
 
-	if(object && topLevelEntities[mapEditorTile]) hudDraw(hwtileset[topLevelEntities[objectCounter](0,0,0,0).frame[1]],0,0,TS,TS);
+	if(object && topLevelEntities[objectCounter]) hudDraw(hwtileset[topLevelEntities[objectCounter](0,0,0,0).frame[1]],0,0,TS,TS);
 	else hudDraw(hwtileset[mapEditorTile],0,0,TS,TS);
+
+	//if(editorArray[sX][sY]) *editorArray[sX][sY]=tilewrapper[1][1];
 }

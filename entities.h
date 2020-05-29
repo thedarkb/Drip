@@ -12,8 +12,8 @@ entity (*topLevelEntities[ENTCOUNT])(int,int,int,int)={
 };
 
 char* editorEntityFlavour[ENTCOUNT]={
-	"Null\0"
-	"Item\0",
-	"Locked Door\0",
-	"Blobby\0"
+	"Null",
+	"Item",
+	"Locked Door",
+	"Blobby"
 };

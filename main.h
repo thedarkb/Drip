@@ -245,7 +245,6 @@ void deadEntityKiller();
 int overlap(unsigned int i, unsigned int j);
 int euclideanDistance(unsigned int i, unsigned int j, unsigned int distance);
 void corpseDisposal();
-//void mapLoader(char entities[SW][SH], char collisions[SW][SH]);
 SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum);
 void text(char* inStr, int x, int y);
 void menu();

@@ -108,40 +108,16 @@ void playerBehaviour(int i) {
 			toggleTab=1;
 			if(mapEditorEnable) {
 				mapEditorEnable=0;
-				entSet[i].collisionClass=1;
+				entSet[0].collisionClass=1;
+				tilewrapper[1][1].flag=1;
+				refresh=1;
 			} else {
 				mapEditorEnable=1;
-				entSet[i].collisionClass=0;
+				entSet[0].collisionClass=0;
+				mapEditorShim(&tilewrapper[1][1],sX,sY);
 			}
 		}
 		if(!keyboard[SDL_SCANCODE_TAB]) toggleTab=0;
-		if(mapEditorEnable && ((entSet[i].x+TS/2)/TS<SW&&(entSet[i].y+TS/2)/TS<SH)) {
-			if(keyboard[SDL_SCANCODE_SPACE]) {	 
-				tilewrapper[1][1].screen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
-				mapEditorShim(&tilewrapper[1][1],sX,sY);
-				refresh=1;
-			}
-			if(keyboard[SDL_SCANCODE_RETURN] && ME.x+TS/2<SW*TS && ME.y+TS/2<SH*TS) {
-				tilewrapper[1][1].tScreen[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=mapEditorTile;
-				mapEditorShim(&tilewrapper[1][1],sX,sY);
-				refresh=1;
-			}
-			if(keyboard[SDL_SCANCODE_COMMA] && ME.x+TS/2<SW*TS && ME.y+TS/2<SH*TS) {
-				tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=1;
-				mapEditorShim(&tilewrapper[1][1],sX,sY);
-				refresh=1;
-			}
-			if(keyboard[SDL_SCANCODE_PERIOD] && ME.x+TS/2<SW*TS && ME.y+TS/2<SH*TS) {
-				tilewrapper[1][1].layers[(entSet[i].y+TS/2)/TS][(entSet[i].x+TS/2)/TS]=0;
-				mapEditorShim(&tilewrapper[1][1],sX,sY);
-				refresh=1;
-			}
-			if(keyboard[SDL_SCANCODE_F10]) {
-				memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
-				mapEditorShim(&tilewrapper[1][1],sX,sY);
-				refresh=1;
-			}
-		}
 		#endif
 
 		if (keyboard[SDL_SCANCODE_F11]) SDL_SetWindowFullscreen(w, SDL_WINDOW_FULLSCREEN_DESKTOP);
@@ -373,7 +349,7 @@ void behav_npc(int i) {
 	if(entSet[entSet[i].status[0]].y > entSet[i].y) moveY(&entSet[i], 1);
 	if(entSet[entSet[i].status[0]].y < entSet[i].y) moveY(&entSet[i], -1); //Pointer to entity, target position, speed.
 
-	if(!entSet[entSet[i].status[0]].health || !entSet[entSet[i].status[0]].visible) entSet[i].behaviour=behav_npcSpawn;
+	//if(!entSet[entSet[i].status[0]].health || !entSet[entSet[i].status[0]].visible) entSet[i].behaviour=behav_npcSpawn;
 }
 
 void behav_wall(int i) {
@@ -412,7 +388,7 @@ void entityLogic() {
 				entSet[i].behaviour(i);
 			}
 			#ifdef DEV
-			//if(mapEditorEnable) break;
+			if(mapEditorEnable) break;
 			#endif
 		}
 	}

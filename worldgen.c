@@ -1,89 +1,3 @@
-void ax_d1rcorridor(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1rcorridor;
-	mapEntitySpawn(ent_door(57,614,307,192,128),614,310,16,64);
-}
-
-void ax_d1lcorridor(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1leftcorridor;
-	mapEntitySpawn(ent_door(57,612,307,16,128),612,310,224,64);
-}
-
-void ax_d1puzzleroom(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1puzzleroom;
-}
-
-void ax_d1blc(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1blc;
-}
-
-void ax_d1brc(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1brc;
-}
-
-void ax_d1tlc(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1tlc;
-}
-
-void ax_d1trc(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1trc;
-}
-
-void ax_d1topcorridor(view* in, unsigned int xPos, unsigned int yPos){
-	*in=map_d1topcorridor;
-	if(!flagArray[D1_SWORDDOOR]){
-		mapEntitySpawn(ent_doorLocked(49,D1_SWORDDOOR,0,0),xPos,yPos,112,48);
-		in->layers[46/TS][112/TS]=1;
-	}
-}
-
-void ax_d1junction(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1junction;
-	mapEntitySpawn(ent_doorLocked(49,D1_2FDOOR,0,0),xPos,yPos,144,64);
-	if(!flagArray[D1_2FDOOR]){
-		mapEntitySpawn(ent_doorLocked(49,D1_2FDOOR,0,0),xPos,yPos,144,64);
-		in->layers[64/TS][144/TS]=1;
-	}
-	mapEntitySpawn(ent_blobby(0,0,0,0),xPos,yPos,128,64);
-}
-
-void ax_d1leftb1f(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1leftb1f;
-	mapEntitySpawn(ent_door(56,613,310,0,64),xPos,yPos,32,128);
-}
-
-void ax_d1centreb1f(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1centreb1f;
-	mapEntitySpawn(ent_item(4,D1_KEY1,0,0),xPos,yPos,96,16);
-	mapEntitySpawn(ent_item(4,D1_KEY2,0,0),xPos,yPos,144,16);
-	mapEntitySpawn(ent_item(2,D1_SWORD,0,0),xPos,yPos,144,32);	
-}
-
-void ax_d1rightb1f(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_d1rightb1f;
-	mapEntitySpawn(ent_door(56,614,310,0,64),xPos,yPos,208,128);
-}
-
-void ax_startPad(view* in, unsigned int xPos, unsigned int yPos){
-	memset(&in->screen,1,sizeof in->screen);
-	mapEntitySpawn(ent_door(48,301,300,16,32),xPos,yPos,16,16);
-	mapEntitySpawn(ent_door(48,595,380,16,32),xPos,yPos,64,64);
-	mapEntitySpawn(ent_door(48,607,305,48,64),xPos,yPos,64,128);
-	mapEntitySpawn(ent_door(48,614,313,TS,TS),xPos,yPos,224,128);
-	in->flag=0;
-}
-
-void ax_testhouse(view* in, unsigned int xPos, unsigned int yPos) {
-	memset(&in->screen,1,sizeof in->screen);
-	*in=interior;
-	mapEntitySpawn(ent_door(48,300,300,64,144),xPos,yPos,48,80);
-	mapEntitySpawn(ent_npc(0,0,0,0),xPos,yPos,48,32);
-}
-
-void ax_entryroom(view* in, unsigned int xPos, unsigned int yPos) {
-	*in=map_entryroom;
-	mapEntitySpawn(ent_door(0,614,310,200,80),xPos,yPos,TS*2,TS*2);
-}
-
 void axiomLoad(){
 	memset(mapLoader,0,sizeof mapLoader);
 	view inMap;
@@ -113,15 +27,15 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 	printf("EntFetch entered...\n");
 
 	for(int i=0;i<MAPELIMIT;i++) {
-		//if(!tilewrapper[xIn][yIn].preSpawns[i].id || tilewrapper[xIn][yIn].preSpawns[i].id>4) continue;
-		printf("Parsing pre-spawns...\n");
+		if(!tilewrapper[xIn][yIn].preSpawns[i].id) continue;
+		printf("Entity found, spawning at %u,%u\n",tilewrapper[xIn][yIn].sX,tilewrapper[xIn][yIn].sY);
 		mapEntitySpawn(topLevelEntities[tilewrapper[xIn][yIn].preSpawns[i].id](
 			tilewrapper[xIn][yIn].preSpawns[i].a1,
 			tilewrapper[xIn][yIn].preSpawns[i].a2,
 			tilewrapper[xIn][yIn].preSpawns[i].a3,
 			tilewrapper[xIn][yIn].preSpawns[i].a4),
-			xIn,
-			yIn,
+			tilewrapper[xIn][yIn].sX,
+			tilewrapper[xIn][yIn].sY,
 			tilewrapper[xIn][yIn].preSpawns[i].x,
 			tilewrapper[xIn][yIn].preSpawns[i].y);
 	}
@@ -134,7 +48,6 @@ void loadSpawn() {
 		for(int y=0; y<3; y++) {
 			if (tilewrapper[x][y].flag) {
 				entFetch(x,y);
-				//if(tilewrapper[x][y].spawnFunc) tilewrapper[x][y].spawnFunc(sX+(x-1),sY+(y-1));
 				//factionFetch(x,y);
 				tilewrapper[x][y].flag=0;
 			}
@@ -151,6 +64,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	#ifdef DEV
 	if(editorArray[xPos][yPos]) {
 		*in=*editorArray[xPos][yPos];
+		in->flag=1;
 		return;
 	}
 	#endif
@@ -160,8 +74,11 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 
 	if(mapLoader[xPos][yPos]) {
 		*in=*mapLoader[xPos][yPos];
+		in->flag=1;
 		return;
 	}
+	//memset(in,0,sizeof tilewrapper[1][1]);
+	//return;
 
 	//printf("Difference: %d\n", diff);
 	if(DIST(xPos,yPos,400,400)<40000 && yPos>250 && xPos<267) {
@@ -180,6 +97,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	} else {
 		memset(in,0,sizeof tilewrapper[1][1]);
 	}
+	memset(in->preSpawns,0,sizeof(in->preSpawns));
 	in->flag=0;
 }
 
