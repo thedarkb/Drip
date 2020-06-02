@@ -23,6 +23,13 @@
 #include "worldgen.c"
 #include "entityLogic.c"
 
+unsigned int weightedRand(int i) {
+	if(i<0) return 0;
+	reroll();
+	if(rng.ui32%2) return weightedRand(++i);
+	return i;
+}
+
 view offsetBlendMap(view blayer, view tlayer, int xOff, int yOff) {
 	view me;
 	me=blayer;
@@ -673,6 +680,7 @@ int main () {
 	unsigned int timer=0;
 	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
 	entityInitialise(); //Loads the player
+	generateTunnels();
 	axiomLoad();//Loads the map function pointer matrix.
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
 	memset(&tilewrapper,0,sizeof tilewrapper);

@@ -14,7 +14,7 @@
 #define FLIMIT 32
 #define ENTVARIETY 1
 #define FACTIONLIMIT 2
-#define TLIMIT 16
+#define TLIMIT 255
 #define SPRITELAYERS 3
 #define INVLIMIT 8
 #define ENTFRAMES 32
@@ -171,7 +171,7 @@ void(*options[6])(); //Menu options.
 
 view cornerRoom;
 
-unsigned char speaker; //Holds index of the entity which started conversation.
+unsigned int speaker; //Holds index of the entity which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
 view* mapLoader[705][610];

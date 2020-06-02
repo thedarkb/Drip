@@ -111,6 +111,14 @@ void drawEditorOverlay(){
 		refresh=1;
 	}
 
+	if(!lastTap&&keyboard[SDL_SCANCODE_APOSTROPHE]&&sY<600) {
+		sY+=600;
+		refresh=1;
+	} else if(!lastTap&&keyboard[SDL_SCANCODE_APOSTROPHE]&&sY>600) {
+		sY-=600;
+		refresh=1;
+	}
+
 	if(!lastTap && keyboard[SDL_SCANCODE_M]) editorMapBinExport();
 	if(!lastTap && keyboard[SDL_SCANCODE_F9]) for(int i=1;i<ELIMIT;i++) memset(&entSet[i],0,sizeof entSet[i]);
 	if(!lastTap && keyboard[SDL_SCANCODE_F8]) {refresh=1;tilewrapper[1][1].flag=1;}
@@ -119,7 +127,8 @@ void drawEditorOverlay(){
 
 
 	if(keyboard[SDL_SCANCODE_PAGEUP] || keyboard[SDL_SCANCODE_PAGEDOWN] || keyboard[SDL_SCANCODE_M]
-	 || keyboard[SDL_SCANCODE_SEMICOLON] || keyboard[SDL_SCANCODE_F9] || keyboard[SDL_SCANCODE_F8]) lastTap=1;
+	 || keyboard[SDL_SCANCODE_SEMICOLON] || keyboard[SDL_SCANCODE_F9] || keyboard[SDL_SCANCODE_F8]
+	 || keyboard[SDL_SCANCODE_APOSTROPHE]) lastTap=1;
 	else lastTap=0;
 
 	if(keyboard[SDL_SCANCODE_RIGHTBRACKET]&&mapEditorTile<TILECOUNT-1)mapEditorTile+=2;
@@ -159,7 +168,6 @@ void drawEditorOverlay(){
 		}
 	}
 	
-
 	char editorText[255];
 	if(object) {
 		if(objectCounter < ENTCOUNT) sprintf(editorText,"%s\nOVER: %s",editorEntityFlavour[objectCounter],over);

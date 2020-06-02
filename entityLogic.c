@@ -1,7 +1,6 @@
 #define ME entSet[i]
 
 void playerBehaviour(int i) {
-
 	if(swordOut) entSet[i].animation=8;
 	#ifndef DEV
 	if(!refresh) image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y, TS, TS);
@@ -323,21 +322,6 @@ void behav_item(int i) {
 }
 
 void behav_npcSpawn(int i){entSet[i].behaviour=behav_npc;}
-
-/*void behav_npcSpawn(int i) {
-	entSet[i].status[0]=0;
-	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS);
-	drawClothes(&entSet[i]);
-	for(int j=ELIMIT-1; j>=0; j--) {
-		if(get_diff(entSet[i].alignment,entSet[j].alignment)>entSet[i].aggroThreshold && entSet[j].health && entSet[j].visible) {
-			if(i!=j) entSet[i].status[0]=j;
-			printf("NPC with id%u\n and collision class %d pursuing entity %u\n", i, entSet[i].collisionClass,entSet[i].status[0]);
-			printf("\tDifference: %u", get_diff(entSet[i].alignment,entSet[j].alignment));
-			entSet[i].behaviour=behav_npc;
-			return;
-		}
-	}	
-}*/
 
 void behav_npc(int i) {
 	image(hwtileset[ANIMPARSE], entSet[i].x, entSet[i].y,TS,TS); //ANIMPARSE lives in main.h
