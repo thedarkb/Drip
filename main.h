@@ -1,8 +1,9 @@
 #define SH 10 //Screen Height
 #define SW 15 //Screen Width
 #define TS 16 //Tile Size
-#define WW 10
-#define WH 10
+
+#define WORLDWIDTH 700 //The size of the editable (not necessarily visible) world.
+#define WORLDHEIGHT 605 //The world is, in practice, larger due to the presence of a procedurally generated dungeon.
 
 #define WORLDFILENAME "world.map"
 
@@ -174,7 +175,7 @@ view cornerRoom;
 unsigned int speaker; //Holds index of the entity which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
-view* mapLoader[705][610];
+view* mapLoader[WORLDWIDTH][WORLDHEIGHT];
 
 view emptyView;
 
@@ -226,6 +227,7 @@ int cameraY=0;
 
 int frameTotal=0;
 
+unsigned int weightedRand(int i);
 view offsetBlendMap(view blayer, view tlayer, int xOff, int yOff);
 view blendMap(view blayer, view tlayer);
 void pathfind(entity* in, int x, int y, int speed);

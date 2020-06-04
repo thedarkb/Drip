@@ -91,22 +91,20 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	uint32_t screenHash=PAIR(xPos,yPos);
 	screenHash = lfsr(screenHash);
 	memset(in,0,sizeof tilewrapper[1][1]);
+	if(xPos<WORLDWIDTH && yPos<WORLDHEIGHT) {
+		#ifdef DEV
+		if(editorArray[xPos][yPos]) {
+			*in=*editorArray[xPos][yPos];
+			in->flag=1;
+			return;
+		}
+		#endif
 
-	#ifdef DEV
-	if(editorArray[xPos][yPos]) {
-		*in=*editorArray[xPos][yPos];
-		in->flag=1;
-		return;
-	}
-	#endif
-
-	//memset(in,0,sizeof *in);
-	//return;
-
-	if(mapLoader[xPos][yPos]) {
-		*in=*mapLoader[xPos][yPos];
-		in->flag=1;
-		return;
+		if(mapLoader[xPos][yPos]) {
+			*in=*mapLoader[xPos][yPos];
+			in->flag=1;
+			return;
+		}
 	}
 	//memset(in,0,sizeof tilewrapper[1][1]);
 	//return;
@@ -129,8 +127,8 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		for(int i=0;i<TLIMIT;i++){
 			if(yPos-600==(xPos*tunnels[i].m)+tunnels[i].c && tunnels[i].c ||
 				yPos-600==((xPos-1)*tunnels[i].m)+tunnels[i].c && tunnels[i].c) {
-				memset(in,0,sizeof(view));
-				memset(in->screen,1,sizeof in->screen);
+				*in=map_dungeon(xPos,yPos);
+				return;
 			}
 		}
 	} else {

@@ -1,4 +1,4 @@
-view* editorArray[705][705];
+view* editorArray[WORLDWIDTH][WORLDHEIGHT];
 unsigned int mapEditorTile=0;
 
 void initMapEditor() {memset(&editorArray,0,sizeof editorArray);}

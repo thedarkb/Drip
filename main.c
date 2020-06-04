@@ -26,7 +26,7 @@
 unsigned int weightedRand(int i) {
 	if(i<0) return 0;
 	reroll();
-	if(rng.ui32%2) return weightedRand(++i);
+	if(!(rng.ui32%4)) return weightedRand(++i);
 	return i;
 }
 
