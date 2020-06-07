@@ -1,32 +1,17 @@
 void generateTunnels() {
-	for(int i=0; i<TLIMIT/2; i++) {
-		duplicate://Dirty, I know.
+	memset(&dungeonRooms,0,sizeof dungeonRooms);
+	for(int i=0;i<WORLDHEIGHT-2;i+=2){
 		reroll();
-		tunnels[i].m=(rng.uc%2)*-1;
-		reroll();
-		tunnels[i].c=(rng.ui32%550)>>1;
-		tunnels[i].c<<=1;
-
-		for(int j=0; j<i; j++) if(tunnels[i].m == tunnels[j].m && tunnels[i].c == tunnels[j].c) goto duplicate;
-		//Goes back to the top of the for loop if a duplicate line is detected.
-		printf("Tunnel %d, m=%d; c=%d\n", i, tunnels[i].m, tunnels[i].c);
-		//printf("%d,%d\n", i, tunnels[i].m, tunnels[i].c);
+		if(rng.uc%3)
+			for(int x=0;x<WORLDWIDTH;x++)
+				dungeonRooms[x][i]=1;
 	}
-	for(int i=TLIMIT/2; i<TLIMIT; i++) {
-		duplicate1://Dirty, I know.
+	for(int i=0;i<WORLDWIDTH-2;i+=2){
 		reroll();
-		tunnels[i].m=rng.uc%2;
-		reroll();
-		tunnels[i].c=((rng.ui32%550)*-1)>>1;
-		tunnels[i].c<<=1;
-
-		for(int j=0; j<i; j++) if(tunnels[i].m == tunnels[j].m && tunnels[i].c == tunnels[j].c) goto duplicate1;
-		//Goes back to the top of the for loop if a duplicate line is detected.
-		printf("Tunnel %d, m=%d; c=%d\n", i, tunnels[i].m, tunnels[i].c);
-		//printf("%d,%d\n", i, tunnels[i].m, tunnels[i].c);
+		if(rng.uc%3)
+			for(int y=0;y<WORLDWIDTH;y++)
+				dungeonRooms[i][y]=1;
 	}
-	tunnels[0].m=0;
-	tunnels[0].c=300;
 }
 
 void axiomLoad(){
@@ -125,8 +110,7 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		memset(&in->layers,1,sizeof in->layers);
 	} else if(xPos<600 && yPos>600) {
 		for(int i=0;i<TLIMIT;i++){
-			if(yPos-600==(xPos*tunnels[i].m)+tunnels[i].c && tunnels[i].c ||
-				yPos-600==((xPos-1)*tunnels[i].m)+tunnels[i].c && tunnels[i].c) {
+			if(dungeonRooms[yPos-600][xPos]) {
 				*in=map_dungeon(xPos,yPos);
 				return;
 			}

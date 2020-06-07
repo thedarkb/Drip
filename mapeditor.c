@@ -90,6 +90,10 @@ void drawEditorOverlay(){
 		}
 		if(keyboard[SDL_SCANCODE_F10]) {
 			memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]);
+			for(int x=0;x<SW;x++)
+				for(int y=0;y<SH;y++)
+					tilewrapper[1][1].screen[y][x]=mapEditorTile;
+			
 			mapEditorShim(&tilewrapper[1][1],sX,sY);
 			refresh=1;
 		}
@@ -111,10 +115,10 @@ void drawEditorOverlay(){
 		refresh=1;
 	}
 
-	if(!lastTap&&keyboard[SDL_SCANCODE_APOSTROPHE]&&sY<600) {
+	if(!lastTap&&keyboard[SDL_SCANCODE_APOSTROPHE]&&sY<602) {
 		sY+=600;
 		refresh=1;
-	} else if(!lastTap&&keyboard[SDL_SCANCODE_APOSTROPHE]&&sY>600) {
+	} else if(!lastTap&&keyboard[SDL_SCANCODE_APOSTROPHE]&&sY>601) {
 		sY-=600;
 		refresh=1;
 	}

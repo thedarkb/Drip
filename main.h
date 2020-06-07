@@ -176,13 +176,14 @@ unsigned int speaker; //Holds index of the entity which started conversation.
 
 view tilewrapper[3][3]; //Holds all of the visible view structs
 view* mapLoader[WORLDWIDTH][WORLDHEIGHT];
+char dungeonRooms[WORLDWIDTH][WORLDHEIGHT];
 
 view emptyView;
 
 unsigned char lastSlot=0;
 
-unsigned int sX = 300; //View struct currently occupied by the player.
-unsigned int sY = 300; //^
+unsigned int sX = 400; //View struct currently occupied by the player.
+unsigned int sY = 601; //^
 unsigned char scroll = 0; //Triggers a screen transition on the next frame.
 
 unsigned char pMaxHealth=100;
@@ -227,7 +228,7 @@ int cameraY=0;
 
 int frameTotal=0;
 
-unsigned int weightedRand(int i);
+unsigned int weightedRand(int i, uint32_t in);
 view offsetBlendMap(view blayer, view tlayer, int xOff, int yOff);
 view blendMap(view blayer, view tlayer);
 void pathfind(entity* in, int x, int y, int speed);

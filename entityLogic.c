@@ -19,7 +19,7 @@ void playerBehaviour(int i) {
 		return;
 	}
 
-	for (int j=0; j<TS*8; j++) { //number of pixels to move per frame.
+	for (int j=0; j<TS/8; j++) { //number of pixels to move per frame.
 		if (entSet[i].status[3]==0 && !swordOut && !dialogueOut) {	
 			if (keyboard[SDL_SCANCODE_RIGHT]) {
 				moveX(&entSet[i], 1);

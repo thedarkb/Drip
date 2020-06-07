@@ -23,10 +23,19 @@
 #include "worldgen.c"
 #include "entityLogic.c"
 
-unsigned int weightedRand(int i) {
-	if(i<0) return 0;
-	reroll();
-	if(!(rng.ui32%4)) return weightedRand(++i);
+int giveInv(int item) {
+	for(int i=0;i<INVLIMIT;i++)
+		if(!pInv.items[i].type) {
+			pInv.items[i]=item;
+			return 0;
+		}
+	return 1;
+}
+
+unsigned int weightedRand(int i, uint32_t in) {
+	if(i<=0) return 0;
+	in=lfsr(in);
+	if(!(in%4)) return weightedRand(--i,in);
 	return i;
 }
 

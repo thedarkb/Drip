@@ -1,3 +1,11 @@
+enum {
+	ITEM_NULL,
+	ITEM_Q,
+	ITEM_SWORD,
+	ITEM_AXE,
+	ITEM_KEY
+} itemSyms;
+
 unsigned char getItemSprite(unsigned char type) {
 	unsigned char sprite[255]={
 		0,

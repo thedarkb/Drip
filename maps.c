@@ -123,17 +123,12 @@ const view map_beachright={
 view map_dungeon(uint16_t xPos, uint16_t yPos){
 	view me;
 	memset(&me,0,sizeof me);
-	reroll();
-	uint32_t xOff=0;
-	reroll();
+	uint32_t screenHash=PAIR(xPos,yPos);
+	uint32_t xOff=lfsr(screenHash)%5;
 	uint32_t yD=yPos-605;
 	uint32_t yOff;
-	if(yD<250) yOff=2;
-	else if (yD<400) yOff=1;
-	else yOff=0;
-	yOff=weightedRand(yOff);
-	if (yOff>2) yOff=2;
-	printf("yOff=%u\n",yOff);
+	screenHash=lfsr(lfsr(screenHash));
+	yOff=weightedRand(yD/100,screenHash);
 	if(mapLoader[605+xOff][yOff]) me=*mapLoader[605+xOff][yOff];
 
 	return me;
