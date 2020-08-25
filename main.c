@@ -26,7 +26,7 @@
 int giveInv(int item) {
 	for(int i=0;i<INVLIMIT;i++)
 		if(!pInv.items[i].type) {
-			pInv.items[i]=item;
+			pInv.items[i].type=item;
 			return 0;
 		}
 	return 1;
@@ -222,7 +222,6 @@ void text(char* inStr, int x, int y) {
 		}
 		i++;
 	}
-	
 }
 
 void menu() {
@@ -689,7 +688,13 @@ int main () {
 	unsigned int timer=0;
 	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
 	entityInitialise(); //Loads the player
-	generateTunnels();
+	generateDungeons();
+	for(int x=0;x<WORLDWIDTH;x++) {
+		for(int y=0;y<WORLDHEIGHT;y++){
+			printf("%c[%d;%df",0x1B,y,x);
+			printf("%d",dungeonRooms[x][y]);
+		}
+	}
 	axiomLoad();//Loads the map function pointer matrix.
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
 	memset(&tilewrapper,0,sizeof tilewrapper);

@@ -4,6 +4,7 @@
 
 #define WORLDWIDTH 700 //The size of the editable (not necessarily visible) world.
 #define WORLDHEIGHT 605 //The world is, in practice, larger due to the presence of a procedurally generated dungeon.
+#define SEED 420
 
 #define WORLDFILENAME "world.map"
 

@@ -335,6 +335,7 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 			screenHash=lfsr(screenHash);
 		}
 	}
+	if(dungeonRooms[xIn][yIn]) mapEntitySpawn(ent_door(57,sX,sY+600,SW/2+TS,SH/2+TS),xIn,yIn,SW/2,SH/2);
 	return me;
 }
 

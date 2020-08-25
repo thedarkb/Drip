@@ -3,14 +3,60 @@ void generateTunnels() {
 	for(int i=0;i<WORLDHEIGHT-2;i+=2){
 		reroll();
 		if(rng.uc%3)
-			for(int x=0;x<WORLDWIDTH;x++)
+			for(int x=0;x<WORLDWIDTH-2;x++)
 				dungeonRooms[x][i]=1;
 	}
-	for(int i=0;i<WORLDWIDTH-2;i+=2){
+	for(int i=0;i<WORLDWIDTH;i+=2){
 		reroll();
 		if(rng.uc%3)
-			for(int y=0;y<WORLDWIDTH;y++)
+			for(int y=0;y<WORLDHEIGHT;y++)
 				dungeonRooms[i][y]=1;
+	}
+}
+
+void generateDungeons() {
+	memset(&dungeonRooms,0,sizeof dungeonRooms);
+	int state=lfsr(SEED);
+	for(int x=0;x<WORLDWIDTH;x++) {//Creates the initial cells from which the dungeon will grow.
+		for(int y=0;y<WORLDHEIGHT;y++) {
+			state=lfsr(state);
+			if(state % 3 == 0) {
+				dungeonRooms[x][y]=1;
+				state=lfsr(state);
+				if(state%10 == 0) dungeonRooms[x][y]|=(1<<1);
+			}
+		}
+	}
+	for(int x=1;x<WORLDWIDTH-1;x++) {
+		for(int y=1;y<WORLDHEIGHT-1;y++) {
+			if(dungeonRooms[x][y]) {
+				int neighbours=0;
+				if(dungeonRooms[x-1][y]) neighbours++;
+				if(dungeonRooms[x+1][y]) neighbours++;
+				if(dungeonRooms[x][y-1]) neighbours++;
+				if(dungeonRooms[x][y+1]) neighbours++;
+
+				while(neighbours<2) {
+					state=lfsr(state);
+					if(state%4==0 && !dungeonRooms[x-1][y]) {
+						dungeonRooms[x-1][y]=1;
+						neighbours++;
+					}
+					if(state%4==1 && !dungeonRooms[x+1][y]) {
+						dungeonRooms[x+1][y]=1;
+						neighbours++;
+					}
+					if(state%4==2 && !dungeonRooms[x][y-1]) {
+						dungeonRooms[x][y-1]=1;
+						neighbours++;
+					}
+					if(state%4==3 && !dungeonRooms[x][y+1]) {
+						dungeonRooms[x][y+1]=1;
+						neighbours++;
+					}
+				}
+			}
+		}
 	}
 }
 
@@ -110,8 +156,11 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 		memset(&in->layers,1,sizeof in->layers);
 	} else if(xPos<600 && yPos>600) {
 		for(int i=0;i<TLIMIT;i++){
-			if(dungeonRooms[yPos-600][xPos]) {
+			if(dungeonRooms[xPos][yPos-600]) {
 				*in=map_dungeon(xPos,yPos);
+				if(dungeonRooms[xPos][yPos-600] & (1<<2)) {
+					memset(&in->screen,11,sizeof in->screen);
+				}
 				return;
 			}
 		}
