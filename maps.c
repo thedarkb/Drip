@@ -259,7 +259,7 @@ view map_snowgrass(uint16_t xIn, uint16_t yIn) {
 			else if(screenHash&BIT(1)) me.screen[y][x]=82;
 			else me.screen[y][x]=85;
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5)){
-				mapEntitySpawn(ent_wall(134,0,0,0),xIn,yIn,TS*x,TS*y);
+				//mapEntitySpawn(ent_wall(134,0,0,0),xIn,yIn,TS*x,TS*y);
 				me.layers[y][x]=1;
 			}
 		}
@@ -329,13 +329,13 @@ view map_grasslandBase(uint16_t xIn, uint16_t yIn) {
 	for(int x=0;x<SW;x++) {
 		for(int y=0;y<SH;y++) {
 			if(screenHash & BIT(2) && screenHash & BIT(3) && screenHash & BIT(4) && screenHash & BIT(5) && me.screen[y][x]==11) {
-				entitySpawn(ent_wall(30,0,0,0),eX+(TS*x),eY+(TS*y));
+				//entitySpawn(ent_wall(30,0,0,0),eX+(TS*x),eY+(TS*y));
 				me.layers[y][x]=1;
 			}
 			screenHash=lfsr(screenHash);
 		}
 	}
-	if(dungeonRooms[xIn][yIn]) mapEntitySpawn(ent_door(57,sX,sY+600,SW/2+TS,SH/2+TS),xIn,yIn,SW/2,SH/2);
+	//if(dungeonRooms[xIn][yIn]) mapEntitySpawn(ent_door(57,sX,sY+600,SW/2+TS,SH/2+TS),xIn,yIn,SW/2,SH/2);
 	return me;
 }
 

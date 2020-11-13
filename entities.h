@@ -5,15 +5,9 @@ entity ent_blobby(int lol1, int lol2, int lol3, int lol4);
 entity ent_doorLocked(int tile, int flag,int filler, int filler2);
 
 entity (*topLevelEntities[ENTCOUNT])(int,int,int,int)={
-	NULL,
-	ent_item,
-	ent_doorLocked,
-	ent_blobby
+	NULL
 };
 
 char* editorEntityFlavour[ENTCOUNT]={
-	"Null",
-	"Item",
-	"Locked Door",
-	"Blobby"
+	"Null"
 };

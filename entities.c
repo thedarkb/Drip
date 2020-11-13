@@ -1,57 +1,34 @@
-entity ent_item(int type, int status, int lol1, int lol2) {
-	entity me;
-	memset(&me, 0, sizeof me);
-	if(flagArray[status]) return me;
-	me.radius=TS;
-	me.health=10;
-	me.behaviour=behav_item;
-	me.xSub=10;
-	me.ySub=10;
-	me.layer=0;
-	me.frame[0]=getItemSprite(type);
-	me.setframe=0;
-	me.status[0]=type;
-	me.status[1]=status;
-	me.visible=0;
-	me.collisionClass=0;
-	me.collider=col_item;
+entity ent_playerM() { //Male
+	entity me={
+		112,
+		64,
+		TS/5,
+		1,
+		0,
+		playerBehaviour,
+		1,
+		0,
+		2,
+		5,
+		1
+	};
+	me.x=50;
+	me.y=50;
+	me.xSub=0;
+	me.ySub=0;
+	me.behaviour=playerBehaviour;
+	me.health=pMaxHealth;
+	me.frame[0]=148; //up
+	me.frame[1]=124; //down
+	me.frame[2]=132; //left
+	me.frame[3]=140; //right
+	me.frame[4]=147; //up step1
+	me.frame[5]=123; //down step1
+	me.frame[6]=131; //left step1
+	me.frame[7]=139; //right step1
+	me.frame[8]=149; //up step2
+	me.frame[9]=125; //down step2
+	me.frame[10]=133; //left step2
+	me.frame[11]=141; //right step2
 	return me;
 }
-
-entity ent_blobby(int lol1, int lol2, int lol3, int lol4) {
-	entity me;
-	memset(&me,0,sizeof me);
-	me.collisionClass=2;
-	me.radius=TS/2;
-	me.xSub=2;
-	me.ySub=1;
-	me.visible=1;
-	me.frame[UP]=212;
-	me.frame[DOWN]=188;
-	me.frame[LEFT]=196;
-	me.frame[RIGHT]=204;
-	me.frame[4+UP]=211;
-	me.frame[4+DOWN]=187;
-	me.frame[4+LEFT]=195;
-	me.frame[4+RIGHT]=203;
-	me.frame[8+UP]=213;
-	me.frame[8+DOWN]=189;
-	me.frame[8+LEFT]=197;
-	me.frame[8+RIGHT]=205;
-	me.health=20;
-	me.layer=1;
-	me.collider=col_bouncy;
-	me.behaviour=behav_npcSpawn;
-	return me;
-}
-
-entity ent_doorLocked(int tile, int flag,int filler, int filler2){
-	entity me;
-	memset(&me,0,sizeof me);
-	me.frame[0]=tile;
-	me.behaviour=behav_lockedDoor;
-	me.status[0]=flag;
-	me.health=255;
-	return me;
-}
-

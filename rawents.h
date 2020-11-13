@@ -1,10 +1,1 @@
 entity ent_player();
-entity ent_aitest();
-entity ent_sword(int direction, int x, int y, int creator);
-entity ent_axe(int direction, int x, int y, int creator);
-entity ent_dialogue(int direction, int x, int y, int filler);
-entity ent_wall(int tile, int lol1, int lol2, int lol3);
-entity ent_nonsolid(int x, int y, int tile, int filler);
-entity ent_item(int type, int status, int lol1, int lol2);
-entity ent_door(int tile, int destSx, unsigned int destSy, int destX, int destY);
-entity ent_empty();

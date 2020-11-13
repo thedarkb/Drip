@@ -1,3 +1,12 @@
+#ifdef WEB
+#include <emscripten.h>
+#endif
+#include <SDL2/SDL_image.h>
+#include <assert.h>
+#include <SDL2/SDL.h>
+#include <stdio.h>
+#include <tcl/tcl.h>
+
 #define SH 10 //Screen Height
 #define SW 15 //Screen Width
 #define TS 16 //Tile Size
@@ -52,6 +61,8 @@ SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
 const uint8_t* keyboard = NULL;
 
+Tcl_Interp* gameState=NULL;
+
 const SDL_Rect clipRect={
 	0,
 	0,
@@ -81,33 +92,21 @@ enum flags {
 } flags;
 unsigned int flagArray[255];
 
-//typedef struct faction faction;
-
-typedef struct outfit {
-	unsigned char frame[FLIMIT];
-	unsigned char colourFrame[FLIMIT];
-} outfit;
-
 typedef struct entity entity;
 
 typedef struct entity {
 	int x; 
 	int y;
+	int xVelocity;
+	int yVelocity;
 	unsigned char xSub; //Defines hitbox
 	unsigned char ySub; //^
 	int radius;//Can't be bothered getting proper sprite collisions working so I just work off of distance from centre.
 	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
-	void(*prevState)(int); //Used to hold the main behaviour while a temporary behaviour is in use.
-	unsigned int freezeFrames; //Can be used by weapons to slow player, other uses may vary by entity.
-	unsigned char visible; //1 if entity is visible to NPCs
-	unsigned char partisan; //1 if entity is part of the faction system.
 	unsigned char direction; //Facing direction
 	unsigned char animation; //Animation frame
-	unsigned char collisionClass; //Collision classes above 128 are not themselves susceptible to collisions.
-	void(*collider)(int, int);//Collision handler.
 	unsigned char layer; //Where they are in the sprite stack.
 	unsigned char attack; //RPG style attack stat.
-	int status[4]; //General purpose entity specific variables.
 	uint16_t health; //Entity is at risk of being despawned if 0.
 	unsigned int frame[FLIMIT]; //Array of animation frames.
 	unsigned char setframe; //Current frame
@@ -115,7 +114,6 @@ typedef struct entity {
 	unsigned char drop[4]; //Array of items, drop table.
 	unsigned char lastHit; //The last entity to strike them.
 	void(*dialogue)(); //Points to the dialogue, stored in dialogue.c; the domain of the man, the myth, the Merlin.
-	outfit clothes;
 } entity;
 
 typedef struct entitySpawners {//Spawnpoints in map cells are stored as an array of these.
@@ -129,12 +127,13 @@ typedef struct entitySpawners {//Spawnpoints in map cells are stored as an array
 } entitySpawners;
 
 typedef struct item {
-	unsigned char type;
-	unsigned char status;
+	unsigned int sprite;
+	void(*behaviour)();
+	void* state;
 } item;
 
 typedef struct inventory {
-	item items[INVLIMIT];
+	item* items[INVLIMIT];
 	unsigned char selection;
 	unsigned char weapon;
 } inventory;

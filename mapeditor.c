@@ -41,7 +41,6 @@ void drawEditorOverlay(){
 	static int lastTap=0;
 	static int object=0;
 	static int objectCounter=0;
-	static int entitySlot=0;
 	char over[64]="";
 	int wEntSlot=0;
 

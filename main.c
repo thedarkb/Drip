@@ -1,32 +1,24 @@
-#ifdef WEB
-#include <emscripten.h>
-#endif
-#include <SDL2/SDL_image.h>
-#include <assert.h>
-#include <SDL2/SDL.h>
-#include <stdio.h>
 #include "main.h"
+#include "draw.c"
 #include "rawents.h"
 #include "entityLogic.h"
 #include "entities.h"
 #ifdef DEV
 #include "mapeditor.c"
 #endif
-#include "items.c"
 #include "dialogue.c"
-#include "clothes.c"
 #include "collision.c"
-#include "rawents.c"
+#include "entityLogic.c"
 #include "entities.c"
 //#include "factions.c"
 #include "maps.c"
 #include "worldgen.c"
-#include "entityLogic.c"
+#include "tcl.c"
 
 int giveInv(int item) {
 	for(int i=0;i<INVLIMIT;i++)
-		if(!pInv.items[i].type) {
-			pInv.items[i].type=item;
+		if(!pInv.items[i]) {
+			pInv.items[i]=item;
 			return 0;
 		}
 	return 1;
@@ -88,12 +80,6 @@ void pathfind(entity* in, int x, int y, int speed) {
 	}
 }
 
-void drawClothes(entity* in) {
-	if(!in) return;
-	if(!in->clothes.colourFrame[0]) return;
-	tintedImage(hwtileset[in->clothes.colourFrame[in->direction+in->animation]],in->x,in->y,TS,TS,0xFFFFFF);
-}
-
 void entityInitialise() { //Clears entity array, spawns player.
 	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
@@ -145,18 +131,18 @@ void entitySpawn(entity in, int x, int y) {
 }
 
 void deadEntityKiller() {
+	return;
 	for (int i=0; i<ELIMIT; i++) {
 		if(entSet[i].health==0) {
-			if(entSet[i].behaviour && entSet[i].behaviour != &behav_dead) {
-				entSet[i].behaviour=behav_dead;
+			if(entSet[i].behaviour) {
 				printf("Killing %d\n with deathframe %u\n", i, entSet[i].deathframe);
 			}
 
-			entSet[i].collisionClass=0;
+			//entSet[i].collisionClass=0;
 			entSet[i].layer=0;
 			if(entSet[i].drop[0] != 0) {
 				printf("Spawning drop...\n");
-				entitySpawn(ent_item(entSet[i].drop[0], 255,0,0),entSet[i].x,entSet[i].y);
+				//entitySpawn(ent_item(entSet[i].drop[0], 255,0,0),entSet[i].x,entSet[i].y);
 				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
 			}
 		}
@@ -169,10 +155,10 @@ int euclideanDistance(unsigned int i, unsigned int j, unsigned int distance) {
 }
 
 int overlap(unsigned int i, unsigned int j){
-	if (!entSet[j].collisionClass) return 0;
-	if (!entSet[i].collisionClass) return 0;
+	//if (!entSet[j].collisionClass) return 0;
+	//if (!entSet[i].collisionClass) return 0;
 	if (i==j) return 0;
-	if (entSet[j].collisionClass>128) return 0;
+	//if (entSet[j].collisionClass>128) return 0;
 	if (DIST(entSet[i].x,entSet[i].y,entSet[j].x,entSet[j].y)<entSet[i].radius*entSet[i].radius) return 1;
 	return 0;
 }
@@ -187,8 +173,8 @@ void spriteCollisions() {
 		for (int j=start; j<ELIMIT && j>=0; j+=direction) {
 			if(overlap(i,j)){
 				printf("OVERLAP\n");
-				if(entSet[i].collider && entSet[j].collisionClass<128) entSet[i].collider(i,j);
-				if(entSet[j].collider && entSet[i].collisionClass<128) entSet[j].collider(j,i);
+				//if(entSet[i].collider && entSet[j].collisionClass<128) entSet[i].collider(i,j);
+				//if(entSet[j].collider && entSet[i].collisionClass<128) entSet[j].collider(j,i);
 			}
 		}
 	}
@@ -314,113 +300,6 @@ int intersect(unsigned int x, unsigned int y) {
 	return -1;
 }
 
-void imageNoTrack(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
-	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h}; //Accounts for HUD but NOT the camera.
-	SDL_RenderCopy(r, imgIn, NULL, &scaler);
-}
-
-void image(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
-	SDL_Rect scaler = {x+CX,y+CY,w,h}; //Accounts for HUD and camera.
-	SDL_RenderCopy(r, imgIn, NULL, &scaler);
-}
-
-void tintedImage(SDL_Texture* imgIn, int x, int y, int w, int h, uint32_t colour) { //Copies an image from the hardware buffer to the screen.
-	union htmlDecode {
-		uint32_t htmlCode;
-		unsigned char rgb[3];
-	} htmlDecode;
-	htmlDecode.htmlCode=colour;
-	if(SDL_SetTextureColorMod(imgIn, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0])) printf("Colour Mod not supported.\n");
-	SDL_Rect scaler = {x+CX,y+CY,w,h}; //Accounts for HUD and camera.
-	SDL_RenderCopy(r, imgIn, NULL, &scaler);
-	SDL_SetTextureColorMod(imgIn, 255, 255, 255);
-}
-
-/*
-void timage(SDL_Texture* imgIn, int x, int y, int w, int h) {
-	SDL_Rect scaler = {x,y,w,h};
-	SDL_RenderCopy(r, imgIn, NULL, &scaler);
-}*/
-
-void simage(SDL_Surface* imgIn, int x, int y, int w, int h) { //Ditto above, but from software buffer.
-	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h};
-	SDL_Texture* imgOut = SDL_CreateTextureFromSurface(r, imgIn);
-	SDL_RenderCopy(r, imgOut, NULL, &scaler);
-	SDL_DestroyTexture(imgOut);
-}
-
-void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h) { //For drawing to the HUD
-	SDL_Rect scaler = {x,y,w,h};
-	SDL_RenderCopy(r, imgIn, NULL, &scaler);
-}
-
-void bgBlit(SDL_Surface* imgIn, int x, int y, int w, int h) { //For drawing to the background layer.
-	SDL_Rect scaler = {x,y,w,h};
-	//SDL_BlitSurface(imgIn, NULL, bgLayer, &scaler);
-}
-
-void bgDraw (view* in) { //Takes a tileset and blits it to the background layer.
-	for (int x=0; x<SW; x++) {
-		for (int y=0; y<SH; y++) {
-			bgBlit(swtileset[in->screen[y][x]],x*TS,y*TS,TS,TS);
-		}
-	}
-}
-
-void drawRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) { //Draws filled rectangle
-	union htmlDecode {
-		uint32_t htmlCode;
-		unsigned char rgb[3];
-	} htmlDecode;
-	htmlDecode.htmlCode=colour;
-	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
-	SDL_Rect scaler={x,y,w,h};
-	SDL_RenderFillRect(r, &scaler);
-}
-
-void drawRectAlpha(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour, uint8_t alpha) { //Draws filled rectangle
-	union htmlDecode {
-		uint32_t htmlCode;
-		unsigned char rgb[3];
-	} htmlDecode;
-	htmlDecode.htmlCode=colour;
-	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], alpha);
-	SDL_Rect scaler={x,y,w,h};
-	SDL_RenderFillRect(r, &scaler);
-}
-
-void drawRectAlphaTrack(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour, uint8_t alpha) { //Draws filled rectangle
-	union htmlDecode {
-		uint32_t htmlCode;
-		unsigned char rgb[3];
-	} htmlDecode;
-	htmlDecode.htmlCode=colour;
-	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], alpha);
-	SDL_Rect scaler = {x+CX,y+CY,w,h};
-	SDL_RenderFillRect(r, &scaler);
-}
-
-void drawRectTrack(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) { //Draws filled rectangle
-	union htmlDecode {
-		uint32_t htmlCode;
-		unsigned char rgb[3];
-	} htmlDecode;
-	htmlDecode.htmlCode=colour;
-	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
-	SDL_Rect scaler = {x+CX,y+CY,w,h};
-	SDL_RenderFillRect(r, &scaler);
-}
-
-void emptyRect(unsigned int x, unsigned int y, unsigned int w, unsigned int h, uint32_t colour) { //Draws empty rectangle.
-	union htmlDecode {
-		uint32_t htmlCode;
-		unsigned char rgb[3];
-	} htmlDecode;
-	htmlDecode.htmlCode=colour;
-	SDL_SetRenderDrawColor(r, htmlDecode.rgb[2], htmlDecode.rgb[1], htmlDecode.rgb[0], 255);
-	SDL_Rect scaler={x,y,w,h};
-	SDL_RenderDrawRect(r, &scaler);
-}
 
 void hudRefresh() { //Redraws HUD
 	drawRect(0,0,TS*SW,HUDHEIGHT,0);
@@ -428,7 +307,7 @@ void hudRefresh() { //Redraws HUD
 	drawRect(132,8,105,4,0xd04648);
 	drawRect(132,12,105,4,0x597dce);
 	for (int i=0; i<INVLIMIT; i++) {
-		if (pInv.items[i].type) hudDraw(hwtileset[getItemSprite(pInv.items[i].type)], TS*i, 2, TS, TS);
+		//if (pInv.items[i].type) hudDraw(hwtileset[getItemSprite(pInv.items[i].type)], TS*i, 2, TS, TS);
 		hudDraw(hwtileset[83], TS*i, 2, TS, TS);
 	}
 	drawRect((pInv.selection*TS)+1,2,TS-2,1,0xFFFF00);
@@ -436,11 +315,7 @@ void hudRefresh() { //Redraws HUD
 }
 
 void flip() { //Updates screen.
-	//t = SDL_CreateTextureFromSurface(r, s);
-	//SDL_RenderCopy(r,t,NULL,NULL);
-	//SDL_DestroyTexture(t);
 	SDL_RenderPresent(r);
-	//SDL_RenderClear(r);
 }
 
 char collisionCheck(int x, int y) { //Collision detection between map layer and entity.
@@ -455,7 +330,8 @@ char collisionCheck(int x, int y) { //Collision detection between map layer and 
 	//return 0;
 	if(wrapperX>2 || wrapperY>2) return 1;
 	//assert(wrapperX<3);
-	if(microX==0 && microY==0 ) return 0;
+	if(microX==0 && microY==0) return 0;
+	printf("Wrapper X: %d\nWrapper Y: %d\nMicro X: %d\nMicro Y: %d\n",wrapperX,wrapperY,microX,microY);
 	return tilewrapper[wrapperX][wrapperY].layers[microY/TS][microX/TS];
 	return 0;
 }
@@ -535,13 +411,14 @@ void loop() {
 		refresh=0;
 	}
 
-	if(!frameTotal) {
-		menuReset;
-		menuText="Boy\nGirl\0";
-		options[0]=diag_boy;
-		options[1]=diag_girl;
-		menuCall;
-	}
+
+	// if(!frameTotal) {
+	// 	menuReset;
+	// 	menuText="Boy\nGirl\0";
+	// 	options[0]=diag_boy;
+	// 	options[1]=diag_girl;
+	// 	menuCall;
+	// }
 
 	char xStart=0;
 	char yStart=0;
@@ -583,6 +460,10 @@ void loop() {
 	deadEntityKiller();
 	spriteCollisions();
 	entityLogic();
+	if(Tcl_Eval(gameState,"loop")) {
+		printf("TCL Game Loop returned non-zero value!\n");
+		printf(Tcl_GetStringResult(gameState));
+	}
 
 	for(int wx=xStart;wx<xEnd;wx++){
 		int worldX=(wx*SW*TS-SW*TS);
@@ -629,10 +510,16 @@ void loop() {
 	//assert(frameTotal<300);
 }
 
-int main () {
+int main (int argc, char** argv) {
 	memset(&emptyView,0,sizeof emptyView);
 	memset(&flagArray,0,sizeof flagArray);
 	SDL_Init(SDL_INIT_VIDEO);
+	Tcl_FindExecutable(argv[0]); 
+    gameState = Tcl_CreateInterp(); 
+    if (Tcl_Init(gameState) != TCL_OK) { 
+        printf("Unable to start TCL interpreter, exiting.\n");
+        return 1;
+    }
 	#ifdef WEB
 	w = SDL_CreateWindow(TITLE, 0, 0, SW*TS*2, (SH*TS+HUDHEIGHT)*2, SDL_WINDOW_OPENGL);
 	#else
@@ -699,7 +586,21 @@ int main () {
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
 	memset(&tilewrapper,0,sizeof tilewrapper);
 	entityInitialise();	
-	
+	entSet[0]=ent_playerM();
+	assert(entSet[0].behaviour);
+	registerCommands();
+	if(Tcl_EvalFile(gameState,"game.tcl")) {
+		printf("game.tcl failed to execute.");
+		printf(Tcl_GetStringResult(gameState));
+		printf("\n");
+		return 1;
+	}
+
+	if(Tcl_Eval(gameState,"setup")) {
+		printf("TCL Setup returned non-zero value!\n");
+		printf(Tcl_GetStringResult(gameState));
+	}
+
 	#ifndef WEB
 	while(1) { //The timing loop leaves a little to be desired.
 		if (SDL_GetTicks()-timer < 1000/FRAMERATE && !keyboard[SDL_SCANCODE_P]) SDL_Delay(1000/FRAMERATE);
