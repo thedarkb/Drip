@@ -95,25 +95,10 @@ unsigned int flagArray[255];
 typedef struct entity entity;
 
 typedef struct entity {
-	int x; 
-	int y;
-	int xVelocity;
-	int yVelocity;
-	unsigned char xSub; //Defines hitbox
-	unsigned char ySub; //^
-	int radius;//Can't be bothered getting proper sprite collisions working so I just work off of distance from centre.
-	void(*behaviour)(int); //Holds the pointer to the behaviour in entityLogic.c
-	unsigned char direction; //Facing direction
-	unsigned char animation; //Animation frame
-	unsigned char layer; //Where they are in the sprite stack.
-	unsigned char attack; //RPG style attack stat.
-	uint16_t health; //Entity is at risk of being despawned if 0.
-	unsigned int frame[FLIMIT]; //Array of animation frames.
-	unsigned char setframe; //Current frame
-	unsigned char deathframe; //Death sprite
-	unsigned char drop[4]; //Array of items, drop table.
-	unsigned char lastHit; //The last entity to strike them.
-	void(*dialogue)(); //Points to the dialogue, stored in dialogue.c; the domain of the man, the myth, the Merlin.
+	int x,y,dX,dY,xSub,ySub,health;
+	char behaviour[128];
+	char dialogue[128];
+	char state[256];
 } entity;
 
 typedef struct entitySpawners {//Spawnpoints in map cells are stored as an array of these.
@@ -239,8 +224,8 @@ void facFrag();
 void entityInitialise();
 void entityScroll(int x, int y);
 void entityReset();
-void mapEntitySpawn(entity in, uint16_t xIn, uint16_t yIn, int x, int y);
-void entitySpawn(entity in, int x, int y);
+void mapEntitySpawn(char* in, uint16_t xIn, uint16_t yIn, int x, int y);
+void entitySpawn(char* in, int x, int y);
 void nentityReset();
 void nentitySpawn(entity in);
 //void factionSpawn(faction* theboys,int x,int y);

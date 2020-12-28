@@ -1,9 +1,9 @@
 east:
-	gcc main.c -O2 -lSDL2 -lSDL2_image -o drip
+	gcc main.c -O2 -lSDL2 -lSDL2_image -ltcl -o drip
 fast:
-	gcc main.c -O0 -lSDL2 -lSDL2_image -g -o drip
+	gcc main.c -O0 -lSDL2 -lSDL2_image -ltcl -g -o drip
 map:
-	gcc main.c -O0 -DDEV -lSDL2 -lSDL2_image -g -o drip
+	gcc main.c -O0 -DDEV -lSDL2 -lSDL2_image -ltcl -g -o drip
 web:
 	mkdir web
 	cp index.html web/

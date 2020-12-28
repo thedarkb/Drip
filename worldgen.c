@@ -1,18 +1,4 @@
-void generateTunnels() {
-	memset(&dungeonRooms,0,sizeof dungeonRooms);
-	for(int i=0;i<WORLDHEIGHT-2;i+=2){
-		reroll();
-		if(rng.uc%3)
-			for(int x=0;x<WORLDWIDTH-2;x++)
-				dungeonRooms[x][i]=1;
-	}
-	for(int i=0;i<WORLDWIDTH;i+=2){
-		reroll();
-		if(rng.uc%3)
-			for(int y=0;y<WORLDHEIGHT;y++)
-				dungeonRooms[i][y]=1;
-	}
-}
+
 
 void generateDungeons() {
 	memset(&dungeonRooms,0,sizeof dungeonRooms);
@@ -88,7 +74,7 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 
 	printf("EntFetch entered...\n");
 
-	for(int i=0;i<MAPELIMIT;i++) {
+	/*for(int i=0;i<MAPELIMIT;i++) {
 		if(!tilewrapper[xIn][yIn].preSpawns[i].id) continue;
 		printf("Entity found, spawning at %u,%u\n",tilewrapper[xIn][yIn].sX,tilewrapper[xIn][yIn].sY);
 		mapEntitySpawn(topLevelEntities[tilewrapper[xIn][yIn].preSpawns[i].id](
@@ -102,7 +88,7 @@ void entFetch(unsigned int xIn, unsigned int yIn) {
 			tilewrapper[xIn][yIn].preSpawns[i].y);
 	}
 
-	tilewrapper[xIn][yIn].flag=0;
+	tilewrapper[xIn][yIn].flag=0;*/
 }
 
 void loadSpawn() {
@@ -124,11 +110,11 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	memset(in,0,sizeof tilewrapper[1][1]);
 	if(xPos<WORLDWIDTH && yPos<WORLDHEIGHT) {
 		#ifdef DEV
-		if(editorArray[xPos][yPos]) {
-			*in=*editorArray[xPos][yPos];
-			in->flag=1;
-			return;
-		}
+		//if(editorArray[xPos][yPos]) {
+		//	*in=*editorArray[xPos][yPos];
+		//	in->flag=1;
+		//	return;
+		//}
 		#endif
 
 		if(mapLoader[xPos][yPos]) {
@@ -141,33 +127,9 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 	//return;
 
 	//printf("Difference: %d\n", diff);
-	if(DIST(xPos,yPos,400,400)<40000 && yPos>250 && xPos<267) {
-		*in=map_grasslandBase(xPos,yPos);
-	} else if( DIST(xPos,yPos,400,400)<40000 && yPos<250){
-		*in=map_snowlandBase(xPos,yPos);
-	} else if(DIST(xPos,yPos,400,400)<40000 && yPos==250) {
-		*in=map_snowgrass(xPos,yPos);
-	} else if((DIST(xPos,yPos,400,400)<40000 && yPos>250 && xPos>267)) {
-		*in=map_burren(xPos,yPos);
-	} else if (DIST(xPos,yPos,400,400)<40804){
-		*in=map_beach(xPos,yPos);
-	} else if(xPos<605&&yPos<605){
-		memset(&in->screen,21,sizeof in->screen);
-		memset(&in->layers,1,sizeof in->layers);
-	} else if(xPos<600 && yPos>600) {
-		for(int i=0;i<TLIMIT;i++){
-			if(dungeonRooms[xPos][yPos-600]) {
-				*in=map_dungeon(xPos,yPos);
-				if(dungeonRooms[xPos][yPos-600] & (1<<2)) {
-					memset(&in->screen,11,sizeof in->screen);
-				}
-				return;
-			}
-		}
-	} else {
-		memset(in,0,sizeof tilewrapper[1][1]);
-	}
-	memset(in->preSpawns,0,sizeof(in->preSpawns));
+
+	memset(in,0,sizeof tilewrapper[1][1]);
+
 	in->flag=0;
 }
 

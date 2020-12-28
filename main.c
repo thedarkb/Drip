@@ -4,9 +4,8 @@
 #include "entityLogic.h"
 #include "entities.h"
 #ifdef DEV
-#include "mapeditor.c"
+//#include "mapeditor.c"
 #endif
-#include "dialogue.c"
 #include "collision.c"
 #include "entityLogic.c"
 #include "entities.c"
@@ -15,15 +14,6 @@
 #include "worldgen.c"
 #include "tcl.c"
 
-int giveInv(int item) {
-	for(int i=0;i<INVLIMIT;i++)
-		if(!pInv.items[i]) {
-			pInv.items[i]=item;
-			return 0;
-		}
-	return 1;
-}
-
 unsigned int weightedRand(int i, uint32_t in) {
 	if(i<=0) return 0;
 	in=lfsr(in);
@@ -31,64 +21,10 @@ unsigned int weightedRand(int i, uint32_t in) {
 	return i;
 }
 
-view offsetBlendMap(view blayer, view tlayer, int xOff, int yOff) {
-	view me;
-	me=blayer;
-	for(int x=0;x<SW;x++){
-		for(int y=0;y<SH;y++) {
-			if(tlayer.screen[y][x] && x+xOff < SW && y+yOff < SH && x+xOff >= 0 && y+yOff >= 0) {
-				me.screen[y+yOff][x+xOff]=tlayer.screen[y][x];
-				me.layers[y+yOff][x+xOff]=tlayer.layers[y][x];
-			}
-		}
-	}
-	return me;
-}
-
-view blendMap(view blayer, view tlayer) {
-	view me;
-	me=blayer;
-	for(int x=0;x<SW;x++){
-		for(int y=0;y<SH;y++) {
-			if(tlayer.screen[y][x]) {
-				me.screen[y][x]=tlayer.screen[y][x];
-				me.layers[y][x]=tlayer.layers[y][x];
-			}
-		}
-	}
-	return me;
-}
-
-void light() {
-	/*unsigned char lightLevel=255;
-	for(int i=0; i<ELIMIT; i++) {
-		if(entSet[i].behaviour && lightLevel-entSet[i].brightness>0) lightLevel-=entSet[i].brightness;
-		else if(entSet[i].behaviour){
-			lightLevel=0;
-			break;
-		}
-	}
-	drawRectAlpha(0,HUDHEIGHT,SW*TS,SH*TS,0x282600,lightLevel);*/
-}
-
-void pathfind(entity* in, int x, int y, int speed) {
-	for(int i=0; i<speed; i++) {
-		if(x > in->x) moveX(in, 1); //Chase target at x,y
-		if(x < in->x) moveX(in, -1);
-		if(y > in->y) moveY(in, 1);
-		if(y < in->y) moveY(in, -1);
-	}
-}
-
 void entityInitialise() { //Clears entity array, spawns player.
 	for (int i=0; i<ELIMIT; i++) {
 		memset(&entSet[i], 0, sizeof entSet[i]);
 	}
-	entSet[0]=ent_playerM();
-	memset(&pInv, 0, sizeof pInv);
-	//pInv.items[0].type=2;
-	//pInv.items[1].type=3;
-	//pInv.items[2].type=4;
 }
 
 void entityScroll(int x, int y) { //Corrects entity positions when player moves to a new area.
@@ -100,32 +36,33 @@ void entityScroll(int x, int y) { //Corrects entity positions when player moves 
 	}
 }
 
-void mapEntitySpawn(entity in, uint16_t xIn, uint16_t yIn, int x, int y) {
+void mapEntitySpawn(char* in, uint16_t xIn, uint16_t yIn, int x, int y) {
 	int eX=(xIn-sX)*(SW*TS);
 	int eY=(yIn-sY)*(SH*TS);
 	entitySpawn(in,eX+x,eY+y);
 }
 
-void entitySpawn(entity in, int x, int y) {
-	if(in.behaviour) {
-		for(int i=0; i<ELIMIT; i++) {
-			if (!entSet[i].behaviour) {
-				entSet[i]=in;
-				entSet[i].x=x;
-				entSet[i].y=y;
-				lastSlot=i;
-				return;
-			}
-		}
-		printf("Entity table full, culling.\n");
-		for(int i=0; i<ELIMIT; i++) {
-			if(entSet[i].health<=0) {
-				entSet[i]=in;
-				entSet[i].x=x;
-				entSet[i].y=y;
-				lastSlot=i;
-				break;
-			}
+void entitySpawn(char* in, int x, int y) {
+
+	for(int i=0;i<ELIMIT;i++) {
+		if(!entSet[i].health) {
+			Tcl_Eval(gameState,in);
+			char* newEnt=Tcl_GetStringResult(gameState);
+			memset(&entSet[i],0,sizeof(entSet[i]));
+
+			entSet[i].x=x;
+			entSet[i].y=y;
+
+			strcat(entSet[i].behaviour, strtok(newEnt, " "));
+			strcat(entSet[i].behaviour, strtok(NULL, " "));
+			strcat(entSet[i].behaviour, strtok(NULL, " "));
+			strcat(entSet[i].behaviour, strtok(NULL, " "));
+			strcat(entSet[i].behaviour, strtok(NULL, " "));
+			strcat(entSet[i].behaviour, strtok(NULL, " "));
+			strcpy(entSet[i].state, strtok(NULL, "{}"));
+
+			printf("Entity %d state: %s\nBehaviour: %s\n",i,entSet[i].state,entSet[i].behaviour);
+			break;
 		}
 	}
 }
@@ -134,7 +71,7 @@ void deadEntityKiller() {
 	return;
 	for (int i=0; i<ELIMIT; i++) {
 		if(entSet[i].health==0) {
-			if(entSet[i].behaviour) {
+			/*if(entSet[i].behaviour) {
 				printf("Killing %d\n with deathframe %u\n", i, entSet[i].deathframe);
 			}
 
@@ -144,56 +81,14 @@ void deadEntityKiller() {
 				printf("Spawning drop...\n");
 				//entitySpawn(ent_item(entSet[i].drop[0], 255,0,0),entSet[i].x,entSet[i].y);
 				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
-			}
+			}*/
 		}
 	}
 }
 
 int euclideanDistance(unsigned int i, unsigned int j, unsigned int distance) {
-	if(DIST(entSet[i].x,entSet[i].y, entSet[j].x, entSet[j].y)<distance*distance) return 1;
+	//if(DIST(entSet[i].x,entSet[i].y, entSet[j].x, entSet[j].y)<distance*distance) return 1;
 	return 0;
-}
-
-int overlap(unsigned int i, unsigned int j){
-	//if (!entSet[j].collisionClass) return 0;
-	//if (!entSet[i].collisionClass) return 0;
-	if (i==j) return 0;
-	//if (entSet[j].collisionClass>128) return 0;
-	if (DIST(entSet[i].x,entSet[i].y,entSet[j].x,entSet[j].y)<entSet[i].radius*entSet[i].radius) return 1;
-	return 0;
-}
-
-void spriteCollisions() {
-	static int direction=1;
-	direction*=-1;
-	int start;
-	if(direction==1) start=0;
-	else start=ELIMIT-1;
-	for (int i=start; i<ELIMIT && i>=0; i+=direction) {
-		for (int j=start; j<ELIMIT && j>=0; j+=direction) {
-			if(overlap(i,j)){
-				printf("OVERLAP\n");
-				//if(entSet[i].collider && entSet[j].collisionClass<128) entSet[i].collider(i,j);
-				//if(entSet[j].collider && entSet[i].collisionClass<128) entSet[j].collider(j,i);
-			}
-		}
-	}
-}
-
-//Reads tiles from sheet
-SDL_Surface* surfLoader (SDL_Surface* imgIn, unsigned int sizeX, unsigned int sizeY, unsigned char inSize, unsigned char outSize, unsigned char tNum) {
-	SDL_Surface* tileOut;
-	SDL_Rect tile;
-	SDL_Rect scaler = {0,0,outSize,outSize};
-
-	tile.x = (tNum % (sizeX/inSize))*inSize;
-	tile.y = (tNum / (sizeX/inSize))*inSize;
-	tile.w = inSize;
-	tile.h = inSize;
-
-	tileOut = SDL_CreateRGBSurface(0,outSize,outSize,32,0,0,0,0);
-	SDL_BlitScaled(imgIn, &tile, tileOut, &scaler);
-	return tileOut;
 }
 
 void text(char* inStr, int x, int y) {
@@ -289,112 +184,20 @@ uint32_t lfsr (uint32_t shift) { //Pseudo-random number generator.
 	return shift >> 1;
 }
 
-void reroll() {
-	rng.ui32=lfsr(rng.ui32);
-}
 
-int intersect(unsigned int x, unsigned int y) {
-	for (int i=0; i<TLIMIT; i++) {
-		if (get_diff(y*100, ((tunnels[i].m*x)+tunnels[i].c)*100)<200) return get_diff(y*100, ((tunnels[i].m*x)+tunnels[i].c)*100);
-	}
-	return -1;
-}
-
-
-void hudRefresh() { //Redraws HUD
-	drawRect(0,0,TS*SW,HUDHEIGHT,0);
-	drawRect(132,4,entSet[0].health*(105/pMaxHealth),4,0x6DAA2C);
-	drawRect(132,8,105,4,0xd04648);
-	drawRect(132,12,105,4,0x597dce);
-	for (int i=0; i<INVLIMIT; i++) {
-		//if (pInv.items[i].type) hudDraw(hwtileset[getItemSprite(pInv.items[i].type)], TS*i, 2, TS, TS);
-		hudDraw(hwtileset[83], TS*i, 2, TS, TS);
-	}
-	drawRect((pInv.selection*TS)+1,2,TS-2,1,0xFFFF00);
-	drawRect((pInv.weapon*TS)+1,TS+1,TS-2,1,0x00FF00);
-}
-
-void flip() { //Updates screen.
-	SDL_RenderPresent(r);
-}
-
-char collisionCheck(int x, int y) { //Collision detection between map layer and entity.
-	#ifdef DEV
-	if(mapEditorEnable) return 0;
-	#endif
-	
-	int wrapperX=(x+TS*SW)/(TS*SW);
-	int wrapperY=(y+TS*SH)/(TS*SH);
-	int microX=(x+TS*SW)%(TS*SW);
-	int microY=(y+TS*SH)%(TS*SH);
-	//return 0;
-	if(wrapperX>2 || wrapperY>2) return 1;
-	//assert(wrapperX<3);
-	if(microX==0 && microY==0) return 0;
-	printf("Wrapper X: %d\nWrapper Y: %d\nMicro X: %d\nMicro Y: %d\n",wrapperX,wrapperY,microX,microY);
-	return tilewrapper[wrapperX][wrapperY].layers[microY/TS][microX/TS];
-	return 0;
-}
-
-void moveX(entity* movEnt, short amount) { //Pretty self explanatory
-	if (amount>0) movEnt->direction = 3;
-	else movEnt->direction=2;
-
-	movEnt->animation = ((animationG/15)*4)+4;
-	if (movEnt->animation > 8) movEnt->animation=8;
-
-	unsigned int check = (*movEnt).x + amount;
-	unsigned int checkY=movEnt->y+TS/2-movEnt->ySub;
-	//if (check >TS*SW-TS) return;
-	if (collisionCheck(check+(*movEnt).xSub, checkY+TS/8)) return; //Checks all the corners, plus a bit in the middle.
-	if (collisionCheck(check+(*movEnt).xSub, checkY+TS/2)) return;
-	if (collisionCheck(check+TS-(*movEnt).xSub, checkY+TS/8)) return;
-	if (collisionCheck(check+TS-(*movEnt).xSub, checkY+TS/2)) return;
-	if (collisionCheck(check+TS-(*movEnt).xSub, checkY+TS/2-(*movEnt).ySub)) return;
-	if (collisionCheck(check+(*movEnt).xSub, checkY+TS/2-(*movEnt).ySub)) return;
-	(*movEnt).x = check;
-}
-
-void moveY(entity* movEnt, short amount) {
-	if (amount>0) movEnt->direction = 1;
-	else movEnt->direction=0;
-
-	movEnt->animation = ((animationG/15)*4)+4;
-	if (movEnt->animation > 8) movEnt->animation=8;
-
-	unsigned int check = (*movEnt).y+amount+TS/2;
-	unsigned int checkY=movEnt->y+TS/2;
-
-	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+(*movEnt).ySub)) return;
-	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+(*movEnt).ySub)) return;
-	if (collisionCheck((*movEnt).x+TS/2, check+(*movEnt).ySub)) return;
-	if (collisionCheck((*movEnt).x+TS-(*movEnt).xSub, check+TS/2-(*movEnt).ySub)) return;
-	if (collisionCheck((*movEnt).x+TS/2, check+TS/2-(*movEnt).ySub)) return;	
-	if (collisionCheck((*movEnt).x+(*movEnt).xSub, check+TS/2-(*movEnt).ySub)) return;	
-	(*movEnt).y = check-TS/2;
-}
-
-void fastMoveX(entity* movEnt, short direction, short speed) { //Use these for high speed movement to prevent clipping.
-	for (int i=0; i<speed; i++) {
-		moveX(movEnt, direction);
-	}
-}
-
-void fastMoveY(entity* movEnt, short direction, short speed) {
-	for (int i=0; i<speed; i++) {
-		moveY(movEnt, direction);
-	}
-}
-
-void snapToGrid(entity* movEnt) {
-	if (((*movEnt).x % TS) > (TS/2)) (*movEnt).x+=(TS-((*movEnt).x % TS));
-	else (*movEnt).x = ((*movEnt).x/TS)*TS;
-	if (((*movEnt).y % TS) > (TS/2)) (*movEnt).y+=(TS-((*movEnt).y % TS));
-	else (*movEnt).y = ((*movEnt).y/TS)*TS;
-}
 
 
 void loop() {
+	#ifdef DEV
+	if(keyboard[SDL_SCANCODE_F5]) {
+		if(Tcl_EvalFile(gameState,"game.tcl")) {
+			printf("game.tcl failed to execute.");
+			printf(Tcl_GetStringResult(gameState));
+			printf("\n");
+		}
+	}
+	#endif
+	
 	SDL_SetRenderDrawColor(r,0,0,0,255);
 	SDL_RenderClear(r);
 	if (scroll) scrollMap();
@@ -458,7 +261,6 @@ void loop() {
 		}
 	}
 	deadEntityKiller();
-	spriteCollisions();
 	entityLogic();
 	if(Tcl_Eval(gameState,"loop")) {
 		printf("TCL Game Loop returned non-zero value!\n");
@@ -494,14 +296,14 @@ void loop() {
 	hudRefresh();
 	#endif
 
-	#ifdef DEV
-	if(mapEditorEnable)drawEditorOverlay();
-	else hudRefresh();
-	#endif
+	// #ifdef DEV
+	// if(mapEditorEnable)drawEditorOverlay();
+	// else hudRefresh();
+	// #endif
 
-	flip();
-	cameraX=entSet[0].x;
-	cameraY=entSet[0].y;
+	SDL_RenderPresent(r);
+	//cameraX=entSet[0].x;
+	//cameraY=entSet[0].y;
 
 	if(animationG<30) animationG+=2;
 	else animationG=0;
@@ -548,58 +350,35 @@ int main (int argc, char** argv) {
 	loader = IMG_Load("sheet.png"); //tilesheet
 
 	#ifdef DEV
-	initMapEditor();
+	//initMapEditor();
 	#endif
 
 
-	/*surfLoader: First arg is the width of the tilesheet, second is height, third is tile size on sheet, fourth is for the
-	tile size as stored, fifth is for the tile number. It reads from the */
-	for (int i = 0; i<TILECOUNT; i++) { //Loads all of the tiles into memory
-		swtileset[i] = surfLoader(loader, SHEETX, SHEETY, 16, TS, i);
-		SDL_SetColorKey(swtileset[i], SDL_TRUE, 0x00FF00);
-	}
-	for (int i=0; i<TILECOUNT; i++) { //Streams the tiles from memory into VRAM
-		hwtileset[i]=SDL_CreateTextureFromSurface(r, swtileset[i]);
-	}
-	SDL_FreeSurface(loader); //Don't want leaks
-	loader=IMG_Load("font.png");
-	for (int i=0; i<127; i++) {
-		font[i]=surfLoader(loader, 889, 7, 7, 7, i);
-		SDL_SetColorKey(font[i], SDL_TRUE, 0x00FF00);
-	}
-	for (int i=0; i<127; i++) {
-		hwfont[i]=SDL_CreateTextureFromSurface(r, font[i]);
-		//SDL_FreeSurface(font[i]);
-	}
-	SDL_FreeSurface(loader);
+
 	unsigned int timer=0;
 	memset(&entSet, 0, sizeof entSet); //Zeroes out the entity table.
 	entityInitialise(); //Loads the player
-	generateDungeons();
-	for(int x=0;x<WORLDWIDTH;x++) {
-		for(int y=0;y<WORLDHEIGHT;y++){
-			printf("%c[%d;%df",0x1B,y,x);
-			printf("%d",dungeonRooms[x][y]);
-		}
-	}
-	axiomLoad();//Loads the map function pointer matrix.
 	memset(&tilewrapper[1][1],0,sizeof tilewrapper[1][1]); //Resets the player's spawn area
 	memset(&tilewrapper,0,sizeof tilewrapper);
-	entityInitialise();	
-	entSet[0]=ent_playerM();
-	assert(entSet[0].behaviour);
+	entityInitialise();
 	registerCommands();
+	Tcl_LinkVar(gameState, "cameraX", &cameraX, TCL_LINK_INT);
+	Tcl_LinkVar(gameState, "cameraY", &cameraY, TCL_LINK_INT);
 	if(Tcl_EvalFile(gameState,"game.tcl")) {
 		printf("game.tcl failed to execute.");
 		printf(Tcl_GetStringResult(gameState));
 		printf("\n");
+		#ifndef DEV
 		return 1;
+		#endif
 	}
 
 	if(Tcl_Eval(gameState,"setup")) {
 		printf("TCL Setup returned non-zero value!\n");
 		printf(Tcl_GetStringResult(gameState));
 	}
+
+	entitySpawn("testEntSpawn",120,80);
 
 	#ifndef WEB
 	while(1) { //The timing loop leaves a little to be desired.
