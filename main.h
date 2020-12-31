@@ -83,33 +83,11 @@ enum direction {
 	RIGHT
 } direction;
 
-enum flags {
-	D1_SWORDDOOR,
-	D1_2FDOOR,
-	D1_KEY1,
-	D1_KEY2,
-	D1_SWORD
-} flags;
-unsigned int flagArray[255];
-
 typedef struct entity entity;
 
 typedef struct entity {
-	int x,y,dX,dY,xSub,ySub,health;
-	char behaviour[128];
-	char dialogue[128];
-	char state[256];
+	char state[512];
 } entity;
-
-typedef struct entitySpawners {//Spawnpoints in map cells are stored as an array of these.
-	uint32_t id;//Check out entities.h for these.
-	int32_t x;//X spawn position
-	int32_t y;//Y spawn position
-	int32_t a1;//First argument.
-	int32_t a2;//Second argument.
-	int32_t a3;//Third argument.
-	int32_t a4;//Fourth argument.
-} entitySpawners;
 
 typedef struct item {
 	unsigned int sprite;
@@ -129,7 +107,6 @@ typedef struct view {
 	uint8_t tScreen[SH][SW];//Top layer tile data.
 	uint32_t sX;
 	uint32_t sY;
-	entitySpawners preSpawns[MAPELIMIT];//Entities to be spawned on map load.
 	uint8_t flag; //Tells worldgen that it must refresh the entities in a room.
 } view;
 
@@ -229,7 +206,6 @@ void entitySpawn(char* in, int x, int y);
 void nentityReset();
 void nentitySpawn(entity in);
 //void factionSpawn(faction* theboys,int x,int y);
-void deadEntityKiller();
 int overlap(unsigned int i, unsigned int j);
 int euclideanDistance(unsigned int i, unsigned int j, unsigned int distance);
 void corpseDisposal();

@@ -134,8 +134,8 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 }
 
 void scrollMap() {
-	int checkX = entSet[0].x;
-	int checkY = entSet[0].y;
+	int checkX = stateGet(entSet[0].state, E_X);
+	int checkY = stateGet(entSet[0].state, E_Y);
 	//collisionReset=1;
 	const int speed=(TS*SW)/24;
 	switch (scroll) {
@@ -152,9 +152,6 @@ void scrollMap() {
 			worldgen(&tilewrapper[1][0],sX,sY-1);			
 			worldgen(&tilewrapper[2][0],sX+1,sY-1);
 			
-			cameraX=entSet[0].x;
-			cameraY=entSet[0].y;
-		scroll=0;
 		break;
 		case 2:
 		checkY=5;
@@ -177,9 +174,6 @@ void scrollMap() {
 			
 			//entSet[0].x=checkX;
 			//entSet[0].y=1;
-			cameraX=entSet[0].x;
-			cameraY=entSet[0].y;
-			scroll=0;
 		break;
 		case 3:
 			entityScroll(1,0);
@@ -198,9 +192,6 @@ void scrollMap() {
 			worldgen(&tilewrapper[0][2],sX-1,sY+1);
 			
 			//entSet[0].x=TS*SW-TS;
-			cameraX=entSet[0].x;
-			cameraY=entSet[0].y;
-			scroll=0;
 		break;
 		case 4:
 			entityScroll(-1,0);
@@ -219,10 +210,10 @@ void scrollMap() {
 			worldgen(&tilewrapper[2][2],sX+1,sY+1);
 			
 			//entSet[0].x=-TS+1;
-			cameraX=entSet[0].x;
-			cameraY=entSet[0].y;
-			scroll=0;
-		break;			
+		break;
+		scroll=0;
+		cameraX=stateGet(entSet[0].state, E_X);
+		cameraY=stateGet(entSet[0].state, E_Y);
 	}
 }
 

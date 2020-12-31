@@ -1,18 +1,11 @@
 #include "main.h"
+
 #include "draw.c"
-#include "rawents.h"
 #include "entityLogic.h"
-#include "entities.h"
-#ifdef DEV
-//#include "mapeditor.c"
-#endif
-#include "collision.c"
-#include "entityLogic.c"
-#include "entities.c"
-//#include "factions.c"
-#include "maps.c"
-#include "worldgen.c"
 #include "tcl.c"
+#include "entityLogic.c"
+#include "worldgen.c"
+
 
 unsigned int weightedRand(int i, uint32_t in) {
 	if(i<=0) return 0;
@@ -28,12 +21,12 @@ void entityInitialise() { //Clears entity array, spawns player.
 }
 
 void entityScroll(int x, int y) { //Corrects entity positions when player moves to a new area.
-	for (int i=0; i<ELIMIT; i++) {
+	/*for (int i=0; i<ELIMIT; i++) {
 		entSet[i].x=entSet[i].x+((SW*TS)*x);
 		entSet[i].y=entSet[i].y+((SH*TS)*y);
 		if (entSet[i].x < -SW*TS || entSet[i].x > (SW*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
 		if (entSet[i].y < -SH*TS || entSet[i].y > (SH*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
-	}
+	}*/
 }
 
 void mapEntitySpawn(char* in, uint16_t xIn, uint16_t yIn, int x, int y) {
@@ -43,48 +36,21 @@ void mapEntitySpawn(char* in, uint16_t xIn, uint16_t yIn, int x, int y) {
 }
 
 void entitySpawn(char* in, int x, int y) {
-
 	for(int i=0;i<ELIMIT;i++) {
-		if(!entSet[i].health) {
+		if(!entSet[0].state[0]) {
 			Tcl_Eval(gameState,in);
-			char* newEnt=Tcl_GetStringResult(gameState);
+			const char* newEnt=Tcl_GetStringResult(gameState);
 			memset(&entSet[i],0,sizeof(entSet[i]));
+			strcpy(entSet[i].state,newEnt);
 
-			entSet[i].x=x;
-			entSet[i].y=y;
+			stateSet(entSet[i].state,E_X,x);
+			stateSet(entSet[i].state,E_Y,y);
 
-			strcat(entSet[i].behaviour, strtok(newEnt, " "));
-			strcat(entSet[i].behaviour, strtok(NULL, " "));
-			strcat(entSet[i].behaviour, strtok(NULL, " "));
-			strcat(entSet[i].behaviour, strtok(NULL, " "));
-			strcat(entSet[i].behaviour, strtok(NULL, " "));
-			strcat(entSet[i].behaviour, strtok(NULL, " "));
-			strcpy(entSet[i].state, strtok(NULL, "{}"));
-
-			printf("Entity %d state: %s\nBehaviour: %s\n",i,entSet[i].state,entSet[i].behaviour);
 			break;
 		}
 	}
 }
 
-void deadEntityKiller() {
-	return;
-	for (int i=0; i<ELIMIT; i++) {
-		if(entSet[i].health==0) {
-			/*if(entSet[i].behaviour) {
-				printf("Killing %d\n with deathframe %u\n", i, entSet[i].deathframe);
-			}
-
-			//entSet[i].collisionClass=0;
-			entSet[i].layer=0;
-			if(entSet[i].drop[0] != 0) {
-				printf("Spawning drop...\n");
-				//entitySpawn(ent_item(entSet[i].drop[0], 255,0,0),entSet[i].x,entSet[i].y);
-				memset(&entSet[i].drop, 0, sizeof entSet[i].drop);
-			}*/
-		}
-	}
-}
 
 int euclideanDistance(unsigned int i, unsigned int j, unsigned int distance) {
 	//if(DIST(entSet[i].x,entSet[i].y, entSet[j].x, entSet[j].y)<distance*distance) return 1;
@@ -260,7 +226,6 @@ void loop() {
 			}
 		}
 	}
-	deadEntityKiller();
 	entityLogic();
 	if(Tcl_Eval(gameState,"loop")) {
 		printf("TCL Game Loop returned non-zero value!\n");
@@ -314,7 +279,6 @@ void loop() {
 
 int main (int argc, char** argv) {
 	memset(&emptyView,0,sizeof emptyView);
-	memset(&flagArray,0,sizeof flagArray);
 	SDL_Init(SDL_INIT_VIDEO);
 	Tcl_FindExecutable(argv[0]); 
     gameState = Tcl_CreateInterp(); 
@@ -362,8 +326,8 @@ int main (int argc, char** argv) {
 	memset(&tilewrapper,0,sizeof tilewrapper);
 	entityInitialise();
 	registerCommands();
-	Tcl_LinkVar(gameState, "cameraX", &cameraX, TCL_LINK_INT);
-	Tcl_LinkVar(gameState, "cameraY", &cameraY, TCL_LINK_INT);
+	Tcl_LinkVar(gameState, "cameraX", (void*)&cameraX, TCL_LINK_INT);
+	Tcl_LinkVar(gameState, "cameraY", (void*)&cameraY, TCL_LINK_INT);
 	if(Tcl_EvalFile(gameState,"game.tcl")) {
 		printf("game.tcl failed to execute.");
 		printf(Tcl_GetStringResult(gameState));
