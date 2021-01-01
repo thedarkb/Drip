@@ -61,7 +61,7 @@ void text(char* inStr, int x, int y) {
 	int i=0;
 	int xb=x;
 	while (inStr[i]) { //Breaks if it hits a null terminator.
-		if (inStr[i]>37) simage(font[inStr[i]], x, y, 7, 7); //If character is printing, print character.
+		if (inStr[i]>37) image(font[inStr[i]], x, y, 7, 7); //If character is printing, print character.
 		x+=8; //Moves the cursor
 		if(inStr[i]==10) { //If line feed is detected, reset cursor to left side of the screen.
 			y+=10; //And move the cursor down one line.
@@ -220,7 +220,7 @@ void loop() {
 					int writeX=(x*TS)+worldX+offsetX;
 					int writeY=(y*TS)+worldY+offsetY;
 					if(writeX>0-TS && writeX<RESX && writeY>0-TS && writeY<RESY) {
-						imageNoTrack(hwtileset[tilewrapper[wx][wy].screen[y][x]],writeX,writeY,TS,TS);
+						imageNoTrack(tilewrapper[wx][wy].screen[y][x],writeX,writeY,TS,TS);
 					}
 				}
 			}
@@ -244,7 +244,7 @@ void loop() {
 					int writeX=(x*TS)+worldX+offsetX;
 					int writeY=(y*TS)+worldY+offsetY;
 					if(writeX>0-TS && writeX<SW*TS && writeY>0-TS && writeY<SH*TS && tilewrapper[wx][wy].tScreen[y][x]){
-						imageNoTrack(hwtileset[tilewrapper[wx][wy].tScreen[y][x]],writeX,writeY,TS,TS);
+						imageNoTrack(tilewrapper[wx][wy].tScreen[y][x],writeX,writeY,TS,TS);
 					}
 				}
 			}
@@ -312,6 +312,8 @@ int main (int argc, char** argv) {
 	keyboard = SDL_GetKeyboardState(NULL);
 
 	loader = IMG_Load("sheet.png"); //tilesheet
+	sheet=SDL_CreateTextureFromSurface(r,loader);
+	SDL_FreeSurface(loader);
 
 	#ifdef DEV
 	//initMapEditor();
@@ -326,8 +328,13 @@ int main (int argc, char** argv) {
 	memset(&tilewrapper,0,sizeof tilewrapper);
 	entityInitialise();
 	registerCommands();
+
 	Tcl_LinkVar(gameState, "cameraX", (void*)&cameraX, TCL_LINK_INT);
 	Tcl_LinkVar(gameState, "cameraY", (void*)&cameraY, TCL_LINK_INT);
+	Tcl_LinkVar(gameState, "sheetX", (void*)&sheetX, TCL_LINK_INT);
+	Tcl_LinkVar(gameState, "sheetY", (void*)&sheetY, TCL_LINK_INT);
+	Tcl_LinkVar(gameState, "tileSize", (void*)&tileSize, TCL_LINK_INT);
+
 	if(Tcl_EvalFile(gameState,"game.tcl")) {
 		printf("game.tcl failed to execute.");
 		printf(Tcl_GetStringResult(gameState));

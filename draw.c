@@ -1,11 +1,13 @@
-void imageNoTrack(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
+void imageNoTrack(int index, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
 	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h}; //Accounts for HUD but NOT the camera.
-	SDL_RenderCopy(r, imgIn, NULL, &scaler);
+	SDL_Rect sprite={(index % (sheetX/tileSize))*tileSize, (index / (sheetX/tileSize))*tileSize, tileSize, tileSize};
+	SDL_RenderCopy(r, sheet, &sprite, &scaler);
 }
 
-void image(SDL_Texture* imgIn, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
+void image(int index, int x, int y, int w, int h) { //Copies an image from the hardware buffer to the screen.
 	SDL_Rect scaler = {x+CX,y+CY,w,h}; //Accounts for HUD and camera.
-	SDL_RenderCopy(r, imgIn, NULL, &scaler);
+	SDL_Rect sprite={(index % (sheetX/tileSize))*tileSize, (index / (sheetX/tileSize))*tileSize, tileSize, tileSize};
+	SDL_RenderCopy(r, sheet, &sprite, &scaler);
 }
 
 void tintedImage(SDL_Texture* imgIn, int x, int y, int w, int h, uint32_t colour) { //Copies an image from the hardware buffer to the screen.
@@ -26,12 +28,12 @@ void timage(SDL_Texture* imgIn, int x, int y, int w, int h) {
 	SDL_RenderCopy(r, imgIn, NULL, &scaler);
 }*/
 
-void simage(SDL_Surface* imgIn, int x, int y, int w, int h) { //Ditto above, but from software buffer.
+/*void simage(SDL_Surface* imgIn, int x, int y, int w, int h) { //Ditto above, but from software buffer.
 	SDL_Rect scaler = {x,y+HUDHEIGHT,w,h};
 	SDL_Texture* imgOut = SDL_CreateTextureFromSurface(r, imgIn);
 	SDL_RenderCopy(r, imgOut, NULL, &scaler);
 	SDL_DestroyTexture(imgOut);
-}
+}*/
 
 void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h) { //For drawing to the HUD
 	SDL_Rect scaler = {x,y,w,h};

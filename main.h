@@ -57,6 +57,7 @@ SDL_Surface* loader = NULL;
 SDL_Renderer* r = NULL;
 SDL_Texture* t = NULL;
 SDL_Texture* screenBackup=NULL;
+SDL_Texture* sheet=NULL;
 SDL_Rect hudStripper = {0,HUDHEIGHT, SW*TS, SH*TS};
 SDL_Event keyIn;
 const uint8_t* keyboard = NULL;
@@ -73,7 +74,7 @@ const SDL_Rect clipRect={
 
 SDL_Surface* swtileset[TILECOUNT]; 
 SDL_Texture* hwtileset[TILECOUNT];
-SDL_Surface* font[128];
+int font[128];
 SDL_Texture* hwfont[128];
 
 enum direction {
@@ -188,6 +189,10 @@ SDL_Surface* sf1 = NULL;
 int cameraX=0;
 int cameraY=0;
 
+int sheetX=128;
+int sheetY=512;
+int tileSize=16;
+
 int frameTotal=0;
 
 unsigned int weightedRand(int i, uint32_t in);
@@ -222,7 +227,7 @@ int32_t getrandom();
 void setCollision(view* in, int iX, int iY, char stat);
 void worldgen(view* in, uint16_t xPos, uint16_t yPos);
 void scrollMap();
-void image(SDL_Texture* imgIn, int x, int y, int w, int h);
+void image(int index, int x, int y, int w, int h);
 void tintedImage(SDL_Texture* imgIn, int x, int y, int w, int h, uint32_t colour);
 void simage(SDL_Surface* imgIn, int x, int y, int w, int h);
 void hudDraw(SDL_Texture* imgIn, int x, int y, int w, int h);
