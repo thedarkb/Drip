@@ -12,22 +12,11 @@ enum {
 };
 
 char* lindex(char* in, int i) {
-	static char output[512];
-	output[0]='\0';
-	char* token=NULL;
-	
-
-	if(!strlen(in)) return output;
-	token=strtok(in," ");
-	if(!i) {
-		strcpy(output,token);
-		return output;
-	}
-	for(int j=0;j<i;j++) {
-		token=strtok(NULL, " ");
-	}
-	if(token) strcpy(output,token);
-	return output;
+	static char element[512];
+	sprintf(element,"lindex {%s} %d",in,i);
+	Tcl_Eval(gameState,element);
+	strcpy(element,Tcl_GetStringResult(gameState));
+	return element;
 }
 
 int stateGet(char* in, int kv) {
@@ -38,7 +27,8 @@ char* stateSet(char* in, int kv, int value) {
 	char toEval[512];
 	toEval[0]='\0';
 
-	sprintf(toEval,"lreplace {%s} %d 1 %d", in, kv, value);
+	sprintf(toEval,"lreplace {%s} %d %d %d", in, kv, kv, value);
+	printf("eval: %s\n",toEval);
 	Tcl_Eval(gameState,toEval);
 	strcpy(in,Tcl_GetStringResult(gameState));
 	return in;

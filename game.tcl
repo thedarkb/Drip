@@ -10,11 +10,10 @@ proc setup {} {
 
 
 proc testEntSpawn {} {
-	return {testEntBehav empty 69 420 42 17 10 {lol asdf lol}}
+	return {testEntBehav empty 0 0 69 420 42 17 10 {lol asdf lol}}
 }
 
 proc testEntBehav {diag x y dx dy xsub ysub health stateList} {
-	puts [list testEntBehav $diag $x $y $dx $dy $xsub $ysub $health $stateList]
 	puts "running!"
 	global cameraX
 	global cameraY

@@ -1,5 +1,4 @@
 #include "main.h"
-
 #include "draw.c"
 #include "entityLogic.h"
 #include "tcl.c"
@@ -23,12 +22,16 @@ void entityInitialise() { //Clears entity array, spawns player.
 void entityScroll(int x, int y) { //Corrects entity positions when player moves to a new area.
 	printf("Entity scrolling...\n");
 	for (int i=0; i<ELIMIT; i++) {
-		//entSet[i].x=entSet[i].x+((SW*TS)*x);
-		stateSet(entSet[i].state,E_X,stateGet(entSet[i].state, E_X)+((SW*TS)*x));
-		//entSet[i].y=entSet[i].y+((SH*TS)*y);
-		stateSet(entSet[i].state,E_Y,stateGet(entSet[i].state, E_Y)+((SH*TS)*y));
-		//if (entSet[i].x < -SW*TS || entSet[i].x > (SW*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
-		//if (entSet[i].y < -SH*TS || entSet[i].y > (SH*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
+		if(entSet[i].state[0]) {
+			printf("Original state: %s\n",entSet[i].state);
+			int nX=stateGet(entSet[i].state, E_X)+((SW*TS)*x);
+			int nY=stateGet(entSet[i].state, E_Y)+((SH*TS)*y);
+			stateSet(entSet[i].state,E_X,nX);
+			stateSet(entSet[i].state,E_Y,nY);
+
+			printf("New coordinates: %d,%d\n",nX,nY);
+			printf("New state: %s\n",entSet[i].state);
+		}
 	}
 }
 
@@ -46,8 +49,8 @@ void entitySpawn(char* in, int x, int y) {
 			memset(&entSet[i],0,sizeof(entSet[i]));
 			strcpy(entSet[i].state,newEnt);
 
-			stateSet(entSet[i].state,E_X,x);
-			stateSet(entSet[i].state,E_Y,y);
+			//stateSet(entSet[i].state,E_X,x);
+			//stateSet(entSet[i].state,E_Y,y);
 
 			break;
 		}
@@ -158,20 +161,20 @@ uint32_t lfsr (uint32_t shift) { //Pseudo-random number generator.
 
 void loop() {
 
-
 	#ifdef DEV
-	if(keyboard[SDL_SCANCODE_F5]) {
+	/*if(keyboard[SDL_SCANCODE_F5]) {
 		if(Tcl_EvalFile(gameState,"game.tcl")) {
 			printf("game.tcl failed to execute.");
 			printf(Tcl_GetStringResult(gameState));
 			printf("\n");
 		}
-	}
+	}*/
 	#endif
 	
 	SDL_SetRenderDrawColor(r,0,0,0,255);
 	SDL_RenderClear(r);
 	if (scroll) scrollMap();
+	
 
 	if (refresh) {		
 		for(int i=1;i<ELIMIT;i++) memset(&entSet[i],0,sizeof entSet[i]);
@@ -184,6 +187,7 @@ void loop() {
 		}
 		refresh=0;
 	}
+
 
 
 	// if(!frameTotal) {
@@ -231,7 +235,9 @@ void loop() {
 			}
 		}
 	}
+
 	entityLogic();
+
 	if(Tcl_Eval(gameState,"loop")) {
 		printf("TCL Game Loop returned non-zero value!\n");
 		printf(Tcl_GetStringResult(gameState));
@@ -271,6 +277,7 @@ void loop() {
 	if(stateGet(entSet[0].state, E_Y)>TS*SH) scroll=2;
 	if(stateGet(entSet[0].state, E_X)<-TS) scroll=3;
 	if(stateGet(entSet[0].state, E_X)>TS*SW-TS-1) scroll=4;
+	printf("X: %d\n",stateGet(entSet[0].state, E_X));
 
 	/*if (entSet[0].y < 0) scroll = 1;
 	if (entSet[0].y > TS*SH) scroll=2;
