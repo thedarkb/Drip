@@ -66,6 +66,18 @@ int T_image(ClientData clientData, Tcl_Interp* state, int argc, char** argv) {
 	return 1;
 }
 
+/*int T_image(ClientData clientData, Tcl_Interp* state, int argc, char** argv) {
+	if(argc==6) {
+		image(atoi(argv[1]),atoi(argv[2]),atoi(argv[3]),atoi(argv[4]),atoi(argv[5]));		
+		return 0;
+	} else if (argc==4) {
+		image(atoi(argv[1]),atoi(argv[2]),atoi(argv[3]),TS,TS);
+		return 0;	
+	}
+	printf("Wrong number of arguments (%d) to image!\n", argc);
+	return 1;
+}*/
+
 int T_spawn(ClientData clientData, Tcl_Interp* state, int argc, char** argv) {
 	
 }

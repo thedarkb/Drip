@@ -8,15 +8,21 @@ proc setup {} {
 	puts "Setup ran."
 }
 
-set cameraX 10
 
 proc testEntSpawn {} {
 	return {testEntBehav empty 69 420 42 17 10 {lol asdf lol}}
 }
 
 proc testEntBehav {diag x y dx dy xsub ysub health stateList} {
+	puts [list testEntBehav $diag $x $y $dx $dy $xsub $ysub $health $stateList]
 	puts "running!"
-	image 8 x y
+	global cameraX
+	global cameraY
+
+	image 8 $x $y
+
+	set cameraX $x
+	set cameraY $y
 
 	if [key $::SDL_SCANCODE_W] {
 		incr y -1
@@ -35,7 +41,6 @@ proc testEntBehav {diag x y dx dy xsub ysub health stateList} {
 }
 
 proc loop {} {
-	global cameraX
 	if [key $::SDL_SCANCODE_SPACE] {
 		puts "Space pressed!"
 	}

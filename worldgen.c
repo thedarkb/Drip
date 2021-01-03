@@ -128,7 +128,8 @@ void worldgen(view* in, uint16_t xPos, uint16_t yPos) {
 
 	//printf("Difference: %d\n", diff);
 
-	memset(in,19,sizeof tilewrapper[1][1]);
+	memset(in,0,sizeof(*in));
+	memset(in->screen,11,sizeof tilewrapper[1][1].screen);
 
 	in->flag=0;
 }

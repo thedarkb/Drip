@@ -21,12 +21,15 @@ void entityInitialise() { //Clears entity array, spawns player.
 }
 
 void entityScroll(int x, int y) { //Corrects entity positions when player moves to a new area.
-	/*for (int i=0; i<ELIMIT; i++) {
-		entSet[i].x=entSet[i].x+((SW*TS)*x);
-		entSet[i].y=entSet[i].y+((SH*TS)*y);
-		if (entSet[i].x < -SW*TS || entSet[i].x > (SW*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
-		if (entSet[i].y < -SH*TS || entSet[i].y > (SH*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
-	}*/
+	printf("Entity scrolling...\n");
+	for (int i=0; i<ELIMIT; i++) {
+		//entSet[i].x=entSet[i].x+((SW*TS)*x);
+		stateSet(entSet[i].state,E_X,stateGet(entSet[i].state, E_X)+((SW*TS)*x));
+		//entSet[i].y=entSet[i].y+((SH*TS)*y);
+		stateSet(entSet[i].state,E_Y,stateGet(entSet[i].state, E_Y)+((SH*TS)*y));
+		//if (entSet[i].x < -SW*TS || entSet[i].x > (SW*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
+		//if (entSet[i].y < -SH*TS || entSet[i].y > (SH*TS)*2) memset(&entSet[i], 0, sizeof entSet[i]);
+	}
 }
 
 void mapEntitySpawn(char* in, uint16_t xIn, uint16_t yIn, int x, int y) {
@@ -154,6 +157,8 @@ uint32_t lfsr (uint32_t shift) { //Pseudo-random number generator.
 
 
 void loop() {
+
+
 	#ifdef DEV
 	if(keyboard[SDL_SCANCODE_F5]) {
 		if(Tcl_EvalFile(gameState,"game.tcl")) {
@@ -257,18 +262,30 @@ void loop() {
 
 	//light();
 
-	#ifndef DEV
-	hudRefresh();
-	#endif
-
 	// #ifdef DEV
 	// if(mapEditorEnable)drawEditorOverlay();
 	// else hudRefresh();
 	// #endif
 
+	if(stateGet(entSet[0].state, E_Y)<0) scroll=1;
+	if(stateGet(entSet[0].state, E_Y)>TS*SH) scroll=2;
+	if(stateGet(entSet[0].state, E_X)<-TS) scroll=3;
+	if(stateGet(entSet[0].state, E_X)>TS*SW-TS-1) scroll=4;
+
+	/*if (entSet[0].y < 0) scroll = 1;
+	if (entSet[0].y > TS*SH) scroll=2;
+	if (entSet[0].x < -TS) scroll = 3;
+	if (entSet[0].x > TS*SW-TS-1) scroll = 4;*/
+
 	SDL_RenderPresent(r);
 	//cameraX=entSet[0].x;
 	//cameraY=entSet[0].y;
+	Tcl_UpdateLinkedVar(gameState, "cameraX");
+	Tcl_UpdateLinkedVar(gameState, "cameraY");
+	Tcl_UpdateLinkedVar(gameState, "sheetX");
+	Tcl_UpdateLinkedVar(gameState, "sheetY");
+	Tcl_UpdateLinkedVar(gameState, "tileSize");
+	printf("CameraX: %d\n",cameraX);
 
 	if(animationG<30) animationG+=2;
 	else animationG=0;
