@@ -13,6 +13,8 @@ SDL_Window* w=NULL;
 SDL_Event keyIn;
 
 int loop(ClientData clientData, Tcl_Interp* state, int argc, char** argv) {
+	SDL_PollEvent(&keyIn);
+	if (keyIn.type == SDL_QUIT) exit(0);
 	return 0;
 }
 

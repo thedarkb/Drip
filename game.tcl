@@ -14,9 +14,13 @@ proc testEntSpawn {} {
 }
 
 proc testEntBehav {diag x y dx dy xsub ysub health stateList} {
-	puts "running!"
+	#puts "running!"
+
 	global cameraX
 	global cameraY
+
+	set cameraX $x
+	set cameraY $y
 
 	image 8 $x $y
 

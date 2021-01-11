@@ -31,6 +31,7 @@ void entityScroll(int x, int y) { //Corrects entity positions when player moves 
 
 			printf("New coordinates: %d,%d\n",nX,nY);
 			printf("New state: %s\n",entSet[i].state);
+			scroll=0;//This shouldn't be here, but it doesn't work if it isn't, so here it's going to stay.
 		}
 	}
 }
@@ -238,6 +239,13 @@ void loop() {
 
 	entityLogic();
 
+	if(stateGet(entSet[0].state, E_Y)<0) scroll=1;
+	if(stateGet(entSet[0].state, E_Y)>TS*SH) scroll=2;
+	if(stateGet(entSet[0].state, E_X)<-TS) scroll=3;
+	if(stateGet(entSet[0].state, E_X)>TS*SW-TS-1) scroll=4;
+	//printf("X: %d\n",stateGet(entSet[0].state, E_X));
+	//printf("Y: %d\n",stateGet(entSet[0].state, E_X));
+
 	if(Tcl_Eval(gameState,"loop")) {
 		printf("TCL Game Loop returned non-zero value!\n");
 		printf(Tcl_GetStringResult(gameState));
@@ -273,12 +281,7 @@ void loop() {
 	// else hudRefresh();
 	// #endif
 
-	if(stateGet(entSet[0].state, E_Y)<0) scroll=1;
-	if(stateGet(entSet[0].state, E_Y)>TS*SH) scroll=2;
-	if(stateGet(entSet[0].state, E_X)<-TS) scroll=3;
-	if(stateGet(entSet[0].state, E_X)>TS*SW-TS-1) scroll=4;
-	printf("X: %d\n",stateGet(entSet[0].state, E_X));
-
+	
 	/*if (entSet[0].y < 0) scroll = 1;
 	if (entSet[0].y > TS*SH) scroll=2;
 	if (entSet[0].x < -TS) scroll = 3;
@@ -292,7 +295,6 @@ void loop() {
 	Tcl_UpdateLinkedVar(gameState, "sheetX");
 	Tcl_UpdateLinkedVar(gameState, "sheetY");
 	Tcl_UpdateLinkedVar(gameState, "tileSize");
-	printf("CameraX: %d\n",cameraX);
 
 	if(animationG<30) animationG+=2;
 	else animationG=0;

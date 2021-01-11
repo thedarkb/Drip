@@ -6,6 +6,7 @@
 #include <SDL2/SDL.h>
 #include <stdio.h>
 #include <tcl/tcl.h>
+#include <sqlite3.h>
 
 #define SH 10 //Screen Height
 #define SW 15 //Screen Width
@@ -31,7 +32,7 @@
 #define ENTFRAMES 32
 #define TILECOUNT 239 //Set this to the actual number of sprites for best performance.
 #define FRAMERATE 60
-#define HUDHEIGHT 20
+#define HUDHEIGHT 0
 #define MSGDEPTH 32
 #define MSGTIME 30
 
@@ -63,6 +64,7 @@ SDL_Event keyIn;
 const uint8_t* keyboard = NULL;
 
 Tcl_Interp* gameState=NULL;
+
 
 const SDL_Rect clipRect={
 	0,
