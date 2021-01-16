@@ -2,10 +2,7 @@ package require Tk
 wm title . "Toolbox"
 wm resizable . 0 0
 
-proc sdlLoopAsync {} {
-	sdlLoop
-	after 33 [list sdlLoopAsync]
-}
+
 
 set e 0
 
@@ -39,7 +36,7 @@ set scriptText [text .textScript ]
 .textTleXY insert end "0 0"
 .textFile insert end "world.map"
 .listTool insert end Stamp Fill Erase Flood-Erase Select
-.listLayer insert end Bottom Collision Top
+.listLayer insert end Bottom Collision Top All
 
 grid $toolLbl $toolList $selectedPixelXYlbl $selectedPixelXYtext -padx 4 -pady 4 -sticky wn
 grid $tileLbl $tileSpin $selectedTileXYlbl $selectedTileXYtext -padx 4 -pady 4 -sticky wn
@@ -49,4 +46,11 @@ grid $screenXLbl $screenXSpin $screenYLbl $screenYSpin -padx 4 -pady 4 -sticky w
 grid $scriptLbl -padx 4 -pady 4
 grid $scriptText -padx 4 -pady 4 -sticky ew -columnspan 4
 grid [button .brevert -text "Revert" -command "reloadDb"] [button .bsave -text "Save" -command "writeDb"] -padx 4 -pady 4 -sticky wn
+
+proc sdlLoopAsync {} {
+	puts [.listLayer curselection]
+	sdlLoop
+	after 33 [list sdlLoopAsync]
+}
+
 sdlLoopAsync

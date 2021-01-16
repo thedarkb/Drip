@@ -108,8 +108,7 @@ typedef struct view {
 	uint8_t screen[SH][SW]; //Bottom layer tile data.
 	uint8_t layers[SH][SW]; //Collision data.
 	uint8_t tScreen[SH][SW];//Top layer tile data.
-	uint32_t sX;
-	uint32_t sY;
+	char script[1024];
 	uint8_t flag; //Tells worldgen that it must refresh the entities in a room.
 } view;
 
@@ -193,7 +192,7 @@ int cameraY=0;
 
 int sheetX=128;
 int sheetY=512;
-int tileSize=16;
+int tileSize=TS;
 
 int frameTotal=0;
 

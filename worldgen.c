@@ -46,22 +46,6 @@ void generateDungeons() {
 	}
 }
 
-void axiomLoad(){
-	memset(mapLoader,0,sizeof mapLoader);
-	view inMap;
-	FILE* inFile=NULL;
-	if(!(inFile=fopen(WORLDFILENAME, "rb"))) {
-		printf(WORLDFILENAME);
-		printf(" not found, exiting.\n");
-		exit(1);
-	}
-	while(fread(&inMap, sizeof inMap, 1, inFile)) {
-		printf("Map segment found with sX:%u and sY:%u.\n", inMap.sX, inMap.sY);
-		mapLoader[inMap.sX][inMap.sY]=malloc(sizeof inMap);
-		*mapLoader[inMap.sX][inMap.sY]=inMap;
-	}
-}
-
 void entFetch(unsigned int xIn, unsigned int yIn) {
 	uint32_t screenNum=0;
 	screenNum |= sX+(xIn-1);
