@@ -2,23 +2,24 @@ package require Tk
 wm title . "Toolbox"
 wm resizable . 0 0
 
-
-
 set e 0
+set tileNo 1
+set sX 1
+set sY 1
 
 set toolLbl [label .labTool -text "Tool"]
 set toolList [listbox .listTool -height 0 -exportselection 0]
 
 set tileLbl [label .labTile -text "Tile"]
-set tileSpin [spinbox .spinTile -from 1 -to 65535]
+set tileSpin [spinbox .spinTile -from 1 -to 65535 -textvariable tileNo]
 
 set layerLbl [label .labLayer -text "Layer"]
 set layerList [listbox .listLayer -height 0 -exportselection 0]
 
 set screenXLbl [label .labXscreen -text "X"]
 set screenYLbl [label .labYscreen -text "Y"]
-set screenXSpin [spinbox .spinXScreen -from 0 -to 65535]
-set screenYSpin [spinbox .spinYScreen -from 0 -to 65535]
+set screenXSpin [spinbox .spinXScreen -from 0 -to 65535 -textvariable sX]
+set screenYSpin [spinbox .spinYScreen -from 0 -to 65535 -textvariable sY]
 
 set selectedPixelXYlbl [label .labPxlXY -text "Selected Pixel X Y:"]
 set selectedPixelXYtext [entry .textPxlXY]
@@ -45,10 +46,9 @@ grid $layerLbl $layerList $filenameLbl $filenameText -padx 4 -pady 4 -sticky wn
 grid $screenXLbl $screenXSpin $screenYLbl $screenYSpin -padx 4 -pady 4 -sticky wn
 grid $scriptLbl -padx 4 -pady 4
 grid $scriptText -padx 4 -pady 4 -sticky ew -columnspan 4
-grid [button .brevert -text "Revert" -command "reloadDb"] [button .bsave -text "Save" -command "writeDb"] -padx 4 -pady 4 -sticky wn
+grid [button .brevert -text "Load" -command "reloadDb"] [button .bsave -text "Save" -command "writeDb"] -padx 4 -pady 4 -sticky wn
 
 proc sdlLoopAsync {} {
-	puts [.listLayer curselection]
 	sdlLoop
 	after 33 [list sdlLoopAsync]
 }

@@ -12,6 +12,9 @@
 #define SW 15 //Screen Width
 #define TS 16 //Tile Size
 
+#define SCRIPTLENGTH 512 //Length of scripts run on chunk load.
+#define STATELENGTH 512 //Length of list defining entity state.
+
 #define WORLDWIDTH 700 //The size of the editable (not necessarily visible) world.
 #define WORLDHEIGHT 605 //The world is, in practice, larger due to the presence of a procedurally generated dungeon.
 #define SEED 420
@@ -89,7 +92,7 @@ enum direction {
 typedef struct entity entity;
 
 typedef struct entity {
-	char state[512];
+	char state[STATELENGTH];
 } entity;
 
 typedef struct item {
@@ -108,8 +111,12 @@ typedef struct view {
 	uint8_t screen[SH][SW]; //Bottom layer tile data.
 	uint8_t layers[SH][SW]; //Collision data.
 	uint8_t tScreen[SH][SW];//Top layer tile data.
-	char script[1024];
 	uint8_t flag; //Tells worldgen that it must refresh the entities in a room.
+
+	/*Loading a chunk with the wrong script length is undefined behaviour,
+	but it should still work with the script truncated, all going well.*/
+
+	char script[SCRIPTLENGTH];
 } view;
 
 typedef struct location {
@@ -125,7 +132,7 @@ typedef struct tunnel {
 	unsigned char type; //Not yet used.
 } tunnel;
 
-union rng { //All of these variables are refreshed with reroll()
+union rng { //Union refreshed with reroll()
 	int32_t i32;
 	uint32_t ui32;
 	char c;
